@@ -1,0 +1,75 @@
+Plugin v0.0.1 running on KiCad 9.0.0 and Python 3.11.5 (main, Jan 27 2025, 07:08:36) [MSC v.1942 64 bit (AMD64)] on win32.
+Config file C:\Users\paa(windows)\Documents\KiCad\9.0\projects\V3\V3.kicad_pcb.hierpcb.json not found. Creating new one.
+Imported C:\Users\paa(windows)\Documents\KiCad\9.0\projects\V3\V3.kicad_pcb, with 47 footprints, 468 tracks, and 25 drawings.
+/ (+ PCB C:\Users\paa(windows)\Documents\KiCad\9.0\projects\V3\V3.kicad_pcb)
+├─ /swd19/
+├─ /swd7/
+├─ /swd6/
+├─ /swd22/
+├─ /swd1/
+├─ /swd4/
+├─ /swd3/
+├─ /swd17/
+├─ /swd23/
+├─ /swd21/
+├─ /swd15/
+├─ /swd12/
+├─ /swd13/
+├─ /swd14/
+├─ /swd11/
+├─ /swd5/
+├─ /swd20/
+├─ /swd10/
+├─ /swd8/
+├─ /swd18/
+├─ /swd16/
+├─ /swd2/
+├─ /swd9/
+PCB C:\Users\paa(windows)\Documents\KiCad\9.0\projects\V3\V3.kicad_pcb
+  /eb4d7b6c/a10fd513: D20
+  /2706eed4/78cb1f2a: CH3
+  /a25682e8/78cb1f2a: CH16
+  /042b0675/78cb1f2a: CH22
+  /042b0675/a10fd513: D22
+  /da3fed3c/a10fd513: D10
+  /920a5335/78cb1f2a: CH14
+  /0542d225/78cb1f2a: CH8
+  /efb91d7a/78cb1f2a: CH4
+  /952a55a5/78cb1f2a: CH15
+  /952a55a5/a10fd513: D15
+  /efb91d7a/a10fd513: D4
+  /da3fed3c/78cb1f2a: CH10
+  /0542d225/a10fd513: D8
+  /045b5786/78cb1f2a: CH9
+  /920a5335/a10fd513: D14
+  /2706eed4/a10fd513: D3
+  /a25682e8/a10fd513: D16
+  /eb4d7b6c/78cb1f2a: CH20
+  /045b5786/a10fd513: D9
+  /0679d390: U1
+  /c8af49c7/a10fd513: D23
+  /c8af49c7/78cb1f2a: CH23
+  /88d26cb9/a10fd513: D24
+  /88d26cb9/78cb1f2a: CH24
+  /f1c1fe80/a10fd513: D11
+  /f1c1fe80/78cb1f2a: CH11
+  /b82975b1/a10fd513: D7
+  /b82975b1/78cb1f2a: CH7
+  /2b92400b/a10fd513: D5
+  /2b92400b/78cb1f2a: CH5
+  /a2e221ef/78cb1f2a: CH13
+  /a2e221ef/a10fd513: D13
+  /4f511978/a10fd513: D19
+  /4f511978/78cb1f2a: CH19
+  /8f783959/a10fd513: D17
+  /8f783959/78cb1f2a: CH17
+  /ed815332/a10fd513: D18
+  /ed815332/78cb1f2a: CH18
+  /2b8d41fd/78cb1f2a: CH6
+  /2b8d41fd/a10fd513: D6
+  /cd317f15/78cb1f2a: CH12
+  /cd317f15/a10fd513: D12
+  /15bc7b5d/a10fd513: D25
+  /15bc7b5d/78cb1f2a: CH25
+  /62a0fe5d/a10fd513: D26
+  /62a0fe5d/78cb1f2a: CH26
