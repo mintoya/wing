@@ -1,3 +1,6 @@
 V3-backups
 production/backups
 production
+replicate_layout.log
+fp-info-cache
+fabrication-toolkit-options.json
