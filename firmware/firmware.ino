@@ -1,0 +1,102 @@
+#include <BleKeyboard.h>
+#include <SPIFFS.h>
+#include <stdlib.h>
+#include "KBState.h"
+#include "list.h"
+//#include <bluemicro_hid.h>
+
+BleKeyboard bleKeyboard("ESP32 BLE Keyboard", "YourManufacturer", 100);
+String getS(){
+    String input = Serial.readStringUntil('\n').c_str();
+    Serial.println("Received: " + input);
+    // You can parse JSON here if needed
+    return input;
+}
+void panic(String message){
+  Serial.println(message);
+  delay(10000);
+  exit(0);
+}
+
+static char* location = "/dat.txt";
+static kbs KeyboardStateHolder;
+void kbsSave(){
+  Serial.println("saving Keyboard");
+  fatPointer bits = bytesKb(KeyboardStateHolder);
+  Serial.println("got char*, opening file:");
+  File file;
+  if(not (file = SPIFFS.open(location,FILE_WRITE))){
+    panic("couldnt open file");
+  }
+  file.write((uint8_t*)bits.ptr,bits.len);
+  file.close();
+  free(bits.ptr);
+  // void* bytesKb(kbs state);
+  // kbs readKb(void* a);
+}
+void kbsDefaultLoad(){
+    unsigned int a_array[] = {13};
+    unsigned int b_array[] = {14};
+    unsigned int* b = b_array;
+    unsigned int* a = a_array;
+    Serial.println("kbData init");
+    keyAction ka[] = {{.kind = 0,.data = 'a'}};
+    KeyboardStateHolder = kbs_init((unsigned int)1,(unsigned int)1,a,b,(keyAction*)ka);
+    kbsSave();
+}
+void kbsLoad(){
+  Serial.println("loading Keyboard");
+  List* L = List_new(sizeof(char));
+  if(SPIFFS.exists(location)){
+
+    File file = SPIFFS.open(location);
+    if (file) {
+      while (file.available()) {
+        char c = file.read();
+        List_append(L,&c);
+      }
+      file.close();
+    }else{
+      panic("couldnt open existing file");
+    }
+    readKb(L->head,&KeyboardStateHolder );
+    Serial.println("Loaded keyboard Binds");
+  }else{
+    kbsDefaultLoad();
+    kbsSave();
+  }
+  kbsPinsInit(KeyboardStateHolder);
+}
+void setup() {
+  Serial.begin(115200);
+  delay(2000);
+  Serial.println("testing testing 123");
+  SPIFFS.begin(true);
+  Serial.println("Starting BLE work!");
+  bleKeyboard.begin();
+  Serial.println("Ble init");
+  //kbsDefaultLoad();
+  kbsLoad();
+  kbsPinsInit(KeyboardStateHolder);
+  Serial.println("initialized");
+  pinMode(2, OUTPUT);
+  digitalWrite(2, LOW);
+}
+void loop() {
+  kbs_Update(&KeyboardStateHolder);
+  kbs_compareAndSend(&KeyboardStateHolder,bleKeyboard);
+  if(Serial.available()){
+    digitalWrite(2,HIGH);
+    delay(100);
+    digitalWrite(2,LOW);
+    String input = Serial.readStringUntil('\n');
+    DynamicJsonDocument doc(1024);
+    if(deserializeJson(doc,input)){
+      Serial.println("invalid Json?");
+    }else{
+      readSerial(&KeyboardStateHolder,doc);
+      kbsSave();
+      kbsPinsInit(KeyboardStateHolder);
+    }
+  }
+}
