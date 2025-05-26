@@ -1,6 +1,6 @@
-V3-backups
-production/backups
-production
-replicate_layout.log
-fp-info-cache
-fabrication-toolkit-options.json
+kicad/V3.kicad_pcb.hierpcb.json
+kicad/V3.kicad_pcb.hierpcb.json
+kicad/V3-backups
+kicad/fp-info-cache
+kicad/freerouting.dsn
+kicad/temp-freerouting.dsn
