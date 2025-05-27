@@ -7,6 +7,7 @@ let layout = {
   cols: [1,2],
   rows: [3,4],
   keys2d: [[1,2], [3,4]],
+  selected:[0,0],
   locked: true,
 }
 
@@ -25,7 +26,16 @@ const qwertyKeys = [
   ['shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 'shift'],
   ['ctrl', 'meta', 'alt', 'space', 'alt', 'meta', 'ctrl']
 ];
+const functionKeys = [['F1','F2']];
+const arrowKeys = [['up'],['left','down','right']]
+const otherKeys = []
 
+quertyDiv = document.createElement('div')
+arrowDiv = document.createElement('div')
+functionDiv = document.createElement('div')
+otherDiv = document.createElement('div')
+const keyDivs = [quertyDiv,arrowDiv,functionDiv,otherDiv]
+var selectedDiv = 0;
 qwertyKeys.forEach(row => {
   const rowDiv = document.createElement('div');
   rowDiv.className = 'keyBoardRow';
@@ -36,9 +46,56 @@ qwertyKeys.forEach(row => {
     btn.setAttribute('data-key', key)
     rowDiv.appendChild(btn);
   });
-  keyboardDiv.appendChild(rowDiv);
+  quertyDiv.appendChild(rowDiv);
 });
-
+arrowKeys.forEach(row => {
+  const rowDiv = document.createElement('div');
+  rowDiv.className = 'keyBoardRow';
+  row.forEach(key => {
+    const btn = document.createElement('button');
+    btn.className = 'keyBoardKey';
+    btn.textContent = key;
+    btn.setAttribute('data-key', key)
+    rowDiv.appendChild(btn);
+  });
+  arrowDiv.appendChild(rowDiv);
+});
+otherKeys.forEach(row => {
+  const rowDiv = document.createElement('div');
+  rowDiv.className = 'keyBoardRow';
+  row.forEach(key => {
+    const btn = document.createElement('button');
+    btn.className = 'keyBoardKey';
+    btn.textContent = key;
+    btn.setAttribute('data-key', key)
+    rowDiv.appendChild(btn);
+  });
+  otherDiv.appendChild(rowDiv);
+});
+functionKeys.forEach(row => {
+  const rowDiv = document.createElement('div');
+  rowDiv.className = 'keyBoardRow';
+  row.forEach(key => {
+    const btn = document.createElement('button');
+    btn.className = 'keyBoardKey';
+    btn.textContent = key;
+    btn.setAttribute('data-key', key)
+    rowDiv.appendChild(btn);
+  });
+  functionDiv.appendChild(rowDiv);
+});
+function nextKeys(){
+  selectedDiv+=1
+  selUpdate()
+}
+function prevKeys(){
+  selectedDiv-=1
+  selUpdate()
+}
+function selUpdate(){
+  keyboardDiv.innerHTML = "";
+  keyboardDiv.appendChild(keyDivs[Math.abs(selectedDiv%keyDivs.length)])
+}
 
 function lock(){
   updateData()
@@ -95,7 +152,21 @@ function updateVisual() {
       var b = document.createElement("button")
       b.className = "key"
       b.textContent = layout.keys2d[i][j]
+      b.setAttribute("i", i)
+      b.setAttribute("j", j)
       r.appendChild(b)
+
+      b.addEventListener("click", function (e) {
+        console.log("Left click on:", b.textContent)
+        layout.selected = [i,j]
+        console.log(layout.selected)
+      })
+      b.addEventListener("contextmenu", function (e) {
+        e.preventDefault()
+        console.log("Right click on:", b.textContent)
+      });
+
+
     }
     keys.appendChild(r)
   }
@@ -130,5 +201,6 @@ function removeCol() {
 
 // make sure the style is synced
 updateVisual()
+selUpdate()
 lock()
 lock()
