@@ -119,6 +119,9 @@
 		margin: 5px;
 		aspect-ratio: 1;
 	}
+  .key[selected="true"]{
+      background-color:lightblue;
+  }
 
 	.col {
 		background-color: red;
@@ -163,7 +166,7 @@
     border-radius: 10px;
     cursor: pointer;
     margin-right:auto;
-}
+  }
 
 	.keyBoardRow {
 		display: flex;

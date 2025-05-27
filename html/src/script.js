@@ -22,14 +22,17 @@ let sendLayout = {
 const qwertyKeys = [
   ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'bksp'],
   ['tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\'],
-  ['capslock', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', 'enter'],
+  ['caps', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', 'enter'],
   ['shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 'shift'],
   ['ctrl', 'meta', 'alt', 'space', 'alt', 'meta', 'ctrl']
 ];
-const functionKeys = [['F1','F2']];
+const functionKeys = [
+  ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10'],
+  ['F11', 'F12', 'F13', 'F14', 'F15', 'F16', 'F17', 'F18', 'F19', 'F20'],
+  ['F21', 'F22', 'F23', 'F24']
+];
 const arrowKeys = [['up'],['left','down','right']]
-const otherKeys = []
-
+const otherKeys = [['M(1)', 'M(2)', 'M(3)', 'M(4)', 'M(5)', 'M(6)', 'M(7)', 'M(8)', 'M(9)', 'M(10)']];
 quertyDiv = document.createElement('div')
 arrowDiv = document.createElement('div')
 functionDiv = document.createElement('div')
@@ -157,16 +160,21 @@ function updateVisual() {
       r.appendChild(b)
 
       b.addEventListener("click", function (e) {
-        console.log("Left click on:", b.textContent)
-        layout.selected = [i,j]
+        var clicked = e.target
+        var coord = [parseInt(e.target.getAttribute("i")),parseInt(e.target.getAttribute("j"))]
+
+        document.querySelectorAll('.key[selected="true"]').forEach(el => {
+          el.removeAttribute('selected');
+        })
+        clicked.setAttribute("selected","true")
+
+        layout.selected = coord
         console.log(layout.selected)
       })
       b.addEventListener("contextmenu", function (e) {
         e.preventDefault()
         console.log("Right click on:", b.textContent)
       });
-
-
     }
     keys.appendChild(r)
   }
