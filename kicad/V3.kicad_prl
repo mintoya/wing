@@ -124,7 +124,7 @@
       "pins": true,
       "symbols": true,
       "text": false,
-      "wires": false
+      "wires": true
     }
   }
 }
