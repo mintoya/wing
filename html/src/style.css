@@ -1,111 +1,174 @@
-  :root {
-    --widths: 50px;
-    --margins: 5px;
-    --ds: 60px;
-  }
-  #saverDiv{
-    border-top-left-radius:50%;
-    button{
-       border-top-left-radius:50%;
-    }
-  }
-  #top {
-    background: #eee;
-    position: relative;
-  }
+:root {
+	--widths: 50px;
+	--margins: 5px;
+	--ds: 60px;
+	--lockColor: white;
+	--lockVisible: collapse;
+	--unlockVisible: visible;
+	--rw: 40px;
+}
 
-  .wraps {
-    background-color: rgb(100, 100, 100);
+#top {
+	background: #eee;
+	position: relative;
+
+	.wraps {
+		background-color: rgb(100, 100, 100);
+		border-radius: 5px;
+		justify-content: center;
+		flex: 1;
+		display: flex;
+		position: absolute;
+	}
+
+	#cols {
+		flex-direction: row;
+		height: var(--ds);
+		left: var(--ds);
+		top: 0;
+		border-top-right-radius: 25px;
+		border-bottom-right-radius: 25px;
+
+		.add {
+			width: calc(var(--ds) * 0.4);
+			border-top-right-radius: 50px;
+			border-bottom-right-radius: 50px;
+			margin-left: 0;
+			background-color: var(--lockColor);
+		}
+
+		.sub {
+			border-top-left-radius: 50px;
+			border-bottom-left-radius: 50px;
+			border-top-right-radius: 5px;
+			border-bottom-right-radius: 5px;
+		}
+
+		div {
+			button {
+				border-top-left-radius: 50%;
+				border-top-right-radius: 50%;
+			}
+		}
+	}
+
+	#rows {
+		flex-direction: column;
+		width: var(--ds);
+		left: 0;
+		top: var(--ds);
+		border-bottom-left-radius: 25px;
+		border-bottom-right-radius: 25px;
+
+		.add {
+			margin-top: 0;
+			height: calc(var(--ds) * 0.4);
+			border-bottom-left-radius: 50px;
+			border-bottom-right-radius: 50px;
+			background-color: var(--lockColor);
+		}
+
+		.sub {
+			border-top-left-radius: 50px;
+			border-top-right-radius: 50px;
+			border-bottom-left-radius: 5px;
+			border-bottom-right-radius: 5px;
+		}
+
+		div {
+			button {
+				border-top-left-radius: 50%;
+				border-bottom-left-radius: 50%;
+			}
+		}
+	}
+
+	#saverDiv {
+		border-top-left-radius: 50%;
+
+		button {
+			background-color: var(--lockColor);
+			border-top-left-radius: 50%;
+		}
+
+		.lock {
+			visibility: var(--lockVisible);
+		}
+
+		.unlock {
+			visibility: var(--unlockVisible);
+		}
+	}
+
+	#keys {
+		flex-direction: column;
+		left: var(--ds);
+		top: var(--ds);
+	}
+
+	.keyRow {
+		flex-direction: column;
+		border-width: 1px;
+	}
+
+	.key {
+		height: var(--widths);
+		width: var(--widths);
+		border: none;
+		border-radius: 5px;
+		margin: 5px;
+		aspect-ratio: 1;
+	}
+
+	.col {
+		background-color: red;
+		height: 50%;
+		transform: translate(0%, 60%);
+	}
+
+	.row {
+		background-color: blue;
+		width: 50%;
+		transform: translate(60%, 0%);
+	}
+
+	.add {
+		order: 2;
+	}
+
+	.notAdd {
+		order: 1;
+	}
+}
+
+#keyReferences {
+	position: absolute;
+	top: var(--rw);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 5px;
+
+  div{
+    padding-left:5px;
+    padding-right:5px;
+		background-color: rgb(100, 100, 100);
     border-radius: 5px;
-    justify-content: center;
-    flex: 1;
-    display: flex;
-    position: absolute;
   }
-  #cols {
-    flex-direction: row;
-    height: var(--ds);
-    left: var(--ds);
-    top: 0;
-    border-top-right-radius:  30px;
-    border-bottom-right-radius: 30px;
-    .add {
-      width: calc(var(--ds) * 0.4);
-      border-top-right-radius:  50px;
-      border-bottom-right-radius: 50px;
-      margin-left:0;
-    }
-    .sub{
-      border-top-left-radius:  50px;
-      border-bottom-left-radius: 50px;
-      border-top-right-radius:  5px;
-      border-bottom-right-radius: 5px;
-    }
-    div{
-      button{
-        border-top-left-radius:50%;
-        border-top-right-radius:50%;
 
-      }
-    }
-  }
-  #rows {
-    flex-direction: column;
-    width: var(--ds);
-    left: 0;
-    top: var(--ds);
-    border-bottom-left-radius: 30px;
-    border-bottom-right-radius: 30px;
-    .add {
-      margin-top:0;
-      height: calc(var(--ds) * 0.4);
-      border-bottom-left-radius:  50px;
-      border-bottom-right-radius: 50px;
-    }
-    .sub{
-      border-top-left-radius:  50px;
-      border-top-right-radius: 50px;
-      border-bottom-left-radius:  5px;
-      border-bottom-right-radius: 5px;
-    }
-    div{
-      button{
-        border-top-left-radius:50%;
-        border-bottom-left-radius:50%;
-      }
-    }
-  }
-  #keys {
+	.keyBoardRow {
+		display: flex;
+		justify-content: center;
+		gap: 5px;
+    margin-top:5px;
+    margin-bottom:5px;
+	}
 
-    flex-direction: column;
-    left: var(--ds);
-    top: var(--ds);
-  }
-  .keyRow {
-    flex-direction: column;
-    border-width: 1px;
-  }
-  .key {
-    height: var(--widths);
-    width: var(--widths);
-    border: none;
-    border-radius: 5px;
-    margin: 5px;
-    aspect-ratio: 1;
-  }
-  .col {
-    background-color: red;
-    height: 50%;
-    transform:translate(0%,60%);
-  }
-  .row {
-    background-color: blue;
-    width: 50%;
-    transform:translate(60%,0%);
-  }
-  .add {
-    order: 9999;
-  }
-  .notAdd {
-    order: 1;
-  }
+	.keyBoardKey {
+		aspect-ratio: 1;
+		height: 50px;
+		border: none;
+		border-radius: 5px;
+		margin: 0;
+	}
+}
