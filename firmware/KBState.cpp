@@ -262,66 +262,72 @@ keyAction fromUint16(uint16_t src) {
   return r;
 }
 void readSerial(kbs* currentState, DynamicJsonDocument doc) {
-  JsonArray r = doc["rows"];
-  JsonArray c = doc["cols"];
-  JsonArray k = doc["keys"];
-  JsonArray m = doc["mods"];
-  if (k.size() != c.size() * r.size() and m.size() == 10) {
-    Serial.println("valid json,wrong sizes");
-    return;
-  }
-  unsigned int* rows = (unsigned int*)malloc(sizeof(unsigned int) * r.size());
-  unsigned int* cols = (unsigned int*)malloc(sizeof(unsigned int) * c.size());
-  keyAction* keys = (keyAction*)malloc(sizeof(keyAction) * k.size());
-  char* a = (char*)calloc(k.size(), sizeof(char));
-  char* b = (char*)calloc(k.size(), sizeof(char));
-  keyAction* mH[10] = {
-    (keyAction*)calloc(r.size() * c.size(), sizeof(keyAction)),
-    (keyAction*)calloc(r.size() * c.size(), sizeof(keyAction)),
-    (keyAction*)calloc(r.size() * c.size(), sizeof(keyAction)),
-    (keyAction*)calloc(r.size() * c.size(), sizeof(keyAction)),
-    (keyAction*)calloc(r.size() * c.size(), sizeof(keyAction)),
-    (keyAction*)calloc(r.size() * c.size(), sizeof(keyAction)),
-    (keyAction*)calloc(r.size() * c.size(), sizeof(keyAction)),
-    (keyAction*)calloc(r.size() * c.size(), sizeof(keyAction)),
-    (keyAction*)calloc(r.size() * c.size(), sizeof(keyAction)),
-    (keyAction*)calloc(r.size() * c.size(), sizeof(keyAction)),
-  };
+  unsigned int mode = doc["mode"].as<unsigned int>();
+  if (mode == 0) {
+    JsonArray r = doc["rows"];
+    JsonArray c = doc["cols"];
+    JsonArray k = doc["keys"];
 
-  for (size_t i = 0; i < r.size(); i++) {
-    rows[i] = r[i].as<unsigned int>();
-  }
-  for (size_t i = 0; i < c.size(); i++) {
-    cols[i] = c[i].as<unsigned int>();
-  }
-  for (size_t i = 0; i < k.size(); i++) {
-    const char* str = k[i].as<const char*>();
-    keys[i].data = (str && strlen(str) > 0) ? str[0] : 0;
-    //keys[i].data = k[i].as<unsigned char>();
-    keys[i].kind = 0x0;
-  }
-  for (size_t i = 0; i < 10; i++) {
-    JsonArray mode = m[i];
-    for (size_t j = 0; j < c.size() * r.size(); j++) {
-      mH[i][j] = fromUint16(mode[j].as<uint16_t>());
+    unsigned int* rows = (unsigned int*)malloc(sizeof(unsigned int) * r.size());
+    unsigned int* cols = (unsigned int*)malloc(sizeof(unsigned int) * c.size());
+    keyAction* keys = (keyAction*)malloc(sizeof(keyAction) * k.size());
+    char* a = (char*)calloc(k.size(), sizeof(char));
+    char* b = (char*)calloc(k.size(), sizeof(char));
+    keyAction* mH[10] = {
+      (keyAction*)calloc(r.size() * c.size(), sizeof(keyAction)),
+      (keyAction*)calloc(r.size() * c.size(), sizeof(keyAction)),
+      (keyAction*)calloc(r.size() * c.size(), sizeof(keyAction)),
+      (keyAction*)calloc(r.size() * c.size(), sizeof(keyAction)),
+      (keyAction*)calloc(r.size() * c.size(), sizeof(keyAction)),
+      (keyAction*)calloc(r.size() * c.size(), sizeof(keyAction)),
+      (keyAction*)calloc(r.size() * c.size(), sizeof(keyAction)),
+      (keyAction*)calloc(r.size() * c.size(), sizeof(keyAction)),
+      (keyAction*)calloc(r.size() * c.size(), sizeof(keyAction)),
+      (keyAction*)calloc(r.size() * c.size(), sizeof(keyAction)),
+    };
+
+    for (size_t i = 0; i < r.size(); i++) {
+      rows[i] = r[i].as<unsigned int>();
     }
-  }
-  free(currentState->pinCols);
-  free(currentState->pinRows);
-  free(currentState->keys);
-  free(currentState->keysState.a);
-  free(currentState->keysState.b);
-  for (size_t i = 0; i < 10; i++) {
-    free(currentState->modes[i]);
-  }
-  currentState->keys = keys;
-  currentState->keysState.a = a;
-  currentState->keysState.b = b;
-  currentState->pinCols = cols;
-  currentState->pinRows = rows;
-  currentState->colsLength = c.size();
-  currentState->rowsLength = r.size();
-  for (size_t i = 0; i < 10; i++) {
-    currentState->modes[i] = mH[i];
+    for (size_t i = 0; i < c.size(); i++) {
+      cols[i] = c[i].as<unsigned int>();
+    }
+    for (size_t i = 0; i < k.size(); i++) {
+      const char* str = k[i].as<const char*>();
+      keys[i].data = (str && strlen(str) > 0) ? str[0] : 0;
+      //keys[i].data = k[i].as<unsigned char>();
+      keys[i].kind = 0x0;
+    }
+    free(currentState->pinCols);
+    free(currentState->pinRows);
+    free(currentState->keys);
+    free(currentState->keysState.a);
+    free(currentState->keysState.b);
+    for (size_t i = 0; i < 10; i++) {
+      free(currentState->modes[i]);
+    }
+    currentState->keys = keys;
+    currentState->keysState.a = a;
+    currentState->keysState.b = b;
+    currentState->pinCols = cols;
+    currentState->pinRows = rows;
+    currentState->colsLength = c.size();
+    currentState->rowsLength = r.size();
+    for (size_t i = 0; i < 10; i++) {
+      currentState->modes[i] = mH[i];
+    }
+  } else {
+    currentState->modes[mode-1] =(keyAction*)calloc( currentState->rowsLength * currentState->colsLength, sizeof(keyAction));
+    keyAction* current = currentState->modes[mode-1];
+    JsonArray keys = doc["keys"];
+    if(keys.size() != currentState->rowsLength*currentState->colsLength){
+      Serial.println("wrong key number");
+      return;
+    }
+    for (size_t i = 0; i < keys.size(); i++) {
+      const char* str = keys[i].as<const char*>();
+      current[i].data = (str && strlen(str) > 0) ? str[0] : 0;
+      current[i].kind = 0x0;
+    }
   }
 }
