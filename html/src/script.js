@@ -11,12 +11,22 @@ let layout = {
   locked: true,
 }
 
+function setSelected(arg){
+  layout.keys2d[layout.selected[0]][layout.selected[1]] = arg
+}
+function btnUpd(btn){
+  btn.addEventListener("click", function (e) {
+    var t = e.target.textContent
+    setSelected(t)
+    updateVisual()
+  })
+}
 // kinds correspond to modes, 0 is the main one, the rest are modes (1-9)
 let sendLayout = {
   cols:[],
   rows:[],
   keys:[],
-  kind:1,
+  mode:0,
 }
 
 const qwertyKeys = [
@@ -46,6 +56,7 @@ qwertyKeys.forEach(row => {
     const btn = document.createElement('button');
     btn.className = 'keyBoardKey';
     btn.textContent = key;
+    btnUpd(btn)
     btn.setAttribute('data-key', key)
     rowDiv.appendChild(btn);
   });
@@ -59,6 +70,7 @@ arrowKeys.forEach(row => {
     btn.className = 'keyBoardKey';
     btn.textContent = key;
     btn.setAttribute('data-key', key)
+    btnUpd(btn)
     rowDiv.appendChild(btn);
   });
   arrowDiv.appendChild(rowDiv);
@@ -71,6 +83,7 @@ otherKeys.forEach(row => {
     btn.className = 'keyBoardKey';
     btn.textContent = key;
     btn.setAttribute('data-key', key)
+    btnUpd(btn)
     rowDiv.appendChild(btn);
   });
   otherDiv.appendChild(rowDiv);
@@ -83,6 +96,7 @@ functionKeys.forEach(row => {
     btn.className = 'keyBoardKey';
     btn.textContent = key;
     btn.setAttribute('data-key', key)
+    btnUpd(btn)
     rowDiv.appendChild(btn);
   });
   functionDiv.appendChild(rowDiv);
@@ -180,8 +194,10 @@ function updateVisual() {
   }
   updateData()
 }
+
 function updateData(){
-  sendLayout.keys = layout.cols;
+  sendLayout.keys = layout.keys;
+  sendLayout.cols = layout.cols;
   sendLayout.rows = layout.rows;
   sendLayout.keys = layout.keys2d.flat();
 }
@@ -212,3 +228,87 @@ updateVisual()
 selUpdate()
 lock()
 lock()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+let port;
+let writer;
+let reader; // Reader for incoming data
+let receivedData = ""; // Buffer for partial data
+
+async function connect() {
+  port = await navigator.serial.requestPort();
+  await port.open({ baudRate: 115200 });
+
+  // Set up writer
+  writer = port.writable.getWriter();
+
+  // Set up reader
+  const decoder = new TextDecoder();
+  reader = port.readable.getReader();
+
+  // Start reading loop
+  readLoop(decoder);
+
+  alert("Connected to ESP32");
+}
+
+async function readLoop(decoder) {
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+
+      // Decode and handle data
+      const chunk = decoder.decode(value, { stream: true });
+      receivedData += chunk;
+
+      // Process complete lines
+      const lines = receivedData.split("\n");
+      receivedData = lines.pop(); // Save incomplete last line
+
+      for (const line of lines) {
+        if (line.trim()) handleData(line.trim());
+      }
+    }
+  } catch (error) {
+    console.error("Read error:", error);
+  } finally {
+    reader.releaseLock();
+  }
+}
+
+function handleData(data) {
+  console.log("Received:", data);
+  // Add your data handling logic here:
+  // - Update UI
+  // - Process commands
+  // - Display messages, etc.
+}
+
+async function send(text) {
+  const encoder = new TextEncoder();
+  await writer.write(encoder.encode(text + "\n"));
+  console.log("Sent:", text);
+}
+async function sendLayoutf() {
+  send(JSON.stringify(sendLayout))
+}

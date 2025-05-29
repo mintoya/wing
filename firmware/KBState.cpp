@@ -75,7 +75,9 @@ void kbsFree(kbs currentState) {
   free(currentState.keysState.b);
 }
 unsigned int rowColumn(unsigned int row, unsigned int col, kbs currentState) {
-  return currentState.rowsLength * col + row;
+  if (row >= currentState.rowsLength || col >= currentState.colsLength)
+    return 0;  // Safe default
+  return row * currentState.colsLength + col;
 }
 void kbs_Update(kbs* currentState) {
   for (int row = 0; row < currentState->rowsLength; row++) {
