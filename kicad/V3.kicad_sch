@@ -2526,7 +2526,7 @@
 	)
 	(global_label "Col3"
 		(shape input)
-		(at 143.51 50.8 180)
+		(at 143.51 63.5 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -2536,7 +2536,7 @@
 		)
 		(uuid "5703f83b-0e86-4a71-84fa-e220b04edc8f")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 136.2311 50.8 0)
+			(at 136.2311 63.5 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2570,7 +2570,7 @@
 	)
 	(global_label "Col4"
 		(shape input)
-		(at 143.51 63.5 180)
+		(at 143.51 66.04 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -2580,7 +2580,7 @@
 		)
 		(uuid "6404a315-c7cf-4bca-8bf6-8c89034d204d")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 136.2311 63.5 0)
+			(at 136.2311 66.04 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2614,22 +2614,22 @@
 	)
 	(global_label "Col6"
 		(shape input)
-		(at 143.51 68.58 180)
+		(at 187.96 63.5 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify right)
+			(justify left)
 		)
 		(uuid "7774addd-37db-4d0e-bf50-06fd75485478")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 136.2311 68.58 0)
+			(at 195.2389 63.5 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify right)
+				(justify left)
 				(hide yes)
 			)
 		)
@@ -2680,7 +2680,7 @@
 	)
 	(global_label "Col2"
 		(shape input)
-		(at 143.51 48.26 180)
+		(at 143.51 50.8 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -2690,7 +2690,7 @@
 		)
 		(uuid "938b7e85-dab7-47d4-8a7d-d09a2ab29b96")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 136.2311 48.26 0)
+			(at 136.2311 50.8 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2746,7 +2746,7 @@
 	)
 	(global_label "Col5"
 		(shape input)
-		(at 143.51 66.04 180)
+		(at 143.51 68.58 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -2756,7 +2756,7 @@
 		)
 		(uuid "bb08c644-f0fe-4a73-8b12-055a978534ed")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 136.2311 66.04 0)
+			(at 136.2311 68.58 0)
 			(effects
 				(font
 					(size 1.27 1.27)
