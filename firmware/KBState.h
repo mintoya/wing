@@ -11,27 +11,27 @@
 typedef struct keyAction {
   char kind;
   unsigned char data;
-}keyAction ;
+} keyAction;
 
 typedef enum wich {
-    isA,
-    isB
+  isA,
+  isB
 } which;
 
 typedef struct readData {
-    char* a;
-    char* b;
-    which active;
+  char* a;
+  char* b;
+  which active;
 } readData;
 
 typedef struct kbs {
-    unsigned int* pinCols;
-    unsigned int* pinRows;
-    unsigned int colsLength;
-    unsigned int rowsLength;
-    keyAction* keys;
-    char* modes[10];
-    readData keysState;
+  unsigned int* pinCols;
+  unsigned int* pinRows;
+  unsigned int colsLength;
+  unsigned int rowsLength;
+  keyAction* keys;
+  keyAction* modes[10];
+  readData keysState;
 } kbs;
 
 readData readData_init(unsigned int numrows, unsigned int numcols);
@@ -47,7 +47,7 @@ typedef struct fatPointer {
 } fatPointer;
 
 // Initialize keyboard state (allocates pins and buffers)
-kbs kbs_init(unsigned int numrows, unsigned int numcols, unsigned int* pnRows,unsigned int* pnCols,keyAction* KBinds);
+kbs kbs_init(unsigned int numrows, unsigned int numcols, unsigned int* pnRows, unsigned int* pnCols, keyAction* KBinds);
 
 // Scan and update key state into the active buffer
 void kbs_Update(kbs* currentState);
@@ -55,8 +55,8 @@ void kbs_Update(kbs* currentState);
 // Compare buffers and send key events via BLE Keyboard
 void kbs_compareAndSend(kbs* currentState, BleKeyboard keyboard);
 fatPointer bytesKb(kbs state);
-void readKb(void* a,kbs* result);
+void readKb(void* a, kbs* result);
 void kbsFree(kbs currentState);
 void kbsPinsInit(kbs currentState);
-void readSerial(kbs*,DynamicJsonDocument);
-#endif // KBSTATE_H
+void readSerial(kbs*, DynamicJsonDocument);
+#endif  // KBSTATE_H

@@ -2,9 +2,8 @@
 #include <SPIFFS.h>
 #include <stdlib.h>
 #include "KBState.h"
-#include "list.h"
 //#include <bluemicro_hid.h>
-
+#include "list.hpp"
 BleKeyboard bleKeyboard("ESP32 BLE Keyboard", "YourManufacturer", 100);
 String getS(){
     String input = Serial.readStringUntil('\n').c_str();
@@ -27,12 +26,13 @@ void kbsSave(){
   File file;
   if(not (file = SPIFFS.open(location,FILE_WRITE))){
     panic("couldnt open file");
+  }else{
+    Serial.println("opening file");
   }
   file.write((uint8_t*)bits.ptr,bits.len);
   file.close();
   free(bits.ptr);
-  // void* bytesKb(kbs state);
-  // kbs readKb(void* a);
+  Serial.println("saved keyboard");
 }
 void kbsDefaultLoad(){
     unsigned int a_array[] = {13};
@@ -46,20 +46,23 @@ void kbsDefaultLoad(){
 }
 void kbsLoad(){
   Serial.println("loading Keyboard");
-  List* L = List_new(sizeof(char));
+  //List* L = List_new(sizeof(char));
+  ListPlux<char> L;
   if(SPIFFS.exists(location)){
 
     File file = SPIFFS.open(location);
     if (file) {
       while (file.available()) {
         char c = file.read();
-        List_append(L,&c);
+        //List_append(L,&c);
+        L.push_back(c);
       }
       file.close();
     }else{
       panic("couldnt open existing file");
     }
-    readKb(L->head,&KeyboardStateHolder );
+    //readKb(L->head,&KeyboardStateHolder );
+    readKb(L.raw_list()->head,&KeyboardStateHolder);
     Serial.println("Loaded keyboard Binds");
   }else{
     kbsDefaultLoad();
