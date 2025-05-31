@@ -339,6 +339,177 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "Library:CH340C_usb_module"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at 6.35 -1.524 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "CH340C_usb_module_1_1"
+				(rectangle
+					(start -1.27 7.62)
+					(end 7.62 -10.16)
+					(stroke
+						(width 0)
+						(type solid)
+					)
+					(fill
+						(type color)
+						(color 255 255 194 1)
+					)
+				)
+				(pin input line
+					(at -3.81 5.08 0)
+					(length 2.54)
+					(name "3v3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -3.81 2.54 0)
+					(length 2.54)
+					(name "DTR"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -3.81 0 0)
+					(length 2.54)
+					(name "RXD"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -3.81 -2.54 0)
+					(length 2.54)
+					(name "TXD"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -3.81 -5.08 0)
+					(length 2.54)
+					(name "+5v"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -3.81 -7.62 0)
+					(length 2.54)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Library:TP4056_usb_module"
 			(exclude_from_sim no)
 			(in_bom yes)
@@ -1883,6 +2054,16 @@
 	)
 	(wire
 		(pts
+			(xy 165.1 121.92) (xy 167.64 121.92)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1c991ccb-52f6-4304-8a3f-44570a50f0d8")
+	)
+	(wire
+		(pts
 			(xy 231.14 53.34) (xy 234.95 53.34)
 		)
 		(stroke
@@ -2000,6 +2181,16 @@
 			(type default)
 		)
 		(uuid "34fc235d-050d-4fde-bf2e-1ccd1a43726a")
+	)
+	(wire
+		(pts
+			(xy 140.97 76.2) (xy 143.51 76.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "36792cf7-4d66-4fdc-9b0e-8a9a6babfa90")
 	)
 	(wire
 		(pts
@@ -2663,6 +2854,16 @@
 	)
 	(wire
 		(pts
+			(xy 140.97 78.74) (xy 143.51 78.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a20078b7-e00f-4e46-aa26-b4f7fcec3de2")
+	)
+	(wire
+		(pts
 			(xy 83.82 77.47) (xy 91.44 77.47)
 		)
 		(stroke
@@ -2973,6 +3174,16 @@
 	)
 	(wire
 		(pts
+			(xy 165.1 124.46) (xy 167.64 124.46)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ddba2590-1d52-4c6f-8778-c99ac1acfa79")
+	)
+	(wire
+		(pts
 			(xy 95.25 127) (xy 95.25 129.54)
 		)
 		(stroke
@@ -3051,6 +3262,16 @@
 		)
 		(uuid "fc055e0e-69a7-4bad-a572-975e1fae4d79")
 	)
+	(label "RX"
+		(at 165.1 121.92 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "027bd5d8-3993-4566-aa6c-4ef4e3220471")
+	)
 	(label "SDA"
 		(at 130.81 120.65 0)
 		(effects
@@ -3090,6 +3311,16 @@
 			(justify left bottom)
 		)
 		(uuid "272916c4-c6be-4224-9ad5-4742a83d7a36")
+	)
+	(label "TX"
+		(at 140.97 78.74 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "2c0f4aac-c14d-4956-a3c7-a85a18d0776a")
 	)
 	(label "Col6"
 		(at 118.11 50.8 90)
@@ -3160,6 +3391,16 @@
 			(justify left bottom)
 		)
 		(uuid "81f0f069-1907-456e-af22-1470a2f28f40")
+	)
+	(label "TX"
+		(at 165.1 124.46 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "a2a4b1c1-718f-42d6-8cda-d2dd81e70ea7")
 	)
 	(label "Col4"
 		(at 137.16 66.04 0)
@@ -3280,6 +3521,16 @@
 			(justify left bottom)
 		)
 		(uuid "f29d6125-f80f-4310-91e2-39654a526ed1")
+	)
+	(label "RX"
+		(at 140.97 76.2 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "f4bafb1e-5954-4a40-97ec-d4fcd6e10010")
 	)
 	(label "Col1"
 		(at 80.01 50.8 90)
@@ -3598,6 +3849,88 @@
 			(project ""
 				(path "/55ac274f-6d39-4edb-ae03-cf051723ec39"
 					(reference "U1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Library:CH340C_usb_module")
+		(at 171.45 121.92 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "8c69e493-93f8-4767-96e8-117e46c69f77")
+		(property "Reference" "U2"
+			(at 180.34 122.5549 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "~"
+			(at 180.34 124.46 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Library:CH340C_pins"
+			(at 171.45 121.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 171.45 121.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 171.45 121.92 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "4"
+			(uuid "cc57d79d-a0c1-4b07-8a18-ab92da6352f3")
+		)
+		(pin "1"
+			(uuid "652e2fc3-32b4-443d-a44f-2d95a83bc7cf")
+		)
+		(pin "2"
+			(uuid "fd432343-580e-445f-9718-e954dc3a69b6")
+		)
+		(pin "3"
+			(uuid "2cfb30c9-10e7-4d0b-b8d7-16242e1414d5")
+		)
+		(pin "5"
+			(uuid "97ef8219-cf35-47aa-a356-7db2c1207c9c")
+		)
+		(pin "6"
+			(uuid "56c81ee9-c653-43a3-a6e5-9d2d432bac25")
+		)
+		(instances
+			(project ""
+				(path "/55ac274f-6d39-4edb-ae03-cf051723ec39"
+					(reference "U2")
 					(unit 1)
 				)
 			)
@@ -4130,6 +4463,138 @@
 			(project "V3"
 				(path "/55ac274f-6d39-4edb-ae03-cf051723ec39"
 					(reference "#PWR07")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:-3V3")
+		(at 167.64 116.84 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "efd3c394-ab88-417d-ab45-c42b3b79bea0")
+		(property "Reference" "#PWR09"
+			(at 167.64 120.65 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "-3V3"
+			(at 167.64 111.76 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 167.64 116.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 167.64 116.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"-3V3\""
+			(at 167.64 116.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "bcc708fe-438c-410c-9036-34bbbc2e5d00")
+		)
+		(instances
+			(project "V3"
+				(path "/55ac274f-6d39-4edb-ae03-cf051723ec39"
+					(reference "#PWR09")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:Earth")
+		(at 167.64 129.54 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "fb95a335-8c18-46f0-a706-d732430dffdc")
+		(property "Reference" "#PWR010"
+			(at 167.64 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "Earth"
+			(at 167.64 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 167.64 129.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 167.64 129.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"Earth\""
+			(at 167.64 129.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "9e0e6017-4d38-46f5-bdc8-fc348fc3fa73")
+		)
+		(instances
+			(project "V3"
+				(path "/55ac274f-6d39-4edb-ae03-cf051723ec39"
+					(reference "#PWR010")
 					(unit 1)
 				)
 			)
