@@ -23,8 +23,7 @@ void print_wakeup_reason(){
 BleKeyboard bleKeyboard("ESP32 BLE Keyboard", "YourManufacturer", 100);
 String getS(){
     String input = Serial.readStringUntil('\n').c_str();
-    Serial.println("Received: " + input);
-    // You can parse JSON here if needed
+    Serial.println("Received: " + input);2
     return input;
 }
 void panic(String message){

@@ -5,6 +5,183 @@
 	(uuid "55ac274f-6d39-4edb-ae03-cf051723ec39")
 	(paper "A4")
 	(lib_symbols
+		(symbol "Device:Battery_Cell"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "BT"
+				(at 2.54 2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Value" "Battery_Cell"
+				(at 2.54 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(justify left)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 1.524 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 1.524 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Single-cell battery"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "battery cell"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Battery_Cell_0_1"
+				(rectangle
+					(start -2.286 1.778)
+					(end 2.286 1.524)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(rectangle
+					(start -1.524 1.016)
+					(end 1.524 0.508)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 1.778) (xy 0 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 0.762) (xy 0 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0.762 3.048) (xy 1.778 3.048)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.27 3.556) (xy 1.27 2.54)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "Battery_Cell_1_1"
+				(pin passive line
+					(at 0 5.08 270)
+					(length 2.54)
+					(name "+"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 0 -2.54 90)
+					(length 2.54)
+					(name "-"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "Librarie:SSD1306"
 			(pin_names
 				(offset 1.016)
@@ -152,6 +329,179 @@
 						)
 					)
 					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Library:TP4056_usb_module"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at -1.27 -1.27 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Value" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "TP4056_usb_module_0_1"
+				(rectangle
+					(start -5.08 3.81)
+					(end 10.16 -6.35)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "TP4056_usb_module_1_1"
+				(pin output line
+					(at -7.62 1.27 0)
+					(length 2.54)
+					(name "Out+"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin output line
+					(at -7.62 -3.81 0)
+					(length 2.54)
+					(name "Out-"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at 2.54 6.35 270)
+					(length 2.54)
+					(name "Vin"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at 2.54 -8.89 90)
+					(length 2.54)
+					(name "Gin"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 12.7 1.27 180)
+					(length 2.54)
+					(name "B+"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 12.7 -3.81 180)
+					(length 2.54)
+					(name "B-"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -775,6 +1125,107 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "power:-3V3"
+			(power)
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "#PWR"
+				(at 0 -3.81 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Value" "-3V3"
+				(at 0 3.556 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Power symbol creates a global label with name \"-3V3\""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "global power"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "-3V3_0_0"
+				(pin power_in line
+					(at 0 0 90)
+					(length 0)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(symbol "-3V3_0_1"
+				(polyline
+					(pts
+						(xy 0 0) (xy 0 1.27) (xy 0.762 1.27) (xy 0 2.54) (xy -0.762 1.27) (xy 0 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "power:Earth"
 			(power)
 			(pin_numbers
@@ -1267,6 +1718,12 @@
 		(uuid "d7cc5c84-429f-4679-b8bd-227ee7609c99")
 	)
 	(junction
+		(at 218.44 64.77)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "d8e95453-f133-4bf1-8107-c62fa11df6b6")
+	)
+	(junction
 		(at 118.11 90.17)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -1320,6 +1777,10 @@
 		(color 0 0 0 0)
 		(uuid "fd298e5c-3fba-47a5-8994-31ab7e291864")
 	)
+	(no_connect
+		(at 102.87 106.68)
+		(uuid "a03bd918-ae59-4ca1-8eb3-4583db09cae9")
+	)
 	(wire
 		(pts
 			(xy 109.22 127) (xy 110.49 127)
@@ -1329,6 +1790,16 @@
 			(type default)
 		)
 		(uuid "014f1d34-64e3-4e2e-a710-c846b07b9339")
+	)
+	(wire
+		(pts
+			(xy 138.43 83.82) (xy 143.51 83.82)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "029794bc-e057-40d8-8e4b-7b4860d763fc")
 	)
 	(wire
 		(pts
@@ -1409,6 +1880,16 @@
 			(type default)
 		)
 		(uuid "193211cb-f843-456f-b809-35edbd45ec9b")
+	)
+	(wire
+		(pts
+			(xy 231.14 53.34) (xy 234.95 53.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1ca5fda3-291b-4762-b62b-46e769bdecf2")
 	)
 	(wire
 		(pts
@@ -1512,6 +1993,16 @@
 	)
 	(wire
 		(pts
+			(xy 218.44 66.04) (xy 218.44 64.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "34fc235d-050d-4fde-bf2e-1ccd1a43726a")
+	)
+	(wire
+		(pts
 			(xy 114.3 77.47) (xy 114.3 78.74)
 		)
 		(stroke
@@ -1572,6 +2063,16 @@
 	)
 	(wire
 		(pts
+			(xy 138.43 71.12) (xy 143.51 71.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "39d6adc3-dac7-44dd-98cc-daa6314952a0")
+	)
+	(wire
+		(pts
 			(xy 102.87 90.17) (xy 102.87 109.22)
 		)
 		(stroke
@@ -1589,6 +2090,16 @@
 			(type default)
 		)
 		(uuid "3deb5d02-6471-425a-bdbd-02594b392926")
+	)
+	(wire
+		(pts
+			(xy 231.14 53.34) (xy 231.14 54.61)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3f7e1e7c-be43-4f2b-ac20-a58d73fabfc4")
 	)
 	(wire
 		(pts
@@ -1689,6 +2200,16 @@
 			(type default)
 		)
 		(uuid "4ca63625-e6aa-4cc8-bb28-7b704eebc79c")
+	)
+	(wire
+		(pts
+			(xy 208.28 64.77) (xy 218.44 64.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4d98f808-5a50-4667-a192-53ffb7fd6be2")
 	)
 	(wire
 		(pts
@@ -1819,6 +2340,16 @@
 			(type default)
 		)
 		(uuid "665b1535-3e14-4b5d-8955-8f7e7d5e0321")
+	)
+	(wire
+		(pts
+			(xy 208.28 59.69) (xy 208.28 64.77)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "66b3dfb2-d676-416e-b5fa-1d359e327f91")
 	)
 	(wire
 		(pts
@@ -1969,6 +2500,16 @@
 			(type default)
 		)
 		(uuid "84fa1f23-88df-4108-8b1a-193d19236c4b")
+	)
+	(wire
+		(pts
+			(xy 231.14 60.96) (xy 231.14 59.69)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "84fdad5d-47c0-49f2-b239-f59edb1fc0d6")
 	)
 	(wire
 		(pts
@@ -2162,6 +2703,16 @@
 	)
 	(wire
 		(pts
+			(xy 228.6 54.61) (xy 231.14 54.61)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a88a604e-ca0a-4a9d-a7b3-c0abc1fcea74")
+	)
+	(wire
+		(pts
 			(xy 67.31 96.52) (xy 76.2 96.52)
 		)
 		(stroke
@@ -2279,6 +2830,16 @@
 			(type default)
 		)
 		(uuid "b9abfc4c-992e-491f-b5e7-a2772ef2680f")
+	)
+	(wire
+		(pts
+			(xy 231.14 60.96) (xy 234.95 60.96)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "bd94b4e7-bb64-4745-952d-db2d0294be79")
 	)
 	(wire
 		(pts
@@ -2452,6 +3013,16 @@
 	)
 	(wire
 		(pts
+			(xy 228.6 59.69) (xy 231.14 59.69)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f3c09002-4009-4213-ad23-b23b4b265435")
+	)
+	(wire
+		(pts
 			(xy 118.11 127) (xy 118.11 129.54)
 		)
 		(stroke
@@ -2580,6 +3151,16 @@
 		)
 		(uuid "7fef313f-2241-49ac-991f-2bafbc464f91")
 	)
+	(label "SDA"
+		(at 138.43 71.12 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "81f0f069-1907-456e-af22-1470a2f28f40")
+	)
 	(label "Col4"
 		(at 137.16 66.04 0)
 		(effects
@@ -2629,6 +3210,16 @@
 			(justify right bottom)
 		)
 		(uuid "b00cee3a-c60e-4e16-a4a3-7e30beedd1e8")
+	)
+	(label "SCL"
+		(at 138.43 83.82 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "b374d575-5f85-4193-b92c-9aa8d080936b")
 	)
 	(label "Col6"
 		(at 187.96 63.5 0)
@@ -2931,6 +3522,286 @@
 		)
 	)
 	(symbol
+		(lib_id "Library:TP4056_usb_module")
+		(at 215.9 55.88 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "3677b7b7-21e8-4eff-8723-bec1bdb856c3")
+		(property "Reference" "U1"
+			(at 214.63 57.15 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "~"
+			(at 220.5833 50.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Library:HAYATEC TP4056 LIPO CHARGING MODULE"
+			(at 215.9 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 215.9 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 215.9 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "ee518c0a-571c-4798-ac04-eb8bd7dc9cd6")
+		)
+		(pin "6"
+			(uuid "8d73a376-4834-4a9e-9924-335d939932bb")
+		)
+		(pin "3"
+			(uuid "67b87591-4ce0-44be-a55d-6c964da17716")
+		)
+		(pin "4"
+			(uuid "e0efb3d4-6fc2-4670-8ea2-9f4a1853b2cf")
+		)
+		(pin "2"
+			(uuid "d174d30f-515f-4123-bc6e-8073b990a478")
+		)
+		(pin "5"
+			(uuid "1e95783a-5d0d-4077-9c28-a3578bafedd7")
+		)
+		(instances
+			(project ""
+				(path "/55ac274f-6d39-4edb-ae03-cf051723ec39"
+					(reference "U1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:Earth")
+		(at 218.44 66.04 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "90311eec-f479-4bf8-8147-3dfd6be316fc")
+		(property "Reference" "#PWR01"
+			(at 218.44 72.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "Earth"
+			(at 218.44 71.12 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 218.44 66.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 218.44 66.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"Earth\""
+			(at 218.44 66.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "06a970df-3d2a-4144-a504-dd68ba453dbd")
+		)
+		(instances
+			(project ""
+				(path "/55ac274f-6d39-4edb-ae03-cf051723ec39"
+					(reference "#PWR01")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:-3V3")
+		(at 160.02 31.75 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "9404a993-7730-4c62-8822-3b1a4e9f212b")
+		(property "Reference" "#PWR06"
+			(at 160.02 35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "-3V3"
+			(at 160.02 26.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 160.02 31.75 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 160.02 31.75 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"-3V3\""
+			(at 160.02 31.75 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "d7615db9-dc8a-4ca5-b496-4bfa93e3b505")
+		)
+		(instances
+			(project ""
+				(path "/55ac274f-6d39-4edb-ae03-cf051723ec39"
+					(reference "#PWR06")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:VCC")
+		(at 218.44 49.53 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "a506148a-0552-40ae-8e6f-3e8bb1cae841")
+		(property "Reference" "#PWR03"
+			(at 218.44 53.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "VCC"
+			(at 218.44 44.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 218.44 49.53 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 218.44 49.53 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"VCC\""
+			(at 218.44 49.53 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "009d2e44-228f-4284-95de-c9f43378092b")
+		)
+		(instances
+			(project "V3"
+				(path "/55ac274f-6d39-4edb-ae03-cf051723ec39"
+					(reference "#PWR03")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:VCC")
 		(at 125.73 125.73 0)
 		(unit 1)
@@ -2997,6 +3868,76 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:Battery_Cell")
+		(at 234.95 58.42 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "bee3cf35-463a-4e4a-abff-06a292f28859")
+		(property "Reference" "BT1"
+			(at 238.76 55.3084 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "Battery_Cell"
+			(at 238.76 57.8484 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 234.95 56.896 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 234.95 56.896 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Single-cell battery"
+			(at 234.95 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "6b4b5762-20a2-4b24-8431-341168d0a3ab")
+		)
+		(pin "1"
+			(uuid "15bade08-88b8-429d-bd10-090429cd8920")
+		)
+		(instances
+			(project ""
+				(path "/55ac274f-6d39-4edb-ae03-cf051723ec39"
+					(reference "BT1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:Earth")
 		(at 134.62 128.27 0)
 		(unit 1)
@@ -3057,6 +3998,72 @@
 			(project ""
 				(path "/55ac274f-6d39-4edb-ae03-cf051723ec39"
 					(reference "#PWR02")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:-3V3")
+		(at 208.28 54.61 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "de844a77-5aff-4c77-885b-ed4a384f6a5e")
+		(property "Reference" "#PWR08"
+			(at 208.28 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "-3V3"
+			(at 208.28 49.53 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 208.28 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 208.28 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"-3V3\""
+			(at 208.28 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "144b397a-b56f-411d-a0b6-687302a097ef")
+		)
+		(instances
+			(project "V3"
+				(path "/55ac274f-6d39-4edb-ae03-cf051723ec39"
+					(reference "#PWR08")
 					(unit 1)
 				)
 			)
