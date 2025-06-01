@@ -582,7 +582,7 @@
 							)
 						)
 					)
-					(number "1"
+					(number "6"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -600,7 +600,7 @@
 							)
 						)
 					)
-					(number "5"
+					(number "3"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -618,7 +618,7 @@
 							)
 						)
 					)
-					(number "4"
+					(number "2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -636,7 +636,7 @@
 							)
 						)
 					)
-					(number "2"
+					(number "1"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -654,7 +654,7 @@
 							)
 						)
 					)
-					(number "3"
+					(number "5"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -672,7 +672,7 @@
 							)
 						)
 					)
-					(number "6"
+					(number "4"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -2044,6 +2044,12 @@
 		(uuid "b13c69c2-aeef-49c9-91d3-7284b2c899ae")
 	)
 	(junction
+		(at 259.08 39.37)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "b3347253-cf97-4a36-b404-8203f35a89a8")
+	)
+	(junction
 		(at 102.87 109.22)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -2084,12 +2090,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "d7cc5c84-429f-4679-b8bd-227ee7609c99")
-	)
-	(junction
-		(at 259.08 39.37)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "d8e95453-f133-4bf1-8107-c62fa11df6b6")
 	)
 	(junction
 		(at 118.11 90.17)
@@ -2301,7 +2301,7 @@
 	)
 	(wire
 		(pts
-			(xy 247.65 29.21) (xy 248.92 29.21)
+			(xy 242.57 29.21) (xy 248.92 29.21)
 		)
 		(stroke
 			(width 0)
@@ -3441,7 +3441,7 @@
 	)
 	(wire
 		(pts
-			(xy 236.22 31.75) (xy 236.22 24.13)
+			(xy 231.14 31.75) (xy 231.14 24.13)
 		)
 		(stroke
 			(width 0)
@@ -3998,7 +3998,7 @@
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "3677b7b7-21e8-4eff-8723-bec1bdb856c3")
+		(uuid "4d217710-8611-4da6-8b4f-dedc8d4f3618")
 		(property "Reference" "U1"
 			(at 255.27 31.75 90)
 			(effects
@@ -4044,23 +4044,23 @@
 				(hide yes)
 			)
 		)
-		(pin "1"
-			(uuid "ee518c0a-571c-4798-ac04-eb8bd7dc9cd6")
-		)
-		(pin "6"
-			(uuid "8d73a376-4834-4a9e-9924-335d939932bb")
-		)
 		(pin "3"
-			(uuid "67b87591-4ce0-44be-a55d-6c964da17716")
-		)
-		(pin "4"
-			(uuid "e0efb3d4-6fc2-4670-8ea2-9f4a1853b2cf")
-		)
-		(pin "2"
-			(uuid "d174d30f-515f-4123-bc6e-8073b990a478")
+			(uuid "8539f5b7-8af8-4b67-85d8-28071103e188")
 		)
 		(pin "5"
-			(uuid "1e95783a-5d0d-4077-9c28-a3578bafedd7")
+			(uuid "f5815898-90e6-45e7-b62d-9e85d6b7a5fb")
+		)
+		(pin "2"
+			(uuid "f1212775-5e14-4547-99c6-00918fe37b23")
+		)
+		(pin "6"
+			(uuid "1cd2e398-943f-4389-b193-3bd8417550c2")
+		)
+		(pin "1"
+			(uuid "1d89f194-a552-4577-a783-99a0f57e17bb")
+		)
+		(pin "4"
+			(uuid "c36e063a-1753-4575-b64b-5a35b27bbd97")
 		)
 		(instances
 			(project ""
@@ -4287,7 +4287,7 @@
 	)
 	(symbol
 		(lib_id "PCM_SL_Devices:Slide_Switch_SPDT_P3mm_10x5x10mm")
-		(at 242.57 31.75 0)
+		(at 237.49 31.75 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4296,7 +4296,7 @@
 		(fields_autoplaced yes)
 		(uuid "9c561faf-f6eb-4f11-8faa-ff896aa67ec6")
 		(property "Reference" "SW1"
-			(at 241.935 24.13 0)
+			(at 236.855 24.13 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4304,7 +4304,7 @@
 			)
 		)
 		(property "Value" "Slide_Switch_SPDT_P3mm_10x5x10mm"
-			(at 241.935 26.67 0)
+			(at 236.855 26.67 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4312,7 +4312,7 @@
 			)
 		)
 		(property "Footprint" "PCM_SL_Devices:Slide_Switch_SPDT_P3mm_10x5x10mm"
-			(at 243.84 39.37 0)
+			(at 238.76 39.37 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4321,7 +4321,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 241.3 25.4 0)
+			(at 236.22 25.4 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4330,7 +4330,7 @@
 			)
 		)
 		(property "Description" "SPDT Slide Switch with 10mm length, 5mm width and 10mm hight."
-			(at 242.57 31.75 0)
+			(at 237.49 31.75 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4626,7 +4626,7 @@
 	)
 	(symbol
 		(lib_id "power:-3V3")
-		(at 236.22 24.13 0)
+		(at 231.14 24.13 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4635,7 +4635,7 @@
 		(fields_autoplaced yes)
 		(uuid "de844a77-5aff-4c77-885b-ed4a384f6a5e")
 		(property "Reference" "#PWR08"
-			(at 236.22 27.94 0)
+			(at 231.14 27.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4644,7 +4644,7 @@
 			)
 		)
 		(property "Value" "-3V3"
-			(at 236.22 19.05 0)
+			(at 231.14 19.05 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4652,7 +4652,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 236.22 24.13 0)
+			(at 231.14 24.13 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4661,7 +4661,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 236.22 24.13 0)
+			(at 231.14 24.13 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4670,7 +4670,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"-3V3\""
-			(at 236.22 24.13 0)
+			(at 231.14 24.13 0)
 			(effects
 				(font
 					(size 1.27 1.27)
