@@ -339,12 +339,12 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Library:CH340C_usb_module"
+		(symbol "Library:CH9328"
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "U"
-				(at 6.35 -1.524 0)
+				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -359,13 +359,12 @@
 					)
 				)
 			)
-			(property "Footprint" ""
+			(property "Footprint" "Library:CH9328"
 				(at 0 0 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
-					(hide yes)
 				)
 			)
 			(property "Datasheet" ""
@@ -386,10 +385,10 @@
 					(hide yes)
 				)
 			)
-			(symbol "CH340C_usb_module_1_1"
+			(symbol "CH9328_1_1"
 				(rectangle
-					(start -1.27 7.62)
-					(end 7.62 -10.16)
+					(start -7.62 8.89)
+					(end 1.27 -7.62)
 					(stroke
 						(width 0)
 						(type solid)
@@ -399,10 +398,10 @@
 						(color 255 255 194 1)
 					)
 				)
-				(pin input line
-					(at -3.81 5.08 0)
+				(pin power_in line
+					(at -10.16 6.35 0)
 					(length 2.54)
-					(name "3v3"
+					(name "Vcc"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -417,10 +416,10 @@
 						)
 					)
 				)
-				(pin input line
-					(at -3.81 2.54 0)
+				(pin power_in line
+					(at -10.16 2.54 0)
 					(length 2.54)
-					(name "DTR"
+					(name "GND"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -436,9 +435,9 @@
 					)
 				)
 				(pin input line
-					(at -3.81 0 0)
+					(at -10.16 -1.27 0)
 					(length 2.54)
-					(name "RXD"
+					(name "RX"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -454,9 +453,9 @@
 					)
 				)
 				(pin input line
-					(at -3.81 -2.54 0)
+					(at -10.16 -5.08 0)
 					(length 2.54)
-					(name "TXD"
+					(name "RST"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -464,42 +463,6 @@
 						)
 					)
 					(number "4"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at -3.81 -5.08 0)
-					(length 2.54)
-					(name "+5v"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "5"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at -3.81 -7.62 0)
-					(length 2.54)
-					(name "GND"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "6"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -2251,7 +2214,7 @@
 	)
 	(wire
 		(pts
-			(xy 165.1 121.92) (xy 167.64 121.92)
+			(xy 167.64 127) (xy 170.18 127)
 		)
 		(stroke
 			(width 0)
@@ -2698,6 +2661,16 @@
 			(type default)
 		)
 		(uuid "5ecdc38c-9bff-48cf-ab68-6a258a2c23d3")
+	)
+	(wire
+		(pts
+			(xy 163.83 123.19) (xy 170.18 123.19)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5f868538-14e6-40f9-acad-0d2187ae65fe")
 	)
 	(wire
 		(pts
@@ -3381,16 +3354,6 @@
 	)
 	(wire
 		(pts
-			(xy 165.1 124.46) (xy 167.64 124.46)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "ddba2590-1d52-4c6f-8778-c99ac1acfa79")
-	)
-	(wire
-		(pts
 			(xy 95.25 127) (xy 95.25 129.54)
 		)
 		(stroke
@@ -3480,7 +3443,7 @@
 		(uuid "fc055e0e-69a7-4bad-a572-975e1fae4d79")
 	)
 	(label "RX"
-		(at 165.1 121.92 0)
+		(at 167.64 127 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3608,16 +3571,6 @@
 			(justify left bottom)
 		)
 		(uuid "81f0f069-1907-456e-af22-1470a2f28f40")
-	)
-	(label "TX"
-		(at 165.1 124.46 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "a2a4b1c1-718f-42d6-8cda-d2dd81e70ea7")
 	)
 	(label "Col4"
 		(at 137.16 66.04 0)
@@ -3914,6 +3867,72 @@
 		)
 	)
 	(symbol
+		(lib_id "power:VCC")
+		(at 170.18 119.38 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "26a650c2-8f22-4293-8eba-2c68c6b1c740")
+		(property "Reference" "#PWR09"
+			(at 170.18 123.19 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "VCC"
+			(at 170.18 114.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 170.18 119.38 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 170.18 119.38 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"VCC\""
+			(at 170.18 119.38 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "82ce58be-7c3f-4795-aa4d-4a8be8796aca")
+		)
+		(instances
+			(project "V3"
+				(path "/55ac274f-6d39-4edb-ae03-cf051723ec39"
+					(reference "#PWR09")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Librarie:SSD1306")
 		(at 143.51 124.46 90)
 		(unit 1)
@@ -4072,88 +4091,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Library:CH340C_usb_module")
-		(at 171.45 121.92 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "8c69e493-93f8-4767-96e8-117e46c69f77")
-		(property "Reference" "U2"
-			(at 180.34 122.5549 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "~"
-			(at 180.34 124.46 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Library:CH340C_pins"
-			(at 171.45 121.92 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 171.45 121.92 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" ""
-			(at 171.45 121.92 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "4"
-			(uuid "cc57d79d-a0c1-4b07-8a18-ab92da6352f3")
-		)
-		(pin "1"
-			(uuid "652e2fc3-32b4-443d-a44f-2d95a83bc7cf")
-		)
-		(pin "2"
-			(uuid "fd432343-580e-445f-9718-e954dc3a69b6")
-		)
-		(pin "3"
-			(uuid "2cfb30c9-10e7-4d0b-b8d7-16242e1414d5")
-		)
-		(pin "5"
-			(uuid "97ef8219-cf35-47aa-a356-7db2c1207c9c")
-		)
-		(pin "6"
-			(uuid "56c81ee9-c653-43a3-a6e5-9d2d432bac25")
-		)
-		(instances
-			(project ""
-				(path "/55ac274f-6d39-4edb-ae03-cf051723ec39"
-					(reference "U2")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:Earth")
 		(at 259.08 40.64 0)
 		(unit 1)
@@ -4280,6 +4217,82 @@
 			(project ""
 				(path "/55ac274f-6d39-4edb-ae03-cf051723ec39"
 					(reference "#PWR06")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Library:CH9328")
+		(at 180.34 125.73 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "95ecc64c-9b63-4d98-ae51-b85d713ef99d")
+		(property "Reference" "U2"
+			(at 182.88 123.1899 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "~"
+			(at 182.88 125.095 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Library:CH9328"
+			(at 182.88 126.9999 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Datasheet" ""
+			(at 180.34 125.73 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 180.34 125.73 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "3f10d849-c9b2-4943-a953-43ca45153ce5")
+		)
+		(pin "3"
+			(uuid "62f0d01f-897e-4ca1-850c-81474e1cb9b4")
+		)
+		(pin "4"
+			(uuid "c8afedb7-990c-4c56-909c-8061469cf0c5")
+		)
+		(pin "1"
+			(uuid "8736067e-e342-4b29-96f3-e821dc67398e")
+		)
+		(instances
+			(project ""
+				(path "/55ac274f-6d39-4edb-ae03-cf051723ec39"
+					(reference "U2")
 					(unit 1)
 				)
 			)
@@ -4757,74 +4770,8 @@
 		)
 	)
 	(symbol
-		(lib_id "power:-3V3")
-		(at 167.64 116.84 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "efd3c394-ab88-417d-ab45-c42b3b79bea0")
-		(property "Reference" "#PWR09"
-			(at 167.64 120.65 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Value" "-3V3"
-			(at 167.64 111.76 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 167.64 116.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" ""
-			(at 167.64 116.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"-3V3\""
-			(at 167.64 116.84 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "bcc708fe-438c-410c-9036-34bbbc2e5d00")
-		)
-		(instances
-			(project "V3"
-				(path "/55ac274f-6d39-4edb-ae03-cf051723ec39"
-					(reference "#PWR09")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "power:Earth")
-		(at 167.64 129.54 0)
+		(at 163.83 123.19 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4833,7 +4780,7 @@
 		(fields_autoplaced yes)
 		(uuid "fb95a335-8c18-46f0-a706-d732430dffdc")
 		(property "Reference" "#PWR010"
-			(at 167.64 135.89 0)
+			(at 163.83 129.54 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4842,7 +4789,7 @@
 			)
 		)
 		(property "Value" "Earth"
-			(at 167.64 134.62 0)
+			(at 163.83 128.27 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4850,7 +4797,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 167.64 129.54 0)
+			(at 163.83 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4859,7 +4806,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 167.64 129.54 0)
+			(at 163.83 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4868,7 +4815,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"Earth\""
-			(at 167.64 129.54 0)
+			(at 163.83 123.19 0)
 			(effects
 				(font
 					(size 1.27 1.27)
