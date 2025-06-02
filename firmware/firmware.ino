@@ -2,6 +2,8 @@
 #include <SPIFFS.h>
 #include <stdlib.h>
 #include "KBState.h"
+#include <Adafruit_CH9328.h>
+
 void print_wakeup_reason(){
   esp_sleep_wakeup_cause_t wakeup_reason;
 
@@ -18,12 +20,14 @@ void print_wakeup_reason(){
   }
 }
 
+
 //#include <bluemicro_hid.h>
 #include "list.hpp"
 BleKeyboard bleKeyboard("ESP32 BLE Keyboard", "YourManufacturer", 100);
+Adafruit_CH9328 hidKeyboard;
 String getS(){
     String input = Serial.readStringUntil('\n').c_str();
-    Serial.println("Received: " + input);2
+    Serial.println("Received: " + input);
     return input;
 }
 void panic(String message){
@@ -93,6 +97,11 @@ void setup() {
   SPIFFS.begin(true);
   Serial.println("Starting BLE work!");
   bleKeyboard.begin();
+
+  Serial.println("Starting HID work!");
+  hidKeyboard.begin(&Serial1);
+
+
   Serial.println("Ble init");
   //kbsDefaultLoad();
   kbsLoad();
@@ -103,7 +112,7 @@ void setup() {
 }
 void loop() {
   kbs_Update(&KeyboardStateHolder);
-  kbs_compareAndSend(&KeyboardStateHolder,bleKeyboard);
+  kbs_compareAndSend(&KeyboardStateHolder,bleKeyboard,hidKeyboard);
   if(Serial.available()){
     digitalWrite(2,HIGH);
     delay(100);

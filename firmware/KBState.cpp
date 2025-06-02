@@ -1,6 +1,14 @@
 #include "KBState.h"
 #include "list.h"
 #include <ArduinoJson.h>
+#include <Adafruit_CH9328.h>
+#include <Arduino.h>
+#include <SPIFFS.h>
+
+#include <cstdint>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
 readData readData_init(unsigned int numrows, unsigned int numcols) {
   char* a = (char*)calloc(numcols * numrows, sizeof(char));
   char* b = (char*)calloc(numcols * numrows, sizeof(char));
@@ -96,18 +104,52 @@ void kbs_Update(kbs* currentState) {
     digitalWrite(currentState->pinRows[row], LOW);
   }
 }
-void kbs_compareAndSend(kbs* currentState, BleKeyboard keyboard) {
+void adaRelease(Adafruit_CH9328 keyboard2, uint8_t key){
+
+}
+List* hidKeys = NULL;
+void hidPress(uint8_t key,Adafruit_CH9328 keyboard){
+  if (not hidKeys) {
+    hidKeys = List_new(sizeof(u_int8_t));
+  }
+  if(hidKeys->length < 6){
+    List_append(hidKeys, &key);
+  }
+  while(hidKeys->length<6){
+    List_append(hidKeys, NULL);
+  }
+  keyboard.sendKeyPress((unsigned char*)hidKeys->head, 0);
+}
+uint8_t hidKeyEqCurrent;
+int hidKeyEq(void* key){
+  return memcmp(key,&hidKeyEqCurrent,sizeof(uint8_t));
+}
+void hidRelease(uint8_t key,Adafruit_CH9328 keyboard){
+  hidKeyEqCurrent = key;
+  List_filter(hidKeys, &hidKeyEq);
+  while(hidKeys->length<6){
+    List_append(hidKeys, NULL);
+  }
+  keyboard.sendKeyPress((unsigned char*)hidKeys->head, 0);
+}
+void kbs_compareAndSend(kbs* currentState, BleKeyboard keyboard,Adafruit_CH9328 keyboard2) {
   for (int i = 0; i < currentState->colsLength * currentState->rowsLength; i++) {
     char current = readData_getActive(currentState->keysState)[i];
     char last = readData_getInActive(currentState->keysState)[i];
     if (not last and current) {
-      keyboard.press(currentState->keys[i].data);
+
       Serial.print("pressing");
       Serial.println(currentState->keys[i].data);
+
+      keyboard.press(currentState->keys[i].data);
+      hidPress(currentState->keys[i].data, keyboard2);
     } else if (last and not current) {
-      keyboard.release(currentState->keys[i].data);
+
       Serial.print("releasing");
       Serial.println(currentState->keys[i].data);
+
+      keyboard.release(currentState->keys[i].data);
+      hidRelease(currentState->keys[i].data, keyboard2);
     }
   }
   readData_flip(&currentState->keysState);

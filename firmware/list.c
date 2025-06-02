@@ -93,7 +93,13 @@ void List_append(List *l, void *element) {
   if (l->length + 1 >= l->size) {
     List_resize(l, l->length + l->length);
   }
-  memcpy(l->head + l->width * l->length, element, l->width);
+  if(element == NULL){
+    memset(l->head+l->width*l->length, 0, l->width);
+  }
+  else{
+    memcpy(l->head + l->width * l->length, element, l->width);
+  }
+
   l->length++;
 }
 void List_remove(List *l, unsigned int i) {
@@ -138,6 +144,7 @@ void List_copyInto(List *l, void *source, unsigned int i) {
 }
 
 int List_filter(List *l, int (*function)(void *)) {
+  //
   int totalRemoved = 0;
   for (int i = 0; i < l->length; i++) {
     if (!function(List_gst(l, i))) {

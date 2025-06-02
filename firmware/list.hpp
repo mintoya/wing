@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <functional>
 #include <type_traits>
+// completeley written by chatgpt so idk
 
 template <typename T>
 class ListPlux {

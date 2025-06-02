@@ -1,13 +1,8 @@
 #ifndef KBSTATE_H
 #define KBSTATE_H
-
-#include <Arduino.h>
 #include "BleKeyboard.h"
-#include <SPIFFS.h>
 #include <ArduinoJson.h>
-#include <stdlib.h>
-#include <string.h>
-
+#include <Adafruit_CH9328.h>
 typedef struct keyAction {
   char kind;
   unsigned char data;
@@ -53,7 +48,7 @@ kbs kbs_init(unsigned int numrows, unsigned int numcols, unsigned int* pnRows, u
 void kbs_Update(kbs* currentState);
 
 // Compare buffers and send key events via BLE Keyboard
-void kbs_compareAndSend(kbs* currentState, BleKeyboard keyboard);
+void kbs_compareAndSend(kbs* currentState, BleKeyboard keyboard,Adafruit_CH9328 kyeboard2);
 fatPointer bytesKb(kbs state);
 void readKb(void* a, kbs* result);
 void kbsFree(kbs currentState);
