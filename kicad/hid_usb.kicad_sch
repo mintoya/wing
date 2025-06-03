@@ -950,179 +950,6 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "PCM_4ms_Resistor:0R_0603"
-			(pin_numbers
-				(hide yes)
-			)
-			(pin_names
-				(offset 0)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "R"
-				(at 2.032 0 90)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "0R_0603"
-				(at -2.54 0 90)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Footprint" "4ms_Resistor:R_0603"
-				(at -2.54 -12.7 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "0R, 1%, 1/10W, 0603"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Specifications" "0R, 1%, 1/10W, 0603"
-				(at -2.54 -7.874 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-					(hide yes)
-				)
-			)
-			(property "Manufacturer" "Yageo"
-				(at -2.54 -9.398 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-					(hide yes)
-				)
-			)
-			(property "Part Number" "RC0603FR-100RL"
-				(at -2.54 -10.922 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-					(hide yes)
-				)
-			)
-			(property "Display" "0R"
-				(at 3.81 0 90)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "JLCPCB ID" "C21189"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "0R_0603"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "R_* R_*"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "0R_0603_0_1"
-				(rectangle
-					(start -1.016 -2.54)
-					(end 1.016 2.54)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "0R_0603_1_1"
-				(pin passive line
-					(at 0 3.81 270)
-					(length 1.27)
-					(name "~"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 0 -3.81 90)
-					(length 1.27)
-					(name "~"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 		(symbol "PCM_SL_Capacitors:10uF_16V"
 			(exclude_from_sim no)
 			(in_bom yes)
@@ -1500,7 +1327,7 @@
 	)
 	(wire
 		(pts
-			(xy 137.16 59.69) (xy 140.97 59.69)
+			(xy 135.89 59.69) (xy 140.97 59.69)
 		)
 		(stroke
 			(width 0)
@@ -1700,7 +1527,7 @@
 	)
 	(wire
 		(pts
-			(xy 121.92 59.69) (xy 129.54 59.69)
+			(xy 121.92 59.69) (xy 128.27 59.69)
 		)
 		(stroke
 			(width 0)
@@ -2722,44 +2549,41 @@
 		)
 	)
 	(symbol
-		(lib_id "PCM_4ms_Resistor:0R_0603")
-		(at 133.35 59.69 90)
+		(lib_id "PCM_SL_Resistors:5.6k")
+		(at 132.08 59.69 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "fe1d2177-a4ac-4371-ba96-622688e2d701")
+		(uuid "edb6d418-de59-4548-b88b-4c4a951ab3af")
 		(property "Reference" "R3"
-			(at 133.35 53.34 90)
+			(at 132.08 57.912 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Value" "0R_0603"
-			(at 133.35 62.23 90)
+		(property "Value" "1R"
+			(at 132.08 59.944 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(hide yes)
 			)
 		)
-		(property "Footprint" "PCM_4ms_Resistor:R_0402"
-			(at 146.05 62.23 0)
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
+			(at 132.969 64.008 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify left)
 				(hide yes)
 			)
 		)
 		(property "Datasheet" ""
-			(at 133.35 59.69 0)
+			(at 132.588 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2767,55 +2591,8 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "0R, 1%, 1/10W, 0603"
-			(at 133.35 59.69 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Specifications" "0R, 1%, 1/10W, 0603"
-			(at 141.224 62.23 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Manufacturer" "Yageo"
-			(at 142.748 62.23 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Part Number" "RC0603FR-100RL"
-			(at 144.272 62.23 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-				(hide yes)
-			)
-		)
-		(property "Display" "1R"
-			(at 133.35 55.88 90)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "JLCPCB ID" "C21189"
-			(at 133.35 59.69 0)
+		(property "Description" "5.6kΩ, 1/4W Resistor"
+			(at 132.08 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2824,10 +2601,10 @@
 			)
 		)
 		(pin "1"
-			(uuid "06a41b21-02e4-4164-b3fa-a0140a6e87c7")
+			(uuid "efad3b6b-9f91-456d-b6aa-3f770b43c21d")
 		)
 		(pin "2"
-			(uuid "5afea33b-5c9d-4b6a-8de9-219605e25e54")
+			(uuid "f63637ad-4d7d-4df6-97e9-455f468878f3")
 		)
 		(instances
 			(project "V3"

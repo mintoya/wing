@@ -1977,12 +1977,6 @@
 		(uuid "44ef1272-3c79-4f81-bbb7-d8d9e0669ad1")
 	)
 	(junction
-		(at 118.11 158.75)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "4f7af6c3-4529-4131-8bef-36f272335fa6")
-	)
-	(junction
 		(at 118.11 166.37)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3232,16 +3226,6 @@
 	)
 	(wire
 		(pts
-			(xy 118.11 158.75) (xy 138.43 158.75)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a9179850-e999-43fc-aae8-b5b1a93bb498")
-	)
-	(wire
-		(pts
 			(xy 20.32 68.58) (xy 29.21 68.58)
 		)
 		(stroke
@@ -3869,6 +3853,26 @@
 			(justify left bottom)
 		)
 		(uuid "b8b1d4b8-4a4c-4f61-b126-627643c9fe88")
+	)
+	(label "B+"
+		(at 118.11 158.75 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "bad62ddc-6a06-4fc2-a229-b37c999c0f8c")
+	)
+	(label "B+"
+		(at 138.43 158.75 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "ca3b9541-ea93-4c9b-b86b-d67850f0614d")
 	)
 	(label "Col3"
 		(at 107.95 59.69 0)
