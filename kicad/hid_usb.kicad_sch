@@ -1228,19 +1228,13 @@
 		(uuid "a2685f6a-afc5-42c2-beb9-43c4e36ce94a")
 	)
 	(junction
-		(at 140.97 59.69)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "20828be4-aad5-40d6-a29b-ec9c7c125a49")
-	)
-	(junction
 		(at 121.92 44.45)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "4bbbd1a9-06bd-45f5-ae97-f441a4817272")
 	)
 	(junction
-		(at 154.94 57.15)
+		(at 153.67 57.15)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "9928ec02-cbbc-4fad-8fa5-82437dab26b9")
@@ -1264,13 +1258,19 @@
 		(uuid "b1536461-1bf1-4f2c-855e-3f68f9e3fa46")
 	)
 	(junction
-		(at 154.94 52.07)
+		(at 137.16 59.69)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "df61ae38-fbe7-4417-b50f-e6c6fed90cd4")
+	)
+	(junction
+		(at 153.67 52.07)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "edcabc59-c85b-4b5d-8a1f-cc10ab54dfbb")
 	)
 	(junction
-		(at 154.94 59.69)
+		(at 153.67 59.69)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "fed34b40-6b5e-400f-a8ee-c0a702527b8c")
@@ -1307,13 +1307,23 @@
 	)
 	(wire
 		(pts
-			(xy 154.94 48.26) (xy 154.94 52.07)
+			(xy 153.67 48.26) (xy 153.67 52.07)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "15b243fd-26ea-4f4f-a3d2-921c5fd47a3d")
+	)
+	(wire
+		(pts
+			(xy 137.16 59.69) (xy 153.67 59.69)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "18a2f5f4-049c-47d7-b75b-0822667be6cf")
 	)
 	(wire
 		(pts
@@ -1327,7 +1337,7 @@
 	)
 	(wire
 		(pts
-			(xy 135.89 59.69) (xy 140.97 59.69)
+			(xy 133.35 59.69) (xy 137.16 59.69)
 		)
 		(stroke
 			(width 0)
@@ -1337,7 +1347,7 @@
 	)
 	(wire
 		(pts
-			(xy 154.94 57.15) (xy 154.94 59.69)
+			(xy 153.67 57.15) (xy 153.67 59.69)
 		)
 		(stroke
 			(width 0)
@@ -1417,16 +1427,6 @@
 	)
 	(wire
 		(pts
-			(xy 140.97 59.69) (xy 154.94 59.69)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "80e6fbc7-f277-43e2-b87e-9d77c42c7da2")
-	)
-	(wire
-		(pts
 			(xy 111.76 44.45) (xy 111.76 52.07)
 		)
 		(stroke
@@ -1447,16 +1447,6 @@
 	)
 	(wire
 		(pts
-			(xy 140.97 59.69) (xy 140.97 58.42)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "8efcba4f-3828-40b3-ae68-7b1846bd5fdf")
-	)
-	(wire
-		(pts
 			(xy 74.93 71.12) (xy 74.93 72.39)
 		)
 		(stroke
@@ -1467,7 +1457,7 @@
 	)
 	(wire
 		(pts
-			(xy 154.94 52.07) (xy 154.94 57.15)
+			(xy 153.67 52.07) (xy 153.67 57.15)
 		)
 		(stroke
 			(width 0)
@@ -1517,7 +1507,7 @@
 	)
 	(wire
 		(pts
-			(xy 140.97 44.45) (xy 121.92 44.45)
+			(xy 137.16 44.45) (xy 121.92 44.45)
 		)
 		(stroke
 			(width 0)
@@ -1527,7 +1517,7 @@
 	)
 	(wire
 		(pts
-			(xy 121.92 59.69) (xy 128.27 59.69)
+			(xy 121.92 59.69) (xy 125.73 59.69)
 		)
 		(stroke
 			(width 0)
@@ -1587,7 +1577,7 @@
 	)
 	(wire
 		(pts
-			(xy 140.97 50.8) (xy 140.97 44.45)
+			(xy 137.16 52.07) (xy 137.16 44.45)
 		)
 		(stroke
 			(width 0)
@@ -1597,7 +1587,7 @@
 	)
 	(wire
 		(pts
-			(xy 154.94 52.07) (xy 162.56 52.07)
+			(xy 153.67 52.07) (xy 161.29 52.07)
 		)
 		(stroke
 			(width 0)
@@ -1676,7 +1666,7 @@
 		(uuid "624d5cd5-c0e4-472c-851a-fe651f5f864a")
 	)
 	(label "CC1"
-		(at 162.56 57.15 0)
+		(at 161.29 57.15 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1746,7 +1736,7 @@
 		(uuid "d43ba459-76ce-4e55-8d1a-a5997cb93363")
 	)
 	(label "VBus"
-		(at 162.56 52.07 0)
+		(at 161.29 52.07 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1766,7 +1756,7 @@
 		(uuid "f58ba254-f8cf-4d8e-97cc-efa1feec3d8e")
 	)
 	(label "CC2"
-		(at 162.56 59.69 0)
+		(at 161.29 59.69 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -1787,7 +1777,7 @@
 	)
 	(hierarchical_label "Vcc"
 		(shape output)
-		(at 154.94 48.26 0)
+		(at 153.67 48.26 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2346,7 +2336,7 @@
 	)
 	(symbol
 		(lib_id "PCM_SL_Resistors:5.6k")
-		(at 158.75 57.15 0)
+		(at 157.48 57.15 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -2354,7 +2344,7 @@
 		(dnp no)
 		(uuid "a7ddac80-f156-4ce1-ab1f-407216130192")
 		(property "Reference" "R4"
-			(at 158.75 55.372 0)
+			(at 157.48 55.372 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2362,7 +2352,7 @@
 			)
 		)
 		(property "Value" "5.1k"
-			(at 158.75 57.404 0)
+			(at 157.48 57.404 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2370,7 +2360,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
-			(at 159.639 61.468 0)
+			(at 158.369 61.468 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2379,7 +2369,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 159.258 57.15 0)
+			(at 157.988 57.15 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2388,7 +2378,7 @@
 			)
 		)
 		(property "Description" "5.6kΩ, 1/4W Resistor"
-			(at 158.75 57.15 0)
+			(at 157.48 57.15 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2413,7 +2403,7 @@
 	)
 	(symbol
 		(lib_id "PCM_SL_Resistors:5.6k")
-		(at 158.75 59.69 0)
+		(at 157.48 59.69 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -2421,7 +2411,7 @@
 		(dnp no)
 		(uuid "b3eae920-e685-405d-8b36-4fcf7f99090c")
 		(property "Reference" "R6"
-			(at 158.75 61.468 0)
+			(at 157.48 61.468 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2429,7 +2419,7 @@
 			)
 		)
 		(property "Value" "5.1k"
-			(at 158.75 59.69 0)
+			(at 157.48 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2437,7 +2427,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
-			(at 159.639 64.008 0)
+			(at 158.369 64.008 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2446,7 +2436,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 159.258 59.69 0)
+			(at 157.988 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2455,7 +2445,7 @@
 			)
 		)
 		(property "Description" "5.6kΩ, 1/4W Resistor"
-			(at 158.75 59.69 0)
+			(at 157.48 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2480,7 +2470,7 @@
 	)
 	(symbol
 		(lib_id "PCM_SL_Capacitors:10uF_16V")
-		(at 140.97 54.61 90)
+		(at 137.16 55.88 90)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -2489,7 +2479,7 @@
 		(fields_autoplaced yes)
 		(uuid "c358789b-eeb9-4fb2-9249-6e030dee2556")
 		(property "Reference" "C3"
-			(at 144.78 53.3399 90)
+			(at 140.97 54.6099 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2498,7 +2488,7 @@
 			)
 		)
 		(property "Value" "10uF_16V"
-			(at 144.78 55.8799 90)
+			(at 140.97 57.1499 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2507,7 +2497,7 @@
 			)
 		)
 		(property "Footprint" "PCM_4ms_Capacitor:CP_Tantalum_EIA-6032-28_Kemet-C"
-			(at 144.78 53.848 0)
+			(at 140.97 55.118 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2516,7 +2506,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 140.97 54.102 0)
+			(at 137.16 55.372 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2525,7 +2515,7 @@
 			)
 		)
 		(property "Description" "10uF, 16V Electrolytic Capacitor"
-			(at 140.97 54.61 0)
+			(at 137.16 55.88 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2550,7 +2540,7 @@
 	)
 	(symbol
 		(lib_id "PCM_SL_Resistors:5.6k")
-		(at 132.08 59.69 0)
+		(at 129.54 59.69 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -2558,7 +2548,7 @@
 		(dnp no)
 		(uuid "edb6d418-de59-4548-b88b-4c4a951ab3af")
 		(property "Reference" "R3"
-			(at 132.08 57.912 0)
+			(at 129.54 57.912 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2566,7 +2556,7 @@
 			)
 		)
 		(property "Value" "1R"
-			(at 132.08 59.944 0)
+			(at 129.54 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2574,7 +2564,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal"
-			(at 132.969 64.008 0)
+			(at 130.429 64.008 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2583,7 +2573,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 132.588 59.69 0)
+			(at 130.048 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2592,7 +2582,7 @@
 			)
 		)
 		(property "Description" "5.6kΩ, 1/4W Resistor"
-			(at 132.08 59.69 0)
+			(at 129.54 59.69 0)
 			(effects
 				(font
 					(size 1.27 1.27)
