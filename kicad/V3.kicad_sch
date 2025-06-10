@@ -349,31 +349,29 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Librarie:SSD1306"
-			(pin_names
-				(offset 1.016)
-			)
+		(symbol "Library:SSD1306-128X64-OLED-0.96"
 			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
-			(property "Reference" "Brd"
-				(at 0 -3.81 0)
+			(property "Reference" "U?"
+				(at 8.382 1.27 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
 				)
 			)
-			(property "Value" "SSD1306"
-				(at 0 -1.27 0)
+			(property "Value" "SSD1306-128X64-OLED-0.96"
+				(at 3.302 -10.922 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
+					(hide yes)
 				)
 			)
-			(property "Footprint" ""
-				(at 0 6.35 0)
+			(property "Footprint" "Library:SSD1306"
+				(at 2.032 12.192 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -382,15 +380,6 @@
 				)
 			)
 			(property "Datasheet" ""
-				(at 0 6.35 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "SSD1306 OLED"
 				(at 0 0 0)
 				(effects
 					(font
@@ -399,7 +388,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_keywords" "SSD1306"
+			(property "Description" ""
 				(at 0 0 0)
 				(effects
 					(font
@@ -408,33 +397,24 @@
 					(hide yes)
 				)
 			)
-			(property "ki_fp_filters" "SSD1306-128x64_OLED:SSD1306"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "SSD1306_0_1"
+			(symbol "SSD1306-128X64-OLED-0.96_0_0"
 				(rectangle
-					(start -6.35 6.35)
-					(end 6.35 -6.35)
+					(start -5.08 10.16)
+					(end 10.16 -7.62)
 					(stroke
-						(width 0)
+						(width 0.254)
 						(type solid)
 					)
 					(fill
-						(type background)
+						(type none)
 					)
 				)
 			)
-			(symbol "SSD1306_1_1"
-				(pin input line
-					(at -3.81 8.89 270)
+			(symbol "SSD1306-128X64-OLED-0.96_1_0"
+				(pin power_in line
+					(at -7.62 7.62 0)
 					(length 2.54)
-					(name "GND"
+					(name "VCC"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -449,26 +429,8 @@
 						)
 					)
 				)
-				(pin input line
-					(at -1.27 8.89 270)
-					(length 2.54)
-					(name "VCC"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin input line
-					(at 1.27 8.89 270)
+				(pin passive line
+					(at -7.62 2.54 0)
 					(length 2.54)
 					(name "SCL"
 						(effects
@@ -486,7 +448,7 @@
 					)
 				)
 				(pin input line
-					(at 3.81 8.89 270)
+					(at -7.62 0 0)
 					(length 2.54)
 					(name "SDA"
 						(effects
@@ -496,6 +458,24 @@
 						)
 					)
 					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -7.62 -5.08 0)
+					(length 2.54)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -1952,6 +1932,131 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "power:+3V3"
+			(power)
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "#PWR"
+				(at 0 -3.81 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Value" "+3V3"
+				(at 0 3.556 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Power symbol creates a global label with name \"+3V3\""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "global power"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "+3V3_0_1"
+				(polyline
+					(pts
+						(xy -0.762 1.27) (xy 0 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 2.54) (xy 0.762 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 0) (xy 0 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "+3V3_1_1"
+				(pin power_in line
+					(at 0 0 90)
+					(length 0)
+					(name "~"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "power:+5V"
 			(power)
 			(pin_numbers
@@ -2567,6 +2672,16 @@
 	)
 	(wire
 		(pts
+			(xy 34.29 144.78) (xy 38.1 144.78)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "18a338c1-e186-4300-883f-89b3fd3dc2bc")
+	)
+	(wire
+		(pts
 			(xy 114.3 158.75) (xy 118.11 158.75)
 		)
 		(stroke
@@ -2587,7 +2702,7 @@
 	)
 	(wire
 		(pts
-			(xy 30.48 135.89) (xy 34.29 135.89)
+			(xy 34.29 139.7) (xy 38.1 139.7)
 		)
 		(stroke
 			(width 0)
@@ -2717,16 +2832,6 @@
 	)
 	(wire
 		(pts
-			(xy 30.48 140.97) (xy 34.29 140.97)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "4060c4dc-096d-4ecb-b2ca-ec4fb67b127d")
-	)
-	(wire
-		(pts
 			(xy 50.8 81.28) (xy 63.5 81.28)
 		)
 		(stroke
@@ -2827,7 +2932,7 @@
 	)
 	(wire
 		(pts
-			(xy 30.48 138.43) (xy 34.29 138.43)
+			(xy 34.29 137.16) (xy 38.1 137.16)
 		)
 		(stroke
 			(width 0)
@@ -2874,6 +2979,16 @@
 			(type default)
 		)
 		(uuid "6d96e0cf-2720-480e-a1ee-57830777adf5")
+	)
+	(wire
+		(pts
+			(xy 34.29 132.08) (xy 38.1 132.08)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6e1c4d08-748e-4e0d-9d08-a902b414af0a")
 	)
 	(wire
 		(pts
@@ -3316,7 +3431,7 @@
 		(uuid "ffad3607-4c91-4297-a4e6-99303b44ab92")
 	)
 	(label "SDA"
-		(at 30.48 135.89 0)
+		(at 34.29 139.7 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3384,16 +3499,6 @@
 			(justify left bottom)
 		)
 		(uuid "39f076d0-e748-451e-a4af-11e57b44d3b3")
-	)
-	(label "~3v3"
-		(at 30.48 140.97 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "43514b59-3e28-421a-ba69-bbf29df5bb39")
 	)
 	(label "Col1"
 		(at 181.61 45.72 0)
@@ -3486,7 +3591,7 @@
 		(uuid "7d43b545-2f03-4dfc-b9d4-543bc1a90a88")
 	)
 	(label "SCL"
-		(at 30.48 138.43 0)
+		(at 34.29 137.16 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -5201,35 +5306,35 @@
 		)
 	)
 	(symbol
-		(lib_id "Librarie:SSD1306")
-		(at 43.18 139.7 90)
+		(lib_id "Library:SSD1306-128X64-OLED-0.96")
+		(at 45.72 139.7 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
 		(fields_autoplaced yes)
-		(uuid "303fc76c-68a9-4e16-a164-f9e18378ab47")
-		(property "Reference" "Brd1"
-			(at 50.8 138.4299 90)
+		(uuid "33ca6745-4a91-4e38-a0ca-452110640866")
+		(property "Reference" "U4"
+			(at 57.15 138.4299 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify right)
+				(justify left)
 			)
 		)
-		(property "Value" "SSD1306"
-			(at 50.8 140.9699 90)
+		(property "Value" "SSD1306-128X64-OLED-0.96"
+			(at 49.022 150.622 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
-				(justify right)
+				(hide yes)
 			)
 		)
 		(property "Footprint" "Library:SSD1306"
-			(at 36.83 139.7 0)
+			(at 47.752 127.508 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5238,7 +5343,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 36.83 139.7 0)
+			(at 45.72 139.7 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5246,31 +5351,31 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "SSD1306 OLED"
-			(at 43.18 139.7 0)
+		(property "Description" ""
+			(at 45.72 139.7 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(hide yes)
 			)
-		)
-		(pin "3"
-			(uuid "6673d9d4-58ff-4524-ab39-4674ce2ecb38")
-		)
-		(pin "1"
-			(uuid "6cf5e70b-af2c-47b6-8754-9c8ac7be5406")
 		)
 		(pin "2"
-			(uuid "5778d146-a211-4724-930c-aade17473d73")
+			(uuid "329fd871-e352-46c9-9aab-381705e729ad")
+		)
+		(pin "1"
+			(uuid "5eb90f91-4fdc-4427-8586-ab4bf11c0733")
+		)
+		(pin "3"
+			(uuid "a61e4a34-807f-4f32-8a38-7fd8b222c442")
 		)
 		(pin "4"
-			(uuid "21872014-f402-4e22-afb9-d4f0793ffd36")
+			(uuid "83fa94de-e56f-4ad3-a492-b76a04693ab6")
 		)
 		(instances
 			(project ""
 				(path "/55ac274f-6d39-4edb-ae03-cf051723ec39"
-					(reference "Brd1")
+					(reference "U4")
 					(unit 1)
 				)
 			)
@@ -7540,6 +7645,72 @@
 		)
 	)
 	(symbol
+		(lib_id "power:+3V3")
+		(at 204.47 31.75 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "b7d1278f-c840-4376-b65e-00284afa1625")
+		(property "Reference" "#PWR011"
+			(at 204.47 35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+3V3"
+			(at 204.47 26.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 204.47 31.75 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 204.47 31.75 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3V3\""
+			(at 204.47 31.75 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "a3058871-9f44-4573-bd32-d117143d7a53")
+		)
+		(instances
+			(project ""
+				(path "/55ac274f-6d39-4edb-ae03-cf051723ec39"
+					(reference "#PWR011")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:Battery_Cell")
 		(at 118.11 163.83 0)
 		(unit 1)
@@ -7943,7 +8114,7 @@
 	)
 	(symbol
 		(lib_id "power:Earth")
-		(at 34.29 143.51 0)
+		(at 34.29 144.78 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -7951,7 +8122,7 @@
 		(dnp no)
 		(uuid "d72f9d08-c312-4afc-9b2b-a1ce766e24f2")
 		(property "Reference" "#PWR02"
-			(at 34.29 149.86 0)
+			(at 34.29 151.13 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7960,7 +8131,7 @@
 			)
 		)
 		(property "Value" "Earth"
-			(at 34.29 148.59 0)
+			(at 34.29 149.86 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7968,7 +8139,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 34.29 143.51 0)
+			(at 34.29 144.78 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7977,7 +8148,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 34.29 143.51 0)
+			(at 34.29 144.78 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7986,7 +8157,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"Earth\""
-			(at 34.29 143.51 0)
+			(at 34.29 144.78 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8001,6 +8172,72 @@
 			(project ""
 				(path "/55ac274f-6d39-4edb-ae03-cf051723ec39"
 					(reference "#PWR02")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+3V3")
+		(at 34.29 132.08 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "d736673c-c3d7-4944-aeb9-40b3a1cb994c")
+		(property "Reference" "#PWR012"
+			(at 34.29 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+3V3"
+			(at 34.29 127 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 34.29 132.08 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 34.29 132.08 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+3V3\""
+			(at 34.29 132.08 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "5392541d-6629-4edb-bd2c-2f1c9c5e8c28")
+		)
+		(instances
+			(project "V3"
+				(path "/55ac274f-6d39-4edb-ae03-cf051723ec39"
+					(reference "#PWR012")
 					(unit 1)
 				)
 			)

@@ -231,6 +231,35 @@ lock()
 
 
 
+// Usage: Make the element draggable
+const draggableElements = document.querySelectorAll(".keyOuter")
+for (let i = 0; i < draggableElements.length; i++) {
+  dragElement(draggableElements[i])
+}
+const innerElements = document.querySelectorAll(".keyInner")
+for (let i = 0; i < innerElements.length; i++) {
+  innerElements[i].addEventListener("mousedown", (e) => {
+    console.log("touched")
+  })
+}
+function dragElement(elmnt) {
+  let pos3 = 0, pos4 = 0
+  elmnt.onmousedown = function(e) {
+    e.preventDefault()
+    pos3 = e.clientX
+    pos4 = e.clientY
+    document.onmouseup = () => document.onmousemove = document.onmouseup = null
+    document.onmousemove = function(e) {
+      e.preventDefault()
+      let dx = e.clientX - pos3, dy = e.clientY - pos4
+      pos3 = e.clientX
+      pos4 = e.clientY
+      let left = elmnt.offsetLeft + dx, top = elmnt.offsetTop + dy
+      elmnt.style.left = left + "px"
+      elmnt.style.top = top  + "px"
+    }
+  }
+}
 
 
 
