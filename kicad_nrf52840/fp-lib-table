@@ -1,0 +1,6 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "keyswitches")(type "KiCad")(uri "/home/paa/Github/keyswitches.pretty")(options "")(descr ""))
+  (lib (name "diodeLibrary")(type "KiCad")(uri "${KIPRJMOD}/diodeLibrary.pretty")(options "")(descr ""))
+  (lib (name "footprints")(type "KiCad")(uri "${KIPRJMOD}/footprints.pretty")(options "")(descr ""))
+)
