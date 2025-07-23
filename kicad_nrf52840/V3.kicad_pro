@@ -488,7 +488,7 @@
       "netlist": "",
       "plot": "",
       "pos_files": "",
-      "specctra_dsn": "",
+      "specctra_dsn": "../../../Downloads/V3.dsn",
       "step": "V3.step",
       "svg": "",
       "vrml": ""
