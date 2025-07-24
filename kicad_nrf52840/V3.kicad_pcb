@@ -68,7 +68,7 @@
 			(dxfusepcbnewfont yes)
 			(psnegative no)
 			(psa4output no)
-			(plot_black_and_white yes)
+			(plot_black_and_white no)
 			(sketchpadsonfab no)
 			(plotpadnumbers no)
 			(hidednponfab no)
@@ -30130,6 +30130,23 @@
 		)
 		(embedded_fonts no)
 	)
+	(gr_poly
+		(pts
+			(xy 156.707505 31.155508) (xy 169.280487 31.727008) (xy 179.186493 37.823009) (xy 211.380997 38.20401)
+			(xy 211 120.5) (xy 184.711014 141.455017) (xy 173.662003 144.693511) (xy 149.278016 144.503005) (xy 142.801011 137.454513)
+			(xy 142.991501 121.833511) (xy 127.751503 106.97451) (xy 120.321999 106.403007) (xy 114.416504 110.975013)
+			(xy 79.745499 110.594009) (xy 67.553505 98.973503) (xy 67.743996 53.825012) (xy 73.459 47.919509)
+			(xy 88.127503 46.205009) (xy 92.509003 40.299507) (xy 105.653496 38.775508) (xy 109.654007 31.53651)
+			(xy 129.275498 31.155508) (xy 135.371506 23.535509) (xy 150.992508 23.535509)
+		)
+		(stroke
+			(width 0.762)
+			(type solid)
+		)
+		(fill no)
+		(layer "Edge.Cuts")
+		(uuid "5660904b-f26e-4944-8cb8-066b74f2d2e6")
+	)
 	(segment
 		(start 125.4425 51.5007)
 		(end 124.303 51.5405)
@@ -34841,6 +34858,10 @@
 		(layer "B.Cu")
 		(net 47)
 		(uuid "a2fbab9e-ad65-46d6-bc5e-44412ebf41fe")
+	)
+	(group ""
+		(uuid "ad88751a-6d45-4628-a7ad-151360845dc9")
+		(members "5660904b-f26e-4944-8cb8-066b74f2d2e6")
 	)
 	(embedded_fonts no)
 )
