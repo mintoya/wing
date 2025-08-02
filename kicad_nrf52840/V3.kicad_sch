@@ -1983,6 +1983,10 @@
 		(color 0 0 0 0)
 		(uuid "fda7c3b6-e190-40c7-acd6-6e036546c137")
 	)
+	(no_connect
+		(at 77.47 217.17)
+		(uuid "7b875221-e585-4d40-9b97-d7c4f66ad68c")
+	)
 	(bus_entry
 		(at 200.66 20.32)
 		(size 2.54 2.54)
@@ -2001,6 +2005,16 @@
 			(type default)
 		)
 		(uuid "029d4513-61ea-4cfa-ad7c-15f962f819b2")
+	)
+	(wire
+		(pts
+			(xy 234.95 50.8) (xy 229.87 50.8)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0b9be4d1-56ee-4028-898e-00b14a395cda")
 	)
 	(wire
 		(pts
@@ -2141,6 +2155,16 @@
 			(type default)
 		)
 		(uuid "2ab336f3-01e8-4a20-ae04-6f4669a26004")
+	)
+	(wire
+		(pts
+			(xy 234.95 53.34) (xy 229.87 53.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2e8565ab-492a-4a43-82d1-b22d52621d49")
 	)
 	(wire
 		(pts
@@ -2584,6 +2608,16 @@
 	)
 	(wire
 		(pts
+			(xy 234.95 55.88) (xy 229.87 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d29cf09a-07ca-43d6-83d6-e5ea3440aa56")
+	)
+	(wire
+		(pts
 			(xy 115.57 81.28) (xy 128.27 81.28)
 		)
 		(stroke
@@ -2783,22 +2817,22 @@
 		(uuid "81f0f069-1907-456e-af22-1470a2f28f40")
 	)
 	(label "Col6"
-		(at 210.82 76.2 90)
+		(at 234.95 50.8 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify left bottom)
+			(justify right bottom)
 		)
 		(uuid "86db507e-55dd-4aef-bd72-b9f28aaa7791")
 	)
 	(label "Col4"
-		(at 205.74 76.2 90)
+		(at 234.95 55.88 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify left bottom)
+			(justify right bottom)
 		)
 		(uuid "9a6819c1-7e9c-4ec6-870f-3a4eb57f779a")
 	)
@@ -2843,12 +2877,12 @@
 		(uuid "b374d575-5f85-4193-b92c-9aa8d080936b")
 	)
 	(label "Col5"
-		(at 208.28 76.2 90)
+		(at 234.95 53.34 180)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
-			(justify left bottom)
+			(justify right bottom)
 		)
 		(uuid "b9ac3143-060f-4d1d-8784-4cc3f8a2c8e9")
 	)
@@ -2968,7 +3002,7 @@
 				)
 			)
 		)
-		(property "Footprint" "keyswitches:Kailh_socket_MX_reversible"
+		(property "Footprint" "keyswitches:Kailh_socket_PG1350_reversible"
 			(at 113.03 90.17 0)
 			(effects
 				(font
@@ -3036,7 +3070,7 @@
 				)
 			)
 		)
-		(property "Footprint" "keyswitches:Kailh_socket_MX_reversible"
+		(property "Footprint" "keyswitches:Kailh_socket_PG1350_reversible"
 			(at 100.33 71.12 0)
 			(effects
 				(font
@@ -3192,7 +3226,7 @@
 				)
 			)
 		)
-		(property "Footprint" "keyswitches:Kailh_socket_MX_reversible"
+		(property "Footprint" "keyswitches:Kailh_socket_PG1350_reversible"
 			(at 113.03 71.12 0)
 			(effects
 				(font
@@ -3436,7 +3470,7 @@
 				)
 			)
 		)
-		(property "Footprint" "keyswitches:Kailh_socket_MX_reversible"
+		(property "Footprint" "keyswitches:Kailh_socket_PG1350_reversible"
 			(at 74.93 71.12 0)
 			(effects
 				(font
@@ -3767,7 +3801,7 @@
 				)
 			)
 		)
-		(property "Footprint" "keyswitches:Kailh_socket_MX_reversible"
+		(property "Footprint" "keyswitches:Kailh_socket_PG1350_reversible"
 			(at 125.73 71.12 0)
 			(effects
 				(font
@@ -3988,7 +4022,7 @@
 				)
 			)
 		)
-		(property "Footprint" "keyswitches:Kailh_socket_MX_reversible"
+		(property "Footprint" "keyswitches:Kailh_socket_PG1350_reversible"
 			(at 87.63 35.56 0)
 			(effects
 				(font
@@ -4285,7 +4319,7 @@
 				)
 			)
 		)
-		(property "Footprint" "keyswitches:Kailh_socket_MX_reversible"
+		(property "Footprint" "keyswitches:Kailh_socket_PG1350_reversible"
 			(at 125.73 35.56 0)
 			(effects
 				(font
@@ -4353,7 +4387,7 @@
 				)
 			)
 		)
-		(property "Footprint" "keyswitches:Kailh_socket_MX_reversible"
+		(property "Footprint" "keyswitches:Kailh_socket_PG1350_reversible"
 			(at 138.43 52.07 0)
 			(effects
 				(font
@@ -4972,7 +5006,7 @@
 				)
 			)
 		)
-		(property "Footprint" "keyswitches:Kailh_socket_MX_reversible"
+		(property "Footprint" "keyswitches:Kailh_socket_PG1350_reversible"
 			(at 87.63 52.07 0)
 			(effects
 				(font
@@ -5040,7 +5074,7 @@
 				)
 			)
 		)
-		(property "Footprint" "keyswitches:Kailh_socket_MX_reversible"
+		(property "Footprint" "keyswitches:Kailh_socket_PG1350_reversible"
 			(at 113.03 35.56 0)
 			(effects
 				(font
@@ -5108,7 +5142,7 @@
 				)
 			)
 		)
-		(property "Footprint" "keyswitches:Kailh_socket_MX_reversible"
+		(property "Footprint" "keyswitches:Kailh_socket_PG1350_reversible"
 			(at 125.73 90.17 0)
 			(effects
 				(font
@@ -5264,7 +5298,7 @@
 				)
 			)
 		)
-		(property "Footprint" "keyswitches:Kailh_socket_MX_reversible"
+		(property "Footprint" "keyswitches:Kailh_socket_PG1350_reversible"
 			(at 74.93 35.56 0)
 			(effects
 				(font
@@ -5332,7 +5366,7 @@
 				)
 			)
 		)
-		(property "Footprint" "keyswitches:Kailh_socket_MX_reversible"
+		(property "Footprint" "keyswitches:Kailh_socket_PG1350_reversible"
 			(at 138.43 71.12 0)
 			(effects
 				(font
@@ -5664,7 +5698,7 @@
 				)
 			)
 		)
-		(property "Footprint" "keyswitches:Kailh_socket_MX_reversible"
+		(property "Footprint" "keyswitches:Kailh_socket_PG1350_reversible"
 			(at 138.43 35.56 0)
 			(effects
 				(font
@@ -5996,7 +6030,7 @@
 				)
 			)
 		)
-		(property "Footprint" "keyswitches:Kailh_socket_MX_reversible"
+		(property "Footprint" "keyswitches:Kailh_socket_PG1350_reversible"
 			(at 100.33 90.17 0)
 			(effects
 				(font
@@ -6064,7 +6098,7 @@
 				)
 			)
 		)
-		(property "Footprint" "keyswitches:Kailh_socket_MX_reversible"
+		(property "Footprint" "keyswitches:Kailh_socket_PG1350_reversible"
 			(at 125.73 52.07 0)
 			(effects
 				(font
@@ -6378,7 +6412,7 @@
 				)
 			)
 		)
-		(property "Footprint" "keyswitches:Kailh_socket_MX_reversible"
+		(property "Footprint" "keyswitches:Kailh_socket_PG1350_reversible"
 			(at 100.33 52.07 0)
 			(effects
 				(font
@@ -6534,7 +6568,7 @@
 				)
 			)
 		)
-		(property "Footprint" "keyswitches:Kailh_socket_MX_reversible"
+		(property "Footprint" "keyswitches:Kailh_socket_PG1350_reversible"
 			(at 138.43 90.17 0)
 			(effects
 				(font
@@ -6733,7 +6767,7 @@
 				)
 			)
 		)
-		(property "Footprint" "keyswitches:Kailh_socket_MX_reversible"
+		(property "Footprint" "keyswitches:Kailh_socket_PG1350_reversible"
 			(at 87.63 71.12 0)
 			(effects
 				(font
@@ -6801,7 +6835,7 @@
 				)
 			)
 		)
-		(property "Footprint" "keyswitches:Kailh_socket_MX_reversible"
+		(property "Footprint" "keyswitches:Kailh_socket_PG1350_reversible"
 			(at 100.33 35.56 0)
 			(effects
 				(font
@@ -7023,7 +7057,7 @@
 				)
 			)
 		)
-		(property "Footprint" "keyswitches:Kailh_socket_MX_reversible"
+		(property "Footprint" "keyswitches:Kailh_socket_PG1350_reversible"
 			(at 113.03 52.07 0)
 			(effects
 				(font
@@ -7091,7 +7125,7 @@
 				)
 			)
 		)
-		(property "Footprint" "keyswitches:Kailh_socket_MX_reversible"
+		(property "Footprint" "keyswitches:Kailh_socket_PG1350_reversible"
 			(at 74.93 52.07 0)
 			(effects
 				(font
