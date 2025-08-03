@@ -7,7 +7,6 @@
 // not using stdlib for now
 #define FAIL printf("possible seg fault");
 
-
 List *List_new(unsigned long bytes) {
   List *l = calloc(1, sizeof(List));
   l->width = bytes;
@@ -146,4 +145,9 @@ int List_filter(List *l, int (*function)(void *)) {
     }
   }
   return totalRemoved;
+}
+void List_appendFromArr(List *l, void *source, unsigned int index) {
+  for (unsigned int i = 0; i < index; i++) {
+    List_append(l, source + (l->width * i));
+  }
 }
