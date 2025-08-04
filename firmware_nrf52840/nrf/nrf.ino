@@ -31,13 +31,13 @@ void setup() {
     TinyUSBDevice.begin();
   }
   // BLEHID
-  Bluefruit.setTxPower(4);
+  Bluefruit.begin(); 
   blehid.begin();
 
 
 
   // HID
-  device.begin();
+  // device.begin();
 
   while (!TinyUSBDevice.mounted()) {
     delay(10);
@@ -51,10 +51,10 @@ void setup() {
   SerialTinyUSB.begin(115200);
   startAdv();
 }
-void startAdv(void)
-{  
+void startAdv(void) {  
+  Bluefruit.setName("NRF");
   Bluefruit.Advertising.addFlags(BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE);
-  Bluefruit.Advertising.addTxPower();
+  // Bluefruit.Advertising.addTxPower();
   Bluefruit.Advertising.addAppearance(BLE_APPEARANCE_HID_KEYBOARD);
   Bluefruit.Advertising.addService(blehid);
   Bluefruit.Advertising.addName();
@@ -107,6 +107,11 @@ void loop() {
     SerialTinyUSB.println(" no pins connected ");
   } else { 
     for(size_t i = 0; i<activeKeys.length();i++){
+      // if(blehid.connected()){
+        blehid.keyPress('a');
+        delay(1000);
+        blehid.keyRelease('a');
+      // }
       coord current = activeKeys.get(i);
       SerialTinyUSB.printf("%i -> %i\n",current.from,current.to);
     }
