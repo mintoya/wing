@@ -7,7 +7,7 @@ template <typename T> struct listPlus {
   listPlus() { ptr = List_new(sizeof(T)); }
   listPlus(void *p) { ptr = (List *)p; }
   listPlus(List *p) { ptr = p; }
-  listPlus(T arr[], unsigned int length) {
+  listPlus(T *arr, unsigned int length) {
     ptr = List_new(sizeof(T));
     List_fromArr(ptr, arr, length);
   }
@@ -15,7 +15,7 @@ template <typename T> struct listPlus {
   const unsigned int length() { return ptr->length; }
 
   // ~listPlus() {
-  //   List_delete(ptr); // clean up
+  //   List_delete(ptr);
   // }
   void resize(unsigned int newSize) { List_resize(ptr, newSize); }
   void unmake() { List_delete(ptr); }
@@ -26,6 +26,7 @@ template <typename T> struct listPlus {
 
   void set(unsigned int i, const T &value) { List_set(ptr, i, &value); }
   int searchFor(const T &value) { return List_search(ptr, &value); }
+
 
   void print() const { List_prettyPrint(ptr); }
   unsigned int length() const { return ptr->length; }

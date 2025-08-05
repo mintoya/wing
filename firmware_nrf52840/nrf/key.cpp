@@ -1,3 +1,4 @@
+#include <string.h>
 // found in
 // hardware/nRFMicro/nRFMicro-Arduino-Core/libraries/Adafruit_TinyUSB_Arduino/src/class/hid/hid.h:
 //  #def ine HID_ASCII_TO_KEYCODE \
@@ -244,48 +245,73 @@
 
 #include "my-list.hpp"
 
-#include <cstdint>
 #include <stdint.h>
+#include <stdlib.h>
 
 // clang-format off
 
 
 // stores type of data and data
 struct KeyItem {
-  char character;
+  uint8_t character;//not really a character 
   enum : char { 
            PASSTHROUGH = 0,
            CHARACTER = 1, 
            LAYER = 2,
            TAPDANCE = 4 
          } type;
-  inline KeyItem(char c){character = c;type = CHARACTER;}
+  inline KeyItem(uint8_t c){character = c;type = CHARACTER;}
   inline KeyItem(void){character = 0,type = PASSTHROUGH;}
 };
 // clang-format on
 
+// KeyItem matrix[][]  = {{0x41}};
 constexpr uint8_t colPins[6] = {1, 2, 3, 4, 5, 6};
 constexpr uint8_t rowPins[3] = {1, 2, 3};
-constexpr uint8_t colSize = sizeof(colPins) / sizeof(uint8_t);
-constexpr uint8_t rowSize = sizeof(rowPins) / sizeof(uint8_t);
 
-// clang-format off
-KeyItem matix
-  [sizeof(rowPins) / sizeof(uint8_t)]
-  [sizeof(colPins) / sizeof(uint8_t)] = 
-{
-  { 'a','b','c'},
-  { 'a','b','c'},
-  { 'a','b','c'},
-};
-// clang-format on
+listPlus<uint8_t> colPinsList((uint8_t *)colPins, 6);
+listPlus<uint8_t> rowPinsList((uint8_t *)rowPins, 3);
 
+enum direction : uint8_t { NONE = 0, LOWTOHIGH = 1, HIGHTOLOW = 2 };
 struct activeBuffer {
-  bool a[sizeof(rowPins) / sizeof(uint8_t) * sizeof(colPins) /
-         sizeof(uint8_t)] = {0};
-  bool b[sizeof(rowPins) / sizeof(uint8_t) * sizeof(colPins) /
-         sizeof(uint8_t)] = {0};
+  size_t _rows;
+  size_t _cols;
+  bool *a;
+  bool *b;
+  uint8_t *_change;
   bool active = 0;
-  void inline flip() { active = !active; }
-  bool const *getActive() { return (bool *)((void *)(active ? a : b)); }
+  void inline flip() {
+    active = !active;
+    memset(getActive(), 0, _rows * _cols * sizeof(bool));
+  }
+  inline activeBuffer(unsigned int rows, unsigned int cols) {
+    _rows = rows;
+    _cols = cols;
+
+    _change = (uint8_t *)calloc(rows * cols, sizeof(bool));
+    a = (bool *)calloc(rows * cols, sizeof(bool));
+    b = (bool *)calloc(rows * cols, sizeof(bool));
+  }
+  // treat as 2d array
+  void set(unsigned int row, unsigned int col, bool value) {
+    getActive()[row * _cols + col] = value;
+  }
+  inline bool *getActive() { return active ? a : b; }
+  inline bool *getInActive() { return !active ? a : b; }
+  uint8_t *getDifference() {
+    bool *currentActive = getActive();
+    bool *currentNotActive = getInActive();
+
+    for (unsigned int i = 0; i < _rows * _cols; i++) {
+      if (currentActive[i] && !currentNotActive[i]) {
+        _change[i] = direction::HIGHTOLOW;
+      } else if (!currentActive[i] && currentNotActive[i]) {
+        _change[i] = direction::LOWTOHIGH;
+      } else {
+        _change[i] = direction::NONE;
+      }
+    }
+
+    return _change;
+  }
 };
