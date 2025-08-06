@@ -1,8 +1,8 @@
 #ifndef UMAP_H
 #define UMAP_H
 
-#include <stdlib.h>
 #include "my-list.h"
+#include <stdlib.h>
 #include <string.h>
 
 typedef struct fat_pointer {
@@ -30,6 +30,6 @@ um_fp UMap_toBuf(UMap *map);
 #define nullUmf ((um_fp){.ptr = NULL, .length = 0})
 #define um_fromStr(str)                                                        \
   (um_fp) { str, strlen(str) }
-
+#define um_fromStruct(s) ((um_fp){.ptr = &s, .length = sizeof(s)})
 
 #endif
