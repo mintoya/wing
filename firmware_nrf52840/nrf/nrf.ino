@@ -5,9 +5,10 @@
 #include "my-list.h"
 #include "my-list.hpp"
 #include <bluefruit.h>
+#include "key.hpp"
 
 
-constexpr uint8_t gpios[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
+constexpr uint8_t gpios[] = { 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
 uint8_t const desc_hid_report[] = {
   TUD_HID_REPORT_DESC_KEYBOARD()
 };
@@ -23,6 +24,19 @@ Adafruit_USBD_HID device(desc_hid_report, sizeof(desc_hid_report), HID_ITF_PROTO
 using namespace Adafruit_LittleFS_Namespace;
 File file(InternalFS);
 
+//   9 12
+// 5 a  b
+// 3 c  d
+
+uint8_t colPins[2] = { 9, 12 };
+uint8_t rowPins[2] = { 5, 3 };
+// clang-format off
+  KeyItem matrix[4] = {
+    KEY_A, KEY_B, 
+    KEY_C, KEY_D
+  };
+  reportManager rm;
+  keyMap mk;
 void setup() {
   InternalFS.begin();
 
@@ -50,6 +64,10 @@ void setup() {
 
   SerialTinyUSB.begin(115200);
   startAdv();
+
+
+  rm = reportManager(blehid,device);
+  mk = keyMap(rowPins,2,colPins,2,matrix);
 }
 void startAdv(void) {
   Bluefruit.setName("NRF");
@@ -83,13 +101,6 @@ listPlus<coord> getActiveKeys() {
       if (digitalRead(gpios[j])) {
         coord c = { .from = gpios[i], .to = gpios[j] };
         List_append(_activeKeysBuffer, &c);
-
-
-
-
-        // SerialTinyUSB.print(i);
-        // SerialTinyUSB.print(" -> ");
-        // SerialTinyUSB.println(j);
       }
     }
     pinMode(gpios[i], INPUT_PULLDOWN);
@@ -99,24 +110,32 @@ listPlus<coord> getActiveKeys() {
 }
 
 void loop() {
-  listPlus<coord> activeKeys = getActiveKeys();
 
-  if (!activeKeys.length()) {
-    SerialTinyUSB.println(" no pins connected ");
-    uint8_t report[6] = { 0, 0, 0, 0, 0, 0 };
-    blehid.keyboardReport(0, report);     //reportid,modifiers,codes
-    device.keyboardReport(0, 0, report);  //modifiers,codes
-  } else {
-    for (size_t i = 0; i < activeKeys.length(); i++) {
-      // if(blehid.connected()){
+  mk.updateState();
+  mk.pressKeys(rm);
+  SerialTinyUSB.println(rm.keys.get(0));
+  rm.send();
+  delay(1);
 
-      uint8_t report[6] = { 0x4, 0, 0, 0, 0, 0 };
-      blehid.keyboardReport(0, 0, report);  //reportid,modifiers,codes
-      device.keyboardReport(0, 0, report);  //modifiers,codes
-      // }
-      coord current = activeKeys.get(i);
-      SerialTinyUSB.printf("%i -> %i\n", current.from, current.to);
-    }
-    delay(10);
-  }
+  // clang-format on
+  // listPlus<coord> activeKeys = getActiveKeys();
+  //
+  // if (!activeKeys.length()) {
+  //   SerialTinyUSB.println(" no pins connected ");
+  //   uint8_t report[6] = { 0, 0, 0, 0, 0, 0 };
+  //   blehid.keyboardReport(0, report);     //reportid,modifiers,codes
+  //   device.keyboardReport(0, 0, report);  //modifiers,codes
+  // } else {
+  //   for (size_t i = 0; i < activeKeys.length(); i++) {
+  //     // if(blehid.connected()){
+  //
+  //     uint8_t report[6] = { 0x4, 0, 0, 0, 0, 0 };
+  //     blehid.keyboardReport(0, 0, report);  //reportid,modifiers,codes
+  //     device.keyboardReport(0, 0, report);  //modifiers,codes
+  //     // }
+  //     coord current = activeKeys.get(i);
+  //     SerialTinyUSB.printf("%i -> %i\n", current.from, current.to);
+  //   }
+  //   delay(10);
+  // }
 }
