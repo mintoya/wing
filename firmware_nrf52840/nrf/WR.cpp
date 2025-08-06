@@ -12,7 +12,7 @@
 // File file(InternalFS);
 //
 // // the setup function runs once when you press reset or power the board
-// void setup() 
+// void setup()
 // {
 //   Serial.begin(115200);
 //   while ( !Serial ) delay(10);   // for nrf52840 with native usb
@@ -64,6 +64,6 @@
 // }
 //
 // // the loop function runs over and over again forever
-// void loop() 
+// void loop()
 // {
 // }
