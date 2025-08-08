@@ -1,5 +1,5 @@
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 #include "umap.h"
 
@@ -68,7 +68,12 @@ int UMap_linearSearch(UMap *map, um_fp key) {
   return res;
 }
 um_fp UMap_getValAtKey(UMap *map, um_fp key) {
-  return UMap_getValAtIndex(map, UMap_binarySearch(map, key));
+  unsigned int index = UMap_binarySearch(map, key);
+  if (!keyCmp(key, UMap_getKeyAtIndex(map, index))) {
+    return UMap_getValAtIndex(map, UMap_binarySearch(map, key));
+  } else {
+    return nullUmf;
+  }
 }
 void UMap_set(UMap *map, um_fp key, um_fp val) {
   unsigned int index = UMap_binarySearch(map, key);
