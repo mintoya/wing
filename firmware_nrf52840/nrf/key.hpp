@@ -146,16 +146,13 @@ struct keyMap {
         pinStateMatrix[i * _cols + j] = pressed;
       }
 
-      // 3) Float the row back
       pinMode(rowPins[i], INPUT);
-      // (optionally: digitalWrite(rowPins[i], LOW); to avoid stray HIGH)
     }
   }
   void pressKeys(reportManager manager) {
 
     for (size_t i = 0; i < _rows; i++) {
       for (size_t j = 0; j < _cols; j++) {
-        // pinStateMatrix[i * _cols + j] = true;
         if (pinStateMatrix[i * _cols + j]) {
           manager.addKey(matrix[i * _cols + j]);
         }

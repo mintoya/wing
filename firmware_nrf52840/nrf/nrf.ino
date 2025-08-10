@@ -111,31 +111,21 @@ listPlus<coord> getActiveKeys() {
 
 void loop() {
 
-  mk.updateState();
-  mk.pressKeys(rm);
-  SerialTinyUSB.println(rm.keys.get(0));
-  rm.send();
-  delay(1);
+  // mk.updateState();
+  // mk.pressKeys(rm);
+  // SerialTinyUSB.println(rm.keys.get(0));
+  // rm.send();
+  // delay(1);
 
-  // clang-format on
-  // listPlus<coord> activeKeys = getActiveKeys();
-  //
-  // if (!activeKeys.length()) {
-  //   SerialTinyUSB.println(" no pins connected ");
-  //   uint8_t report[6] = { 0, 0, 0, 0, 0, 0 };
-  //   blehid.keyboardReport(0, report);     //reportid,modifiers,codes
-  //   device.keyboardReport(0, 0, report);  //modifiers,codes
-  // } else {
-  //   for (size_t i = 0; i < activeKeys.length(); i++) {
-  //     // if(blehid.connected()){
-  //
-  //     uint8_t report[6] = { 0x4, 0, 0, 0, 0, 0 };
-  //     blehid.keyboardReport(0, 0, report);  //reportid,modifiers,codes
-  //     device.keyboardReport(0, 0, report);  //modifiers,codes
-  //     // }
-  //     coord current = activeKeys.get(i);
-  //     SerialTinyUSB.printf("%i -> %i\n", current.from, current.to);
-  //   }
-  //   delay(10);
-  // }
+  listPlus<coord> activeKeys = getActiveKeys();
+
+  if (!activeKeys.length()) {
+    SerialTinyUSB.println(" no pins connected ");
+  } else {
+    for (size_t i = 0; i < activeKeys.length(); i++) {
+      coord current = activeKeys.get(i);
+      SerialTinyUSB.printf("%i -> %i\n", current.from, current.to);
+    }
+    delay(10);
+  }
 }
