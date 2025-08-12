@@ -7,8 +7,12 @@
 #include <bluefruit.h>
 #include "key.hpp"
 
+#include <SoftwareSerial.h>
+#define RATE 1200
+constexpr uint8_t rowGpios[] = { 10, 11, 12, 13 };
+constexpr uint8_t colGpios[] = { 16, 15, 14, 9, 8, 7 };
+SoftwareSerial comms(2, 3);
 
-constexpr uint8_t gpios[] = { 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
 uint8_t const desc_hid_report[] = {
   TUD_HID_REPORT_DESC_KEYBOARD()
 };
@@ -20,23 +24,23 @@ Adafruit_USBD_HID device(desc_hid_report, sizeof(desc_hid_report), HID_ITF_PROTO
 
 #define FILENAME "/adafruit.txt";
 #define CONTENTS "Adafruit Little File System test file contents";
-
 using namespace Adafruit_LittleFS_Namespace;
 File file(InternalFS);
 
-//   9 12
-// 5 a  b
-// 3 c  d
 
-uint8_t colPins[2] = { 9, 12 };
-uint8_t rowPins[2] = { 5, 3 };
 // clang-format off
-  KeyItem matrix[4] = {
-    KEY_A, KEY_B, 
-    KEY_C, KEY_D
-  };
-  reportManager rm;
-  keyMap mk;
+KeyItem matrix[12 * 4] = {
+    KEY_A, KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T,    KEY_Y, KEY_U, KEY_I, KEY_O, KEY_P, KEY_B,
+    KEY_A, KEY_A, KEY_S, KEY_D, KEY_F, KEY_G,    KEY_H, KEY_J, KEY_K, KEY_L, KEY_SEMICOLON, KEY_B,
+    KEY_A, KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B,    KEY_N, KEY_M, KEY_COMMA, KEY_DOT, KEY_A, KEY_B,
+    KEY_A, KEY_B, KEY_C, KEY_D, KEY_A, KEY_B,    KEY_A, KEY_B, KEY_C, KEY_D, KEY_A, KEY_B,
+};
+bool state[12 * 4] = { 0 };
+// clang-format on
+
+reportManager rm;
+
+
 void setup() {
   InternalFS.begin();
 
@@ -58,16 +62,18 @@ void setup() {
   }
 
   // GPIO
-  for (size_t i = 0; i < sizeof(gpios) / sizeof(uint8_t); i++) {
-    pinMode(gpios[i], INPUT_PULLDOWN);
+  for (size_t i = 0; i < sizeof(rowGpios) / sizeof(uint8_t); i++) {
+    pinMode(rowGpios[i], INPUT_PULLDOWN);
   }
-
-  SerialTinyUSB.begin(115200);
+  for (size_t i = 0; i < sizeof(colGpios) / sizeof(uint8_t); i++) {
+    pinMode(colGpios[i], OUTPUT);
+  }
+  comms.begin(RATE);
+  SerialTinyUSB.begin(RATE);
   startAdv();
 
 
-  rm = reportManager(blehid,device);
-  mk = keyMap(rowPins,2,colPins,2,matrix);
+  rm = reportManager(blehid, device);
 }
 void startAdv(void) {
   Bluefruit.setName("NRF");
@@ -88,44 +94,32 @@ struct coord {
   //connection between wires from high to low
 };
 
-listPlus<coord> getActiveKeys() {
-  static List* _activeKeysBuffer = NULL;
-  if (!_activeKeysBuffer) {
-    _activeKeysBuffer = List_new(sizeof(coord));
-  }
-  _activeKeysBuffer->length = 0;
-  for (size_t i = 0; i < sizeof(gpios) / sizeof(uint8_t); i++) {
-    pinMode(gpios[i], OUTPUT);
-    for (size_t j = 0; j < sizeof(gpios) / sizeof(uint8_t); j++) {
-      if (j == i) continue;
-      if (digitalRead(gpios[j])) {
-        coord c = { .from = gpios[i], .to = gpios[j] };
-        List_append(_activeKeysBuffer, &c);
-      }
-    }
-    pinMode(gpios[i], INPUT_PULLDOWN);
-    delay(1);
-  }
-  return listPlus<coord>(_activeKeysBuffer);
-}
 
+uint8_t otherHalfData[4] = { 0 };
 void loop() {
 
-  // mk.updateState();
-  // mk.pressKeys(rm);
-  // SerialTinyUSB.println(rm.keys.get(0));
-  // rm.send();
-  // delay(1);
-
-  listPlus<coord> activeKeys = getActiveKeys();
-
-  if (!activeKeys.length()) {
-    SerialTinyUSB.println(" no pins connected ");
-  } else {
-    for (size_t i = 0; i < activeKeys.length(); i++) {
-      coord current = activeKeys.get(i);
-      SerialTinyUSB.printf("%i -> %i\n", current.from, current.to);
-    }
-    delay(10);
+  while(comms.available()){
+    uint8_t data = comms.read();
+    otherHalfData[data>>6] = data;
   }
+
+
+  for (size_t i = 0; i < 6; i++) {
+    digitalWrite(colGpios[i],HIGH);
+    for (size_t j = 0; j < 4; j++) {
+      state[j*12+i] = digitalRead(rowGpios[j]);
+      state[j*12+i+6] = otherHalfData[j] & ((uint8_t)1 << i);
+    }
+    digitalWrite(colGpios[i],LOW);
+  }
+
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 8; j++)
+      SerialTinyUSB.print((otherHalfData[i] & ((uint8_t)1 << j)) ? 'X' : ' ');
+  }
+  delay(1);
+  SerialTinyUSB.println();
+
+  keyMap::pressKeys(12*4,matrix,state,rm);
+  rm.send();
 }

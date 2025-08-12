@@ -486,10 +486,10 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "",
+      "plot": "/home/paa/Downloads/",
       "pos_files": "",
-      "specctra_dsn": "",
-      "step": "V3.stl",
+      "specctra_dsn": "../../../Downloads/V3.dsn",
+      "step": "V3.step",
       "svg": "",
       "vrml": ""
     },
@@ -636,10 +636,6 @@
     [
       "55ac274f-6d39-4edb-ae03-cf051723ec39",
       "Root"
-    ],
-    [
-      "24e35c6e-1b9f-4b45-a283-2d51b43b5234",
-      "HID connector"
     ]
   ],
   "text_variables": {}

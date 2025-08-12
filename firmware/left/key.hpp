@@ -1,9 +1,9 @@
+#pragma once
 #include "hid_keys.h"
-#include <cstddef>
-#include <cstdint>
 #include <string.h>
 
 #include "arduino/hid/Adafruit_USBD_HID.h"
+#include "my-list.h"
 #include "my-list.hpp"
 #include <bluefruit.h>
 #include <stdint.h>
@@ -91,72 +91,14 @@ struct reportManager {
   }
 };
 
-struct keyMap {
-  keyMap() {};
-  unsigned int _rows;
-  unsigned int _cols;
-  uint8_t *colPins;
-  uint8_t *rowPins;
-  KeyItem *matrix;
+namespace keyMap {
 
-  bool *pinStateMatrix;
-
-  keyMap(uint8_t *rows, unsigned int rowsLength, uint8_t *cols,
-         unsigned int colsLength, KeyItem *map) {
-    _rows = rowsLength;
-    _cols = colsLength;
-    colPins = (uint8_t *)malloc(sizeof(uint8_t) * _cols);
-    rowPins = (uint8_t *)malloc(sizeof(uint8_t) * _rows);
-    memcpy(colPins, cols, sizeof(uint8_t) * _cols);
-    memcpy(rowPins, rows, sizeof(uint8_t) * _rows);
-    pinStateMatrix = (bool *)calloc(_rows * _cols, sizeof(bool));
-    matrix = (KeyItem *)calloc(_rows * _cols, sizeof(KeyItem));
-    memcpy(matrix, map, sizeof(KeyItem) * _rows * _cols);
-  }
-  // void updateState() {
-  //   for (size_t i = 0; i < _rows; i++) {
-  //     pinMode(rowPins[i], OUTPUT);
-  //     digitalWrite(rowPins[i], HIGH);
-  //     for (size_t j = 0; j < _cols; j++) {
-  //       pinMode(colPins[j], INPUT_PULLDOWN);
-  //       if (j == i)
-  //         continue;
-  //       if (digitalRead(colPins[j])) {
-  //         pinStateMatrix[i * _cols + j] = true;
-  //       } else {
-  //         pinStateMatrix[i * _cols + j] = false;
-  //       }
-  //     }
-  //     pinMode(rowPins[i], INPUT_PULLDOWN);
-  //     delay(1);
-  //   }
-  // }
-  void updateState() {
-    for (size_t i = 0; i < _rows; i++) {
-      // 1) Drive this row pin LOW
-      pinMode(rowPins[i], OUTPUT);
-      digitalWrite(rowPins[i], LOW);
-      delayMicroseconds(5); // let it settle
-
-      // 2) Read each column with a pull-up
-      for (size_t j = 0; j < _cols; j++) {
-        pinMode(colPins[j], INPUT_PULLUP);
-        // if the switch is closed, it'll pull the column LOW
-        bool pressed = (digitalRead(colPins[j]) == LOW);
-        pinStateMatrix[i * _cols + j] = pressed;
+  void pressKeys(uint8_t length,KeyItem* maps, bool*state,reportManager rm){
+    for (unsigned int i = 0;i<length;i++){
+      if(state[i]){
+        rm.addKey(maps[i]);
       }
 
-      pinMode(rowPins[i], INPUT);
     }
   }
-  void pressKeys(reportManager manager) {
-
-    for (size_t i = 0; i < _rows; i++) {
-      for (size_t j = 0; j < _cols; j++) {
-        if (pinStateMatrix[i * _cols + j]) {
-          manager.addKey(matrix[i * _cols + j]);
-        }
-      }
-    }
-  }
-};
+}
