@@ -12,7 +12,7 @@
 #define RATE 115200
 constexpr uint8_t rowGpios[] = { 10, 11, 12, 13 };
 // constexpr uint8_t colGpios[] = { 16, 15, 14, 9, 8, 7 };
-constexpr uint8_t colGpios[] = { 7, 8, 9, 14, 15, 16 };// reversed from right
+constexpr uint8_t colGpios[] = { 7, 8, 9, 14, 15, 16 };  // reversed from right
 SoftwareSerial comms(2, 3);
 SerialTransfer myTransfer;
 uint8_t const desc_hid_report[] = {
@@ -80,7 +80,7 @@ void setup() {
     pinMode(colGpios[i], OUTPUT);
   }
   comms.begin(RATE);
-  myTransfer.begin(comms,true);
+  myTransfer.begin(comms, false);
   SerialTinyUSB.begin(RATE);
   startAdv();
 
@@ -109,32 +109,29 @@ struct coord {
 
 uint8_t otherHalfData[4] = { 0 };
 void loop() {
-
   // while(comms.available()){
   //   uint8_t data = comms.read();
   //   otherHalfData[data>>6] = data;
   // }
-  if(myTransfer.available())
-  {
-    uint16_t recSize = 0;
-    recSize = myTransfer.rxObj(otherHalfData, recSize);
-  }
 
   for (size_t i = 0; i < 6; i++) {
-    digitalWrite(colGpios[i],HIGH);
+    digitalWrite(colGpios[i], HIGH);
     for (size_t j = 0; j < 4; j++) {
-      state[j*12+i] = digitalRead(rowGpios[j]);
-      state[j*12+i+6] = otherHalfData[j] & ((uint8_t)1 << i);
+      state[j * 12 + i] = digitalRead(rowGpios[j]);
+      state[j * 12 + i + 6] = otherHalfData[j] & ((uint8_t)1 << i);
     }
-    digitalWrite(colGpios[i],LOW);
+    digitalWrite(colGpios[i], LOW);
   }
+  while (!myTransfer.available()) { delayMicroseconds(1); }
+  uint16_t recSize = 0;
+  recSize = myTransfer.rxObj(otherHalfData, recSize);
 
-  // for (int i = 0; i < 4; i++) {
-  //   for (int j = 0; j < 8; j++)
-  //     SerialTinyUSB.print((otherHalfData[i] & ((uint8_t)1 << j)) ? 'X' : ' ');
-  // }
-  // SerialTinyUSB.println();
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 8; j++)
+      SerialTinyUSB.print((otherHalfData[i] & ((uint8_t)1 << j)) ? 'X' : ' ');
+  }
+  SerialTinyUSB.println();
 
-  keyMap::pressKeys(12*4,matrix,state,rm);
+  keyMap::pressKeys(12 * 4, matrix, state, rm);
   rm.send();
 }
