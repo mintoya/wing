@@ -4,15 +4,17 @@
 #include "arduino/hid/Adafruit_USBD_HID.h"
 #include "my-list.h"
 #include "my-list.hpp"
+#include <SerialTransfer.h>
 #include <bluefruit.h>
 #include "key.hpp"
 
 #include <SoftwareSerial.h>
-#define RATE 1200
+#define RATE 115200
 constexpr uint8_t rowGpios[] = { 10, 11, 12, 13 };
-constexpr uint8_t colGpios[] = { 16, 15, 14, 9, 8, 7 };
+// constexpr uint8_t colGpios[] = { 16, 15, 14, 9, 8, 7 };
+constexpr uint8_t colGpios[] = { 7, 8, 9, 14, 15, 16 };// reversed from right
 SoftwareSerial comms(2, 3);
-
+SerialTransfer myTransfer;
 uint8_t const desc_hid_report[] = {
   TUD_HID_REPORT_DESC_KEYBOARD()
 };
@@ -29,13 +31,22 @@ File file(InternalFS);
 
 
 // clang-format off
+// KeyItem matrix[12 * 4] = {
+//     KEY_A, KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T,    KEY_Y, KEY_U, KEY_I, KEY_O, KEY_P, KEY_B,
+//     KEY_A, KEY_A, KEY_S, KEY_D, KEY_F, KEY_G,    KEY_H, KEY_J, KEY_K, KEY_L, KEY_SEMICOLON, KEY_B,
+//     KEY_A, KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B,    KEY_N, KEY_M, KEY_COMMA, KEY_DOT, KEY_A, KEY_B,
+//     KEY_A, KEY_B, KEY_C, KEY_D, KEY_SPACE, KEY_SPACE,    KEY_A, KEY_B, KEY_C, KEY_D, KEY_A, KEY_B,
+// };
+using namespace KeyMapDec;
+
 KeyItem matrix[12 * 4] = {
-    KEY_A, KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T,    KEY_Y, KEY_U, KEY_I, KEY_O, KEY_P, KEY_B,
-    KEY_A, KEY_A, KEY_S, KEY_D, KEY_F, KEY_G,    KEY_H, KEY_J, KEY_K, KEY_L, KEY_SEMICOLON, KEY_B,
-    KEY_A, KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B,    KEY_N, KEY_M, KEY_COMMA, KEY_DOT, KEY_A, KEY_B,
-    KEY_A, KEY_B, KEY_C, KEY_D, KEY_A, KEY_B,    KEY_A, KEY_B, KEY_C, KEY_D, KEY_A, KEY_B,
+    KEY_TAB, C('q'), C('w'), C('e'), C('r'), C('t'),    C('y'), C('u'), C('i'), C('o'), C('p'), KEY_BACKSPACE,
+    M('s'), C('a'), C('s'), C('d'), C('f'), C('g'),    C('h'), C('j'), C('k'), C('l'), C(';'),  KEY_LEFTBRACE,
+    M('c'), C('z'), C('x'), C('c'), C('v'), C('b'),    C('n'), C('m'), C(','), C('.'), C('/'),  KEY_ENTER,
+    N()   , N()   , N()   , M('a'), C(' '), C(' '),    C(' '), N(), N(), N(), N(),  N(),
 };
 bool state[12 * 4] = { 0 };
+
 // clang-format on
 
 reportManager rm;
@@ -69,6 +80,7 @@ void setup() {
     pinMode(colGpios[i], OUTPUT);
   }
   comms.begin(RATE);
+  myTransfer.begin(comms,true);
   SerialTinyUSB.begin(RATE);
   startAdv();
 
@@ -98,11 +110,15 @@ struct coord {
 uint8_t otherHalfData[4] = { 0 };
 void loop() {
 
-  while(comms.available()){
-    uint8_t data = comms.read();
-    otherHalfData[data>>6] = data;
+  // while(comms.available()){
+  //   uint8_t data = comms.read();
+  //   otherHalfData[data>>6] = data;
+  // }
+  if(myTransfer.available())
+  {
+    uint16_t recSize = 0;
+    recSize = myTransfer.rxObj(otherHalfData, recSize);
   }
-
 
   for (size_t i = 0; i < 6; i++) {
     digitalWrite(colGpios[i],HIGH);
@@ -113,12 +129,11 @@ void loop() {
     digitalWrite(colGpios[i],LOW);
   }
 
-  for (int i = 0; i < 4; i++) {
-    for (int j = 0; j < 8; j++)
-      SerialTinyUSB.print((otherHalfData[i] & ((uint8_t)1 << j)) ? 'X' : ' ');
-  }
-  delay(1);
-  SerialTinyUSB.println();
+  // for (int i = 0; i < 4; i++) {
+  //   for (int j = 0; j < 8; j++)
+  //     SerialTinyUSB.print((otherHalfData[i] & ((uint8_t)1 << j)) ? 'X' : ' ');
+  // }
+  // SerialTinyUSB.println();
 
   keyMap::pressKeys(12*4,matrix,state,rm);
   rm.send();
