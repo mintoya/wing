@@ -1,5 +1,6 @@
 #pragma once
 #include "hid_keys.h"
+#include <cstdint>
 #include <string.h>
 
 #include "arduino/hid/Adafruit_USBD_HID.h"
@@ -180,10 +181,19 @@ struct reportManager {
 
 namespace keyMap {
 
-void pressKeys(uint8_t length, KeyItem *maps, bool *state, reportManager rm) {
+// only 10 layers for now
+void pressKeys(uint8_t length, KeyItem *maps[10], bool *state, reportManager rm, unsigned int currentLayer = 0) {
+
+  for (unsigned int i = 0; i < length; i++) {
+    if (state[i] && maps[currentLayer][i].type == KeyItem::kType::LAYER) {
+      state[i] = false;
+      return pressKeys(length, maps, state, rm, maps[currentLayer][i].character);
+    }
+  }
+  // key cannot be a layer now
   for (unsigned int i = 0; i < length; i++) {
     if (state[i]) {
-      rm.addKey(maps[i]);
+      rm.addKey(maps[currentLayer][i]);
     }
   }
 }

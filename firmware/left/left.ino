@@ -43,8 +43,16 @@ KeyItem matrix[12 * 4] = {
     KEY_TAB, C('q'), C('w'), C('e'), C('r'), C('t'),    C('y'), C('u'), C('i'), C('o'), C('p'), KEY_BACKSPACE,
     M('s'), C('a'), C('s'), C('d'), C('f'), C('g'),    C('h'), C('j'), C('k'), C('l'), C(';'),  KEY_LEFTBRACE,
     M('c'), C('z'), C('x'), C('c'), C('v'), C('b'),    C('n'), C('m'), C(','), C('.'), C('/'),  KEY_ENTER,
+    N()   , N()   , N()   , M('a'), C(' '), C(' '),    C(' '), L(1), N(), N(), N(),  N(),
+};
+KeyItem matrix2[12 * 4] = {
+    KEY_TAB, C('1'), C('2'), C('3'), C('4'), C('5'),    C('6'), C('7'), C('8'), C('9'), C('0'), KEY_BACKSPACE,
+    M('s'), C('a'), C('s'), C('d'), C('f'), C('g'),    C('h'), C('j'), C('k'), C('l'), C(';'),  KEY_LEFTBRACE,
+    M('c'), C('z'), C('x'), C('c'), C('v'), C('b'),    C('n'), C('m'), C(','), C('.'), C('/'),  KEY_ENTER,
     N()   , N()   , N()   , M('a'), C(' '), C(' '),    C(' '), N(), N(), N(), N(),  N(),
 };
+
+KeyItem* layers[10] = {matrix,matrix2,0};
 bool state[12 * 4] = { 0 };
 
 // clang-format on
@@ -132,6 +140,6 @@ void loop() {
   }
   SerialTinyUSB.println();
 
-  keyMap::pressKeys(12 * 4, matrix, state, rm);
+  keyMap::pressKeys(12 * 4, layers, state, rm);
   rm.send();
 }
