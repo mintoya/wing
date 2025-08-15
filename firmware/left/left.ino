@@ -31,25 +31,22 @@ File file(InternalFS);
 
 
 // clang-format off
-// KeyItem matrix[12 * 4] = {
-//     KEY_A, KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T,    KEY_Y, KEY_U, KEY_I, KEY_O, KEY_P, KEY_B,
-//     KEY_A, KEY_A, KEY_S, KEY_D, KEY_F, KEY_G,    KEY_H, KEY_J, KEY_K, KEY_L, KEY_SEMICOLON, KEY_B,
-//     KEY_A, KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B,    KEY_N, KEY_M, KEY_COMMA, KEY_DOT, KEY_A, KEY_B,
-//     KEY_A, KEY_B, KEY_C, KEY_D, KEY_SPACE, KEY_SPACE,    KEY_A, KEY_B, KEY_C, KEY_D, KEY_A, KEY_B,
-// };
+void testFunction(void){
+  SerialTinyUSB.println("test function call");
+}
 using namespace KeyMapDec;
-
+void (*keyboardFunctions[255])(void) = {testFunction,0}; // initialize all to NULL
 KeyItem matrix[12 * 4] = {
-    KEY_TAB, C('q'), C('w'), C('e'), C('r'), C('t'),    C('y'), C('u'), C('i'), C('o'), C('p'), KEY_BACKSPACE,
-    M('s'), C('a'), C('s'), C('d'), C('f'), C('g'),    C('h'), C('j'), C('k'), C('l'), C(';'),  KEY_LEFTBRACE,
-    M('c'), C('z'), C('x'), C('c'), C('v'), C('b'),    C('n'), C('m'), C(','), C('.'), C('/'),  KEY_ENTER,
-    N()   , N()   , N()   , M('a'), C(' '), C(' '),    C(' '), L(1), N(), N(), N(),  N(),
+    KEY_TAB, C('q'), C('w'), C('e'), C('r'), C('t'),    C('y'), C('u'), C('i'), C('o'), C('p'),  KEY_BACKSPACE,
+    M('s') , C('a'), C('s'), C('d'), C('f'), C('g'),    C('h'), C('j'), C('k'), C('l'), C(';'),  KEY_LEFTBRACE,
+    M('c') , C('z'), C('x'), C('c'), C('v'), C('b'),    C('n'), C('m'), C(','), C('.'), C('/'),  KEY_ENTER,
+    0      , 0     , TD(0) , M('a'), C(' '), C(' '),    L(1)  ,  FN(0),      0,      0,      0,  0,
 };
 KeyItem matrix2[12 * 4] = {
-    KEY_TAB, C('1'), C('2'), C('3'), C('4'), C('5'),    C('6'), C('7'), C('8'), C('9'), C('0'), KEY_BACKSPACE,
-    M('s'), C('a'), C('s'), C('d'), C('f'), C('g'),    C('h'), C('j'), C('k'), C('l'), C(';'),  KEY_LEFTBRACE,
-    M('c'), C('z'), C('x'), C('c'), C('v'), C('b'),    C('n'), C('m'), C(','), C('.'), C('/'),  KEY_ENTER,
-    N()   , N()   , N()   , M('a'), C(' '), C(' '),    C(' '), N(), N(), N(), N(),  N(),
+    KEY_ESC, C('1'), C('2'), C('3'), C('4'), C('5'),    C('6'), C('7'), C('8'), C('9'), C('0'),  KEY_DELETE,
+    0      , 0     , 0     , 0     , 0     , 0     ,    0     , 0     , 0     , 0     , 0     ,  KEY_LEFTBRACE,
+    0      , 0     , 0     , 0     , 0     , 0     ,    0     , 0     , 0     , 0     , 0     ,  KEY_ENTER,
+    0      , 0     , 0     , M('a'), C(' '), C(' '),    L(1)  , 0     , 0     , 0     , 0     ,  0,
 };
 
 KeyItem* layers[10] = {matrix,matrix2,0};

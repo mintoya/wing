@@ -1,46 +1,46 @@
 #pragma once
 #include "hid_keys.h"
-#include <cstdint>
-#include <string.h>
 
 #include "arduino/hid/Adafruit_USBD_HID.h"
 #include "my-list.h"
 #include "my-list.hpp"
 #include <bluefruit.h>
+#include <cstdint>
 #include <stdint.h>
 #include <stdlib.h>
+#include <sys/types.h>
 
 // clang-format off
 
+extern unsigned long millis(void);
+extern void (*keyboardFunctions[255])(void);
 
 // stores type of data and data
-struct KeyItem {
+struct KeyItem{
   uint8_t character;//not really a character 
   enum kType : char{ 
            PASSTHROUGH = 0,
            CHARACTER = 1, 
            LAYER = 2,
            TAPDANCE = 4 ,
-           MODIFIER = 8
+           MODIFIER = 8,
+           FUNCTIONCALL = 64,
          } type;
-  inline KeyItem(uint8_t c){character = c;type = CHARACTER;}
-  inline KeyItem(void){character = 0,type = PASSTHROUGH;}
-  inline KeyItem(kType t,uint8_t data){type = t;character = data;}
+  inline KeyItem(void){
+    character = 0;
+    type = kType::PASSTHROUGH;
+  }
+   inline KeyItem(uint8_t data){
+     character = data;
+     type = (data)?(kType::CHARACTER):(kType::PASSTHROUGH); 
+   }
+   inline KeyItem(uint8_t data,kType t){
+     character = data;type = t;
+   }
 };
 namespace KeyMapDec{
-  KeyItem M(char c){
-// #define KEY_MOD_LCTRL  0x01  c
-// #define KEY_MOD_LSHIFT 0x02  s
-// #define KEY_MOD_LALT   0x04  a
-// #define KEY_MOD_LMETA  0x08  m
-// #define KEY_MOD_RCTRL  0x10  C
-// #define KEY_MOD_RSHIFT 0x20  S
-// #define KEY_MOD_RALT   0x40  A
-// #define KEY_MOD_RMETA  0x80  M
-//
-// left : uncapitalized
-// right: capitalized
 
+  KeyItem M(char c){
     uint8_t actual;
     switch (c){
         case 'c': actual = KEY_MOD_LCTRL; break;
@@ -52,12 +52,17 @@ namespace KeyMapDec{
         case 'A': actual = KEY_MOD_RALT; break;
         case 'M': actual = KEY_MOD_RMETA; break;
     }
-    return KeyItem(KeyItem::kType::MODIFIER,actual);
+    return KeyItem(actual,  KeyItem::kType::MODIFIER);
   }
   KeyItem L(uint8_t layer){
-    return KeyItem(KeyItem::kType::LAYER,layer);
+    return KeyItem(layer,  KeyItem::kType::LAYER);
   }
-  KeyItem N(){return KeyItem();}
+  KeyItem FN(uint8_t functionIndex){
+    return KeyItem(functionIndex,  KeyItem::kType::FUNCTIONCALL);
+  }
+  KeyItem TD(uint8_t tapdanceIndex){
+    return KeyItem(tapdanceIndex,KeyItem::kType::TAPDANCE);
+  }
   KeyItem C(char c){
     uint8_t actual;
 
@@ -105,10 +110,11 @@ namespace KeyMapDec{
         case '.': actual = KEY_DOT; break;
         case ',': actual = KEY_COMMA; break;
         case ';': actual = KEY_SEMICOLON; break;
-
+        case '-': actual = KEY_MINUS; break;
+        case '=': actual = KEY_EQUAL; break;
 
     }
-    return KeyItem(KeyItem::kType::CHARACTER, actual);
+    return KeyItem(actual,  KeyItem::kType::CHARACTER);
     }
 
 }
@@ -148,13 +154,15 @@ struct reportManager {
     blehid = ble;
     usbhid = usb;
   }
-  listPlus<uint8_t> modifiers;
+  // listPlus<uint8_t> modifiers;
+  uint8_t modifier;
   listPlus<uint8_t> keys;
 
   void addKey(KeyItem k) {
     switch (k.type) {
     case KeyItem::MODIFIER:
-      modifiers.append(k.character);
+      modifier |= k.character;
+      // modifiers.append(k.character);
       break;
     case KeyItem::CHARACTER:
       keys.append(k.character);
@@ -164,36 +172,59 @@ struct reportManager {
     }
   }
   void send() {
-    uint8_t modifierResult = 0;
-    for (size_t i = 0; i < modifiers.length(); i++) {
-      modifierResult |= modifiers.get(i);
-    }
-
+    // uint8_t modifierResult = 0;
+    // for (size_t i = 0; i < modifiers.length(); i++) {
+    //   modifierResult |= modifiers.get(i);
+    // }
     while (keys.length() < 6) {
       keys.append(0);
     }
-    blehid.keyboardReport(0, modifierResult, keys.autoCast());
-    usbhid.keyboardReport(0, modifierResult, keys.autoCast());
-    modifiers.ptr->length = 0;
+    blehid.keyboardReport(0, modifier, keys.autoCast());
+    usbhid.keyboardReport(0, modifier, keys.autoCast());
+    // blehid.keyboardReport(0, modifierResult, keys.autoCast());
+    // usbhid.keyboardReport(0, modifierResult, keys.autoCast());
+    // modifiers.ptr->length = 0;
+    modifier = 0;
     keys.ptr->length = 0;
   }
 };
-
 namespace keyMap {
 
 // only 10 layers for now
-void pressKeys(uint8_t length, KeyItem *maps[10], bool *state, reportManager rm, unsigned int currentLayer = 0) {
-
+void pressKeys(uint8_t length, KeyItem *maps[10], bool *state,
+               reportManager &rm, unsigned int currentLayer = 0) {
+  unsigned long now = millis();
+  // check layers
   for (unsigned int i = 0; i < length; i++) {
     if (state[i] && maps[currentLayer][i].type == KeyItem::kType::LAYER) {
       state[i] = false;
-      return pressKeys(length, maps, state, rm, maps[currentLayer][i].character);
+      return pressKeys(length, maps, state, rm,
+                       maps[currentLayer][i].character);
     }
   }
-  // key cannot be a layer now
+
   for (unsigned int i = 0; i < length; i++) {
     if (state[i]) {
-      rm.addKey(maps[currentLayer][i]);
+      KeyItem currentKey = maps[currentLayer][i];
+
+      if (currentKey.type == KeyItem::kType::PASSTHROUGH) {
+        for (int j = currentLayer; j >= 0; j--) {
+          if (!(maps[j][i].type == KeyItem::kType::PASSTHROUGH)) {
+            currentKey = maps[j][i];
+            break;
+          }
+        }
+      }
+      switch (currentKey.type) {
+      case KeyItem::kType::FUNCTIONCALL: {
+        keyboardFunctions[currentKey.character]();
+      } break;
+      case KeyItem::kType::TAPDANCE: {
+        // unimplemented
+      default:
+        rm.addKey(currentKey);
+      }
+      }
     }
   }
 }

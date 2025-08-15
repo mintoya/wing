@@ -82,6 +82,7 @@ void List_set(List *l, unsigned int i, const void *element) {
   checkBounds(l, i);
   memcpy(l->head + i * l->size, element, l->width);
 }
+// expands list to
 void *List_gst(List *l, unsigned int i) {
   checkBounds(l, i);
   return l->head + i * l->width;
@@ -92,7 +93,7 @@ void List_zeroOut(List *l) {
     memset(List_gst(l, i), 0, l->width);
   }
 }
-void List_append(List *l, void *element) {
+void List_append(List *l, const void *element) {
   if (l->length + 1 >= l->size) {
     unsigned int nl = l->length + (l->length >> 1) + 1;
     List_resize(l, nl);
@@ -134,7 +135,7 @@ int List_forEach(List *l, int (*function)(void *)) {
   }
   return result;
 }
-void List_fromArr(List *l, void *source, unsigned int i) {
+void List_fromArr(List *l, const void *source, unsigned int i) {
   // helper function for turning arrays into lists
   l->length = i;
   List_resize(l, i);
@@ -151,16 +152,16 @@ int List_filter(List *l, int (*function)(void *)) {
   }
   return totalRemoved;
 }
-int List_search(List *l, void *value) {
+int List_search(List *l, const void *value) {
   // search entire list for value
   for (size_t i = 0; i < l->length; i++) {
-    if (memcmp(value, List_gst(l, i), l->width)) {
+    if (!memcmp(value, List_gst(l, i), l->width)) {
       return i;
     }
   }
   return -1;
 }
-void List_appendFromArr(List *l, void *source, unsigned int index) {
+void List_appendFromArr(List *l, const void *source, unsigned int index) {
   for (unsigned int i = 0; i < index; i++) {
     List_append(l, source + (l->width * i));
   }
