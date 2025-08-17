@@ -1,4 +1,6 @@
+
 #pragma once
+#define TAPDANCEDEFAULTTIMEOUT 200
 #include "hid_keys.h"
 
 #include "arduino/hid/Adafruit_USBD_HID.h"
@@ -74,6 +76,15 @@ KeyItem L(uint8_t layer) { return KeyItem(layer, KeyItem::kType::LAYER); }
 KeyItem FN(uint8_t functionIndex) {
   return KeyItem(functionIndex, KeyItem::kType::FUNCTIONCALL);
 }
+// KeyItem TD(uint8_t tapdanceIndex) {
+//   static listPlus<uint8_t> tapdanceUsed;
+//   if (List_search(tapdanceUsed.ptr, &tapdanceIndex) > 0) {
+//     tapdanceUsed.append(tapdanceIndex);
+//   return KeyItem(tapdanceIndex, KeyItem::kType::TAPDANCE);
+//   }
+//   return KeyItem();
+// }
+
 KeyItem TD(uint8_t tapdanceIndex) {
   return KeyItem(tapdanceIndex, KeyItem::kType::TAPDANCE);
 }
@@ -268,35 +279,113 @@ enum KeyState : char {
   PRESSED = 1,
   HELDDOWN = 2,
   RELEASED = 3,
+
 };
+// clang-format off
+// pressed
+
+// released
+// FIXED VERSION
+inline KeyState KeyState_up(KeyState state) {
+  switch (state) {
+    case HELDDOWN:  
+      return RELEASED;
+    case PRESSED:   
+      return RELEASED;
+    case RELEASED:  
+      return HELDUP;
+    case HELDUP:    
+      return HELDUP;
+  }
+  return HELDUP;
+}
+inline KeyState KeyState_down(KeyState state) {
+  switch (state) {
+    case HELDUP:    
+    case RELEASED: 
+      return PRESSED;
+    case PRESSED:
+    case HELDDOWN: 
+      return HELDDOWN;
+  }
+  return HELDUP;
+}
+// clang-format on
 
 struct tapDance {
   /*
    * for the "1" state we should be checking the timeouts[0]
    */
   KeyItem actions[10];
-  unsigned long timeouts[10]; // array for time untill the next action
-  unsigned int state;         // 0: no state , 1: initial state
+  unsigned int state; // 0: no state , 1: initial state
   unsigned int length;
+  unsigned long currentCountDown;
   KeyState keystate;
+  /*
+   * when the keystate is pressed for the first time
+   *  state++;
+   *  currentCountDown = now+timeouts[state]
+   * when keystate is pressed for other times
+   *  IF( now<currentCountDown ){ state++;currentCountDown = now+timeouts[state]
+   * } when keystate is released foo(actions[state-1]); state = 0;
+   *
+   */
 };
-tapDance tapDances[1] = {{
-    /*
-     * up detected:
-     *    keystate -> pressed
-     */
-    .actions = {KEY_A, KEY_B},
-    .timeouts = {200, 200},
-    .state = 0,
-    .length = 0,
-    .keystate = KeyState::HELDUP,
-}};
-namespace keyMap {
+tapDance tapDances[1] = {
+    {
+        .actions = {KEY_A, KEY_B, KEY_C, KEY_D},
+        .state = 0,
+        .length = 3,
+        .currentCountDown = 0,
+        .keystate = KeyState::HELDUP,
+    },
+};
 
+namespace keyMap {
 // only 10 layers for now
 void pressKeys(uint8_t length, KeyItem *maps[10], bool *state,
                reportManager &rm, unsigned int currentLayer = 0) {
+  static listPlus<KeyItem> que;
+
   unsigned long now = millis();
+
+  for (unsigned int i = 0; i < sizeof(tapDances) / sizeof(tapDance); i++) {
+    tapDance *td = tapDances + i;
+    if (td->state == 0 and td->keystate == PRESSED) {
+      td->state++;
+      td->currentCountDown = now + TAPDANCEDEFAULTTIMEOUT;
+    } else if (td->keystate == PRESSED && now < td->currentCountDown) {
+      td->state++;
+      td->currentCountDown = now + TAPDANCEDEFAULTTIMEOUT;
+    } else if (td->state && td->keystate == RELEASED &&
+               now > td->currentCountDown) {
+      que.append(td->actions[td->state - 1]);
+      td->state = 0;
+    } else if (td->state && td->keystate == HELDUP &&
+               now > td->currentCountDown) {
+      que.append(td->actions[td->state - 1]);
+      td->state = 0;
+    }
+  }
+
+  for (int i = 0; i < que.length(); i++) {
+    KeyItem currentKey = que.get(i);
+    switch (currentKey.type) {
+    case KeyItem::kType::FUNCTIONCALL: {
+      keyboardFunctions[currentKey.character]();
+    } break;
+    case KeyItem::kType::TAPDANCE: {
+      tapDances[currentKey.character].keystate =
+          KeyState_down(tapDances[currentKey.character].keystate);
+    } break;
+    default:
+      /*
+        KeyItem::kType::CHARACTER
+        KeyItem::kType::MODIFIER
+      */
+      rm.addKey(currentKey);
+    }
+  }
 
   /*
     KeyItem::kType::CHARACTER
@@ -322,6 +411,7 @@ void pressKeys(uint8_t length, KeyItem *maps[10], bool *state,
     KeyItem::kType::PASSTHROUGH
     KeyItem::kType::TAPDANCE
   */
+
   for (unsigned int i = 0; i < length; i++) {
     KeyItem currentKey = maps[currentLayer][i];
     if (currentKey.type == KeyItem::kType::PASSTHROUGH) {
@@ -333,7 +423,6 @@ void pressKeys(uint8_t length, KeyItem *maps[10], bool *state,
       }
     }
     if (state[i]) {
-
       /*
         KeyItem::kType::CHARACTER
         KeyItem::kType::FUNCTIONCALL
@@ -345,20 +434,8 @@ void pressKeys(uint8_t length, KeyItem *maps[10], bool *state,
         keyboardFunctions[currentKey.character]();
       } break;
       case KeyItem::kType::TAPDANCE: {
-        tapDance currentTapdance = tapDances[currentKey.character];
-        switch (currentTapdance.keystate) {
-        case KeyState::HELDDOWN: {
-        } break;
-        case KeyState::HELDUP: {
-          currentTapdance.keystate = KeyState::PRESSED;
-        } break;
-        case KeyState::RELEASED: {
-          currentTapdance.keystate = KeyState::PRESSED;
-        } break;
-        case KeyState::PRESSED: {
-          currentTapdance.keystate = KeyState::HELDDOWN;
-        } break;
-        }
+        tapDances[currentKey.character].keystate =
+            KeyState_down(tapDances[currentKey.character].keystate);
       } break;
       default:
         /*
@@ -369,24 +446,11 @@ void pressKeys(uint8_t length, KeyItem *maps[10], bool *state,
       }
     } else {
       if (currentKey.type == KeyItem::kType::TAPDANCE) {
-
-        tapDance currentTapdance = tapDances[currentKey.character];
-        switch (currentTapdance.keystate) {
-        case KeyState::HELDUP: {
-        } break;
-        case KeyState::PRESSED: {
-          currentTapdance.keystate = KeyState::RELEASED;
-        } break;
-        case KeyState::HELDDOWN: {
-          currentTapdance.keystate = KeyState::RELEASED;
-        } break;
-        case KeyState::RELEASED: {
-          currentTapdance.keystate = KeyState::HELDUP;
-        } break;
-        }
-        tapDances[currentKey.character] = currentTapdance;
+        tapDances[currentKey.character].keystate =
+            KeyState_up(tapDances[currentKey.character].keystate);
       }
     }
   }
+  que.ptr->length = 0;
 }
 } // namespace keyMap
