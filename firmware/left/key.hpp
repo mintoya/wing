@@ -85,6 +85,15 @@ KeyItem FN(uint8_t functionIndex) {
 //   return KeyItem();
 // }
 
+KeyItem D(char direction){
+  switch (direction) {
+    case ('W'):{  return KeyItem(KEY_UP);}break;
+    case ('S'):{  return KeyItem(KEY_DOWN);}break;
+    case ('A'):{  return KeyItem(KEY_LEFT);}break;
+    case ('D'):{  return KeyItem(KEY_RIGHT);}break;
+  }
+  return KEY_A;
+}
 KeyItem TD(uint8_t tapdanceIndex) {
   return KeyItem(tapdanceIndex, KeyItem::kType::TAPDANCE);
 }

@@ -37,19 +37,31 @@ void testFunction(void){
 using namespace KeyMapDec;
 void (*keyboardFunctions[255])(void) = {testFunction,0}; // initialize all to NULL
 KeyItem matrix[12 * 4] = {
-    KEY_TAB, C('q'), C('w'), C('e'), C('r'), C('t'),    C('y'), C('u'), C('i'), C('o'), C('p'),  KEY_BACKSPACE,
-    M('s') , C('a'), C('s'), C('d'), C('f'), C('g'),    C('h'), C('j'), C('k'), C('l'), C(';'),  KEY_LEFTBRACE,
-    M('c') , C('z'), C('x'), C('c'), C('v'), C('b'),    C('n'), C('m'), C(','), C('.'), C('/'),  KEY_ENTER,
-    0      , 0     , 0     , M('a'), C(' '),  TD(0),    L(1)  ,  FN(0),      0,      0,      0,  0,
+    KEY_TAB, C('q'), C('w'), C('e'), C('r'), C('t'),        C('y'), C('u'), C('i'), C('o'), C('p'),  KEY_BACKSPACE,
+    M('s') , C('a'), C('s'), C('d'), C('f'), C('g'),        C('h'), C('j'), C('k'), C('l'), C(';'),  KEY_LEFTBRACE,
+    M('c') , C('z'), C('x'), C('c'), C('v'), C('b'),        C('n'), C('m'), C(','), C('.'), C('/'),  KEY_ENTER,
+    0      , 0     , 0     , M('a'), C(' '),  TD(0),        L(1)  ,   L(2),      0,      0,      0,  0,
 };
 KeyItem matrix2[12 * 4] = {
-    KEY_ESC, C('1'), C('2'), C('3'), C('4'), C('5'),    C('6'), C('7'), C('8'), C('9'), C('0'),  KEY_DELETE,
-    0      , 0     , 0     , 0     , 0     , 0     ,    0     , 0     , 0     , 0     , 0     ,  KEY_LEFTBRACE,
-    0      , 0     , 0     , 0     , 0     , 0     ,    0     , 0     , 0     , 0     , 0     ,  KEY_ENTER,
-    0      , 0     , 0     , M('a'), C(' '), C(' '),    L(1)  , 0     , 0     , 0     , 0     ,  0,
+    KEY_ESC, C('1'), C('2'), C('3'), C('4'), C('5'),        C('6'), C('7'), C('8'), C('9'), C('0'),  KEY_DELETE,
+    0      , 0     , 0     , 0     , 0     , 0     ,        0     , 0     , 0     , 0     , 0     ,  0,
+    0      , 0     , 0     , 0     , 0     , 0     ,        C('='),C('-') , 0     , 0     , 0     ,  0,
+    0      , 0     , 0     , 0     , 0     , 0     ,        0     , 0     , 0     , 0     , 0     ,  0,
+};
+KeyItem matrix3[12 * 4] = {
+    0      , 0     , 0     , 0     , 0     , 0     ,        0     , 0     , D('W'), 0     , 0     ,  0,
+    0      , 0     , 0     , 0     , 0     , 0     ,        0     , D('A'), D('S'), D('D'), 0     ,  0,
+    0      , 0     , 0     , 0     , 0     , 0     ,        0     , 0     , 0     , 0     , 0     ,  0,
+    0      , 0     , 0     , 0     , 0     , 0     ,        0     , 0     , 0     , 0     , 0     ,  0,
+};
+KeyItem matrix4[12 * 4] = {
+    0      , 0     , 0     , 0     , 0     , 0     ,        0     , 0     , 0     , 0     , 0     ,  0,
+    0      , 0     , 0     , 0     , 0     , 0     ,        0     , 0     , 0     , 0     , 0     ,  0,
+    0      , 0     , 0     , 0     , 0     , 0     ,        0     , 0     , 0     , 0     , 0     ,  0,
+    0      , 0     , 0     , 0     , 0     , 0     ,        0     , 0     , 0     , 0     , 0     ,  0,
 };
 
-KeyItem* layers[10] = {matrix,matrix2,0};
+KeyItem* layers[10] = {matrix,matrix2,matrix3,matrix4,0};
 bool state[12 * 4] = { 0 };
 
 // clang-format on
