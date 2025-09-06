@@ -25,15 +25,12 @@ points:
         top: null
     thumb:
       anchor:
-        shift: [63,5]
+        shift: [75,5]
       columns:
-        a:
-          key.splay: 0
-          key.spread: 20
+
         b:
           key.shift: [1,-2]
-          key.splay: -20
-          key.spread: 21
+          key.splay: 
         c:
           key.shift: [1,-5]
           key.splay: -25
@@ -51,3 +48,4 @@ points:
 #     size:
 #     - 30
 #     - 30
+
