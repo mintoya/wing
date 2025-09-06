@@ -1,11 +1,17 @@
+#define useMalloc_LIST 
+#define LIST_5d3bd19_C 
+#include "my-list/my-list.h"
+
 #include "Adafruit_TinyUSB.h"
-#include <Adafruit_LittleFS.h>
-#include <InternalFileSystem.h>
+// #include <Adafruit_LittleFS.h>
+// #include <InternalFileSystem.h>
 #include "arduino/hid/Adafruit_USBD_HID.h"
-#include "my-list.h"
+
 #include "my-list.hpp"
+
+#include "my-list/my-list.h"
 #include <SerialTransfer.h>
-#include <bluefruit.h>
+// #include <bluefruit.h>
 #include "key.hpp"
 
 #include <SoftwareSerial.h>
