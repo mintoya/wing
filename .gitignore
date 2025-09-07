@@ -12,3 +12,6 @@ kicad_nrf52840/production
 kicad_nrf52840/_autosave-V3.kicad_pcb
 kicad_nrf52840/~_autosave-V3.kicad_pcb.lck
 kicad_v4/kbplacer.log
+kicad_v4/esp32_s3_port/esp32_s3_port-backups
+kicad_v4/esp32_s3_port/esp32_s3_port-backups
+kicad_v4/esp32_s3_port/fp-info-cache
