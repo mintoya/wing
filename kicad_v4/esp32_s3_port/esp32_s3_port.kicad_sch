@@ -1225,6 +1225,203 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "PCM_SL_Devices:Slide_Switch_SPDT_P3mm_10x5x10mm"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "SW"
+				(at 0 6.35 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "Slide_Switch_SPDT_P3mm_10x5x10mm"
+				(at -1.27 -5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" "PCM_SL_Devices:Slide_Switch_SPDT_P3mm_10x5x10mm"
+				(at 1.27 -7.62 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at -1.27 6.35 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "SPDT Slide Switch with 10mm length, 5mm width and 10mm hight."
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "switch"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "Slide_Switch_SPDT_P3mm_10x5x10mm_0_1"
+				(polyline
+					(pts
+						(xy -4.445 0) (xy -3.048 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center -2.54 0)
+					(radius 0.4579)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy -2.54 0) (xy 1.27 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 1.27 2.54)
+					(radius 0.4579)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(circle
+					(center 1.27 -2.54)
+					(radius 0.4579)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type outline)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.778 2.54) (xy 3.175 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 1.778 -2.54) (xy 3.175 -2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "Slide_Switch_SPDT_P3mm_10x5x10mm_1_1"
+				(pin passive line
+					(at -6.35 0 0)
+					(length 2)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1 1)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 2.54 180)
+					(length 2)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1 1)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 -2.54 180)
+					(length 2)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1 1)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "PCM_SL_Jumpers_THT:JUP_P5.08mm"
 			(exclude_from_sim no)
 			(in_bom yes)
@@ -2518,12 +2715,6 @@
 		(uuid "35236eee-e255-4341-8a60-e1b47765893c")
 	)
 	(junction
-		(at 231.14 139.7)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "363f9198-9e83-40ff-9a70-660d84175a14")
-	)
-	(junction
 		(at 44.45 172.72)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -2558,6 +2749,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "68b05cf9-209f-46c2-8a17-d9684eb68e72")
+	)
+	(junction
+		(at 243.84 138.43)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "7212effe-2d53-4ab8-9361-885106afb11a")
 	)
 	(junction
 		(at 69.85 137.16)
@@ -2650,7 +2847,7 @@
 		(uuid "c303d069-919b-4c0c-9080-7046fcb64844")
 	)
 	(junction
-		(at 236.22 147.32)
+		(at 246.38 146.05)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "cbd95d49-0f3a-4d27-94cf-f901692ad885")
@@ -2793,6 +2990,16 @@
 	)
 	(wire
 		(pts
+			(xy 243.84 137.16) (xy 243.84 138.43)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "354d8523-8919-438c-820f-de6d4d840acb")
+	)
+	(wire
+		(pts
 			(xy 26.67 140.97) (xy 26.67 160.02)
 		)
 		(stroke
@@ -2800,6 +3007,16 @@
 			(type default)
 		)
 		(uuid "36cdb581-88c5-422b-9be8-5f838466e2aa")
+	)
+	(wire
+		(pts
+			(xy 243.84 138.43) (xy 246.38 138.43)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "37b46019-4c3e-4d4a-a2b7-ecf1a0208d79")
 	)
 	(wire
 		(pts
@@ -2853,7 +3070,7 @@
 	)
 	(wire
 		(pts
-			(xy 231.14 139.7) (xy 236.22 139.7)
+			(xy 241.3 138.43) (xy 243.84 138.43)
 		)
 		(stroke
 			(width 0)
@@ -2890,16 +3107,6 @@
 			(type default)
 		)
 		(uuid "71928f7a-25ca-4f9b-8d7f-1b8282ef815d")
-	)
-	(wire
-		(pts
-			(xy 220.98 139.7) (xy 231.14 139.7)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "74398952-cf3d-474f-b76b-783aefa27a50")
 	)
 	(wire
 		(pts
@@ -2963,6 +3170,16 @@
 	)
 	(wire
 		(pts
+			(xy 232.41 137.16) (xy 243.84 137.16)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8a41876f-8f94-427e-9769-f2938ffec632")
+	)
+	(wire
+		(pts
 			(xy 220.98 144.78) (xy 223.52 144.78)
 		)
 		(stroke
@@ -2973,7 +3190,7 @@
 	)
 	(wire
 		(pts
-			(xy 231.14 147.32) (xy 231.14 146.05)
+			(xy 241.3 146.05) (xy 241.3 144.78)
 		)
 		(stroke
 			(width 0)
@@ -3053,7 +3270,7 @@
 	)
 	(wire
 		(pts
-			(xy 231.14 139.7) (xy 231.14 140.97)
+			(xy 241.3 138.43) (xy 241.3 139.7)
 		)
 		(stroke
 			(width 0)
@@ -3123,7 +3340,7 @@
 	)
 	(wire
 		(pts
-			(xy 236.22 149.86) (xy 236.22 147.32)
+			(xy 246.38 148.59) (xy 246.38 146.05)
 		)
 		(stroke
 			(width 0)
@@ -3223,7 +3440,7 @@
 	)
 	(wire
 		(pts
-			(xy 231.14 147.32) (xy 236.22 147.32)
+			(xy 241.3 146.05) (xy 246.38 146.05)
 		)
 		(stroke
 			(width 0)
@@ -3713,7 +3930,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 236.22 149.86 0)
+		(at 246.38 148.59 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -3722,7 +3939,7 @@
 		(fields_autoplaced yes)
 		(uuid "0025fa12-c944-437c-84c5-62e6db6cda0c")
 		(property "Reference" "#PWR02"
-			(at 236.22 156.21 0)
+			(at 246.38 154.94 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3731,7 +3948,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 236.22 154.94 0)
+			(at 246.38 153.67 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3739,7 +3956,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 236.22 149.86 0)
+			(at 246.38 148.59 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3748,7 +3965,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 236.22 149.86 0)
+			(at 246.38 148.59 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3757,7 +3974,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 236.22 149.86 0)
+			(at 246.38 148.59 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5013,7 +5230,7 @@
 	)
 	(symbol
 		(lib_id "Device:Battery_Cell")
-		(at 236.22 144.78 0)
+		(at 246.38 143.51 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -5022,7 +5239,7 @@
 		(fields_autoplaced yes)
 		(uuid "343e3ba0-fa70-442f-97f8-fc5fdf6b8cfc")
 		(property "Reference" "BT1"
-			(at 240.03 141.6684 0)
+			(at 250.19 140.3984 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5031,7 +5248,7 @@
 			)
 		)
 		(property "Value" "Battery_Cell"
-			(at 240.03 144.2084 0)
+			(at 250.19 142.9384 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5040,7 +5257,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 236.22 143.256 90)
+			(at 246.38 141.986 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5049,7 +5266,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 236.22 143.256 90)
+			(at 246.38 141.986 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -5058,7 +5275,7 @@
 			)
 		)
 		(property "Description" "Single-cell battery"
-			(at 236.22 144.78 0)
+			(at 246.38 143.51 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -6471,7 +6688,6 @@
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "8ada9780-1142-4c2b-92fa-80873d43d18b")
 		(property "Reference" "R2"
 			(at 226.06 147.3199 90)
@@ -6483,7 +6699,7 @@
 			)
 		)
 		(property "Value" "2.2k"
-			(at 226.06 149.8599 90)
+			(at 236.22 148.5899 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7739,7 +7955,7 @@
 	)
 	(symbol
 		(lib_id "PCM_SL_Jumpers_THT:JUP_P5.08mm")
-		(at 231.14 143.51 270)
+		(at 241.3 142.24 270)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -7748,7 +7964,7 @@
 		(fields_autoplaced yes)
 		(uuid "c91d3494-fb10-4f19-8b96-d510ed3e521d")
 		(property "Reference" "JP1"
-			(at 232.41 142.24 90)
+			(at 242.57 140.97 90)
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -7757,7 +7973,7 @@
 			)
 		)
 		(property "Value" "JUP_P5.08mm"
-			(at 232.41 144.78 90)
+			(at 242.57 143.51 90)
 			(effects
 				(font
 					(size 0.8 0.8)
@@ -7766,7 +7982,7 @@
 			)
 		)
 		(property "Footprint" "PCM_SL_Jumpers:JUP_P5.08mm"
-			(at 231.14 143.51 0)
+			(at 241.3 142.24 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7775,7 +7991,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 231.14 143.51 0)
+			(at 241.3 142.24 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7784,7 +8000,7 @@
 			)
 		)
 		(property "Description" "Through-Hole Jumpers or wire links with a pin space of 5.08mm"
-			(at 231.14 143.51 0)
+			(at 241.3 142.24 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -8358,6 +8574,77 @@
 			(project "esp32_s3_port"
 				(path "/b35913c0-3727-49b0-a8b1-477815153830"
 					(reference "D12")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "PCM_SL_Devices:Slide_Switch_SPDT_P3mm_10x5x10mm")
+		(at 227.33 139.7 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "f5744144-4160-44db-a875-5eb726208530")
+		(property "Reference" "SW22"
+			(at 226.695 132.08 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "Slide_Switch_SPDT_P3mm_10x5x10mm"
+			(at 226.695 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "PCM_SL_Devices:Slide_Switch_SPDT_P3mm_10x5x10mm"
+			(at 228.6 147.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 226.06 133.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "SPDT Slide Switch with 10mm length, 5mm width and 10mm hight."
+			(at 227.33 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "23bc4198-6e43-408b-8480-ed13b33346fa")
+		)
+		(pin "2"
+			(uuid "b6b1ec3f-32b4-452e-83f9-26a36f07ec3f")
+		)
+		(pin "3"
+			(uuid "7215d798-1427-4f60-9009-e5d28ad34e13")
+		)
+		(instances
+			(project ""
+				(path "/b35913c0-3727-49b0-a8b1-477815153830"
+					(reference "SW22")
 					(unit 1)
 				)
 			)
