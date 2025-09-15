@@ -1,0 +1,62 @@
+#container {
+  --button-size: 50px;
+  --middle-margin: 0px;
+  --thumb-rotation: 120deg;
+  --thumb-offset: 180px;
+
+  display: flex;
+  flex-direction: row;
+
+  .index{
+    transform:translateY(-10px);
+  }
+  .middle{
+    transform:translateY(-15px);
+  }
+  .ring{
+    transform:translateY(-10px);
+  }
+
+  .key {
+    width: var(--button-size);
+    height: var(--button-size);
+    margin: 5px;
+  }
+
+  .finger {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #right-half {
+    display: flex;
+    flex-direction: row;
+    margin-right: calc(var(--middle-margin)/2);
+
+    .thumb {
+      transform: 
+      rotate(calc(var(--thumb-rotation)*1)) 
+      translate(calc(var(--thumb-offset)));
+      .two{
+        transform:translateX(-10px);
+      }
+    }
+  }
+
+  #left-half {
+    display: flex;
+    flex-direction: row;
+    margin-left: calc(var(--middle-margin)/2);
+
+    .thumb {
+      transform: 
+      rotate(calc(var(--thumb-rotation)*-1)) 
+      translate(calc(var(--thumb-offset)*-1));
+      .two{
+        transform:translateX(10px);
+      }
+    }
+  }
+}
+
+
