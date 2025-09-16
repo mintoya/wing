@@ -1,10 +1,17 @@
+:root{
+  background-color:black;
+}
+#wrap-container{
+}
 #container {
-  --button-size: 50px;
+  --button-width: 55px;
+  --button-height: 50px;
   --middle-margin: 0px;
   --thumb-rotation: 120deg;
-  --thumb-offset: 180px;
+  --thumb-offset: 170px;
 
-  display: flex;
+
+  display:flex;
   flex-direction: row;
 
   .index{
@@ -16,11 +23,15 @@
   .ring{
     transform:translateY(-10px);
   }
-
   .key {
-    width: var(--button-size);
-    height: var(--button-size);
+    width: var(--button-width);
+    height: var(--button-height);
     margin: 5px;
+    border:solid gray;
+    border-bottom-width  :7px;
+    border-top-width     :5px;
+    border-left-width    :5px;
+    border-right-width   :5px;
   }
 
   .finger {
@@ -28,7 +39,7 @@
     flex-direction: column;
   }
 
-  #right-half {
+  #left-half {
     display: flex;
     flex-direction: row;
     margin-right: calc(var(--middle-margin)/2);
@@ -38,12 +49,15 @@
       rotate(calc(var(--thumb-rotation)*1)) 
       translate(calc(var(--thumb-offset)));
       .two{
-        transform:translateX(-10px);
+        transform:translateX(-10px) rotate(-90deg);
+      }
+      button{
+        transform:rotate(-90deg);
       }
     }
   }
 
-  #left-half {
+  #right-half {
     display: flex;
     flex-direction: row;
     margin-left: calc(var(--middle-margin)/2);
@@ -53,7 +67,10 @@
       rotate(calc(var(--thumb-rotation)*-1)) 
       translate(calc(var(--thumb-offset)*-1));
       .two{
-        transform:translateX(10px);
+        transform:translateX(10px) rotate(90deg);
+      }
+      button{
+        transform:rotate(90deg);
       }
     }
   }
