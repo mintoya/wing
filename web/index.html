@@ -7,6 +7,16 @@
     <link href="style.css" rel="stylesheet">
   </head>
   <body>
+    <div>
+      <select id="layer-selector">
+        <option value="0">layer 0</option>
+        <option value="1">layer 1</option>
+        <option value="2">layer 2</option>
+        <option value="3">layer 3</option>
+        <option value="4">layer 4</option>
+        <option value="5">layer 5</option>
+      </select>
+    </div>
     <div id="wrap-container">
       <div id="container">
         <div id="left-half">
@@ -85,6 +95,17 @@
           </div>
         </div>
       </div>
+    </div>
+    <div id = "keyItem-selector" >
+      <div class="top">
+        <input type="text" name="keyitem-text" value="search" oninput = "search(this.value)">
+      </div>
+      <div class = "bottom">
+        <div id = "search-results">
+        </div>
+      </div>
+    </div>
+
     </div>
   </body>
   <script src="index.js"></script>
