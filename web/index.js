@@ -50,8 +50,9 @@ function fuzzySearch(query, data, threshold = 10) {
   return results;
 }
 
-var validKeyValues = 
+const validKeyValues = 
   [
+    "KEY_NONE" ,
     "KEY_MOD_LCTRL"  ,
     "KEY_MOD_LSHIFT" ,
     "KEY_MOD_LALT"   ,
@@ -60,7 +61,6 @@ var validKeyValues =
     "KEY_MOD_RSHIFT" ,
     "KEY_MOD_RALT"   ,
     "KEY_MOD_RMETA"  ,
-    "KEY_NONE" ,
     "KEY_ERR_OVF" ,
     "KEY_A" ,
     "KEY_B" ,
@@ -234,6 +234,7 @@ var validKeyValues =
 
 
 var currentSelectedKey = null;
+var currentLayer = 0;
 
 var keys = [
   "#left-half .pinky-extra .one",
@@ -289,12 +290,12 @@ var keys = [
 
   null,null,null,//padding 
 ];
-var keyValues = []
+var keyValueArrs = [[]]
 
 keys.forEach((selector, index) => {
   if(selector!=null){
     var key = document.querySelector(selector);
-    key.textContent = "KEY_NONE"
+    key.textContent = validKeyValues[0];
     keys[index] = key;
   }
 });
@@ -318,8 +319,22 @@ function search(word){
     button.textContent = map.item;
     button.onclick = ()=>{
       keys[currentSelectedKey].textContent = button.textContent;
-      keyValues[currentSelectedKey] = button.textContent;
+      keys[currentSelectedKey].setAttribute("keyValue",button.textContent)
+      keyValueArrs[currentLayer][currentSelectedKey] = button.textContent;
     }
     container.appendChild(button);
   });
 }
+function changeLayer(layerN){
+  currentLayer = layerN;
+  if(!keyValueArrs[currentLayer]){
+    keyValueArrs[currentLayer] = [];
+  }
+  keys.forEach(( key,index ) => {
+    if(key){
+      keys[index].textContent = keyValueArrs[currentLayer][index] || validKeyValues[0];
+      keys[index].setAttribute("keyValue",keys[index].textContent)
+    }
+  });
+}
+changeLayer(0);
