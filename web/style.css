@@ -1,6 +1,12 @@
 :root{
   background-color:black;
 }
+#layer-selector{
+      flex:1;
+      padding:20px;
+      border-radius:5px;
+      border:none;
+}
 #keyItem-selector{
   width:100%;
   display:flex;
@@ -8,7 +14,9 @@
   .top{
     input{
       flex:1;
-      height:30px;
+      font-size:20px;
+      height:50px;
+      padding:10px;
       border-radius:5px;
       border:none;
     }
@@ -16,8 +24,6 @@
   .bottom{
     flex:1;
     #search-results{
-      display:flex;
-      flex:1;
       button{
         overflow-wrap: break-word;
         height: 50px;
@@ -57,6 +63,8 @@
   .key {
     opacity:1;
     --scale: scale(1);
+    font-weight:bold;
+    font-size:18;
     overflow-wrap: break-word;
     transform: var(--scale);
     width: var(--button-width);
@@ -71,7 +79,7 @@
     transform 0.2s ease,
     background-color 0.2s ease;
   }
-  .key[keyValue="KEY_NONE"] { 
+  .key[keyValue="NONE"] { 
     opacity:.5;
   }
   .key[selected="true"] { 

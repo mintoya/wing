@@ -8,7 +8,7 @@
   </head>
   <body>
     <div>
-      <select id="layer-selector" onchange = "changeLayer(this.value)">
+      <select id="layer-selector" onchange = "changeLayer(this.value)" >
         <option value="0">layer 0</option>
         <option value="1">layer 1</option>
         <option value="2">layer 2</option>
@@ -98,7 +98,7 @@
     </div>
     <div id = "keyItem-selector" >
       <div class="top">
-        <input type="text" name="keyitem-text" value="search" oninput = "search(this.value)">
+        <input type="text" name="keyitem-text" value="search" oninput = "search(this.value)" onchange = "searchAndSelect( this.value )">
       </div>
       <div class = "bottom">
         <div id = "search-results">
