@@ -26,6 +26,7 @@
     #search-results{
       button{
         overflow-wrap: break-word;
+        min-width:50px;
         height: 50px;
         margin: 5px;
         color:white;
@@ -62,7 +63,7 @@
   }
   .key {
     opacity:1;
-    --scale: scale(1);
+    --scale: scale(1) ;
     font-weight:bold;
     font-size:18;
     overflow-wrap: break-word;
@@ -74,18 +75,17 @@
     background-color:gray;
     border:solid transparent;
     border-radius:5px;
-    /* z-index:-1 */
     transition: 
     transform 0.2s ease,
     background-color 0.2s ease;
   }
   .key[keyValue="NONE"] { 
-    opacity:.5;
+    opacity:.7;
   }
   .key[selected="true"] { 
+    position:relative;
     background-color: blue;
-    --scale: scale(1.5);
-    z-index:1;
+    --scale: scale(1.2);
   }
 
 
