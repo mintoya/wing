@@ -37,7 +37,7 @@ function levenshteinDistance(str1, str2) {
 }
 function fuzzySearch(query, data, threshold = 10) {
   if(query=="" || query==null){
-    query = "a"
+    query = "A"
   }
   const results = [];
   const lowerCaseQuery = query.toLowerCase();
