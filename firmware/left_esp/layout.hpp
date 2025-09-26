@@ -1,4 +1,5 @@
 #pragma once
+#include "fileSystemInterface.hpp"
 #include "hid_keys.h"
 #include "hid_keys_names.h"
 #include "key.hpp"
@@ -100,10 +101,15 @@ static void parseLayers(um_fp layersBuf) {
     keyMapLayers.append(thisLayer);
   }
 }
-static void parseLayout(um_fp layoutBuf = defaultLayout_um) {
+static void parseLayout(um_fp layoutBuf = readFile("/lay.kml")) {
+  if(!layoutBuf.ptr){
+    Serial.println("layout not available, loading default layout");
+    layoutBuf = defaultLayout_um;
+  }
   um_fp keyboard =
       findKey(layoutBuf, (um_fp){.ptr = (char *)"keyboard", .width = 8});
   um_fp layersBuf =
       findKey(keyboard, (um_fp){.ptr = (char *)"layers", .width = 6});
   parseLayers(layersBuf);
+  writeFile("/lay.kml", layoutBuf);
 }

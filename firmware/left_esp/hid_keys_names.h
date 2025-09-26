@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <string.h>
 static const uint8_t keyCodes[] = {
+    KEY_NONE,
     KEY_MOD_LCTRL,
     KEY_MOD_LSHIFT,
     KEY_MOD_LALT,
@@ -16,7 +17,6 @@ static const uint8_t keyCodes[] = {
     KEY_MOD_RSHIFT,
     KEY_MOD_RALT,
     KEY_MOD_RMETA,
-    KEY_NONE,
     KEY_ERR_OVF,
     KEY_A,
     KEY_B,
@@ -188,6 +188,7 @@ static const uint8_t keyCodes[] = {
     KEY_MEDIA_CALC,
 };
 static const char *keyNames[] = {
+    "KEY_NONE",
     "KEY_MOD_LCTRL",
     "KEY_MOD_LSHIFT",
     "KEY_MOD_LALT",
@@ -196,7 +197,6 @@ static const char *keyNames[] = {
     "KEY_MOD_RSHIFT",
     "KEY_MOD_RALT",
     "KEY_MOD_RMETA",
-    "KEY_NONE",
     "KEY_ERR_OVF",
     "KEY_A",
     "KEY_B",
@@ -384,7 +384,7 @@ static KeyItem kn_Match_Special(um_fp name) {
     }
     break;
   case 'L':
-    return KeyItem(um_asChar(id)[0] - '0',KeyItem::LAYER);
+    return KeyItem(um_asChar(id)[0] - '0', KeyItem::LAYER);
   }
   Serial.print("couldn't find key from mods:  ");
   Serial.printf("%.*s\n", (int)name.width, (char *)name.ptr);

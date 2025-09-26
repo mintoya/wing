@@ -397,7 +397,7 @@ function getLayoutAsKml(){
     msg+="]";
 
   }
-  msg+="]}"
-  msg+="OVERRIDE:y;"//no confirmation
+  msg+="]}";
+  msg+= "requestType:setLayout;";
   return msg;
 }

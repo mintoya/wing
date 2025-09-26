@@ -23,6 +23,7 @@ const unsigned int ncolGpios = sizeof(colGpios) / sizeof(colGpios[0]);
 #include <USBHID.h>
 #include <USBHIDKeyboard.h>
 #include "debounce.hpp"
+#include "fileSystemInterface.hpp"
 
 
 #define MY_LIST_C
@@ -149,6 +150,7 @@ static inline void fillKeyStates() {
 #endif
 void setup() {
   Serial.begin(115200);
+  delay(5000);
   wireSetup();
   for (int i = 0; i < ncolGpios; i++) {
     pinMode(colGpios[i], OUTPUT);
@@ -159,9 +161,9 @@ void setup() {
   }
 #ifndef ISRIGHT
   Keyboard.begin();
+  FSISetup();
   parseLayout();
   prettyPrintLayers();
-  //HAS TO BE IN THIS ORDER
   rm = reportManager(sendHidReport, fakeSender);
 #endif
 }
@@ -169,6 +171,38 @@ void setup() {
 #ifdef ISRIGHT
 void loop() {}
 #else
+void serialRequestManager(um_fp layo){
+  Serial.write((uint8_t *)layo.ptr, layo.width);
+  Serial.println("");
+  um_fp requestType;
+  if(!(requestType = findKey(layo,um_from("requestType"))).ptr){
+    Serial.println("no requestType provided");
+    Serial.println(
+        "examples\n\n"
+        "keyboard:{layers:{{KEY_A}}}requestType:setLayout; -- sets layout\n"
+        "requestType:getLayout;                            -- prints layout\n"
+        "requestType:getDefaultLayout;                     -- prints default layout \n"
+       );
+    return;
+  }
+  if(requestType==um_from("setLayout")){
+    Serial.println("setting Layout");
+    parseLayout(layo);
+  }else if(requestType==um_from("ls")){
+    listDir("/");
+  }else if(requestType==um_from("setDefaultLayout")){
+    Serial.println("setting default Layout");
+    parseLayout(defaultLayout_um);
+  } else if(requestType==um_from("getLayout")){
+    Serial.println("getting saved Layout");
+    um_fp savedLayout = readFile("/lay.kml");
+    Serial.write((uint8_t *)savedLayout.ptr, savedLayout.width);
+    free(savedLayout.ptr);
+  } else if (requestType==um_from("getDefaultLayout")){
+    Serial.println("getting default Layout");
+    Serial.write((uint8_t *)defaultLayout_um.ptr, defaultLayout_um.width);
+  }
+}
 void loop() {
   if (Serial.available()) {
     listPlus<uint8_t> readBuf;
@@ -178,30 +212,7 @@ void loop() {
     }
 
     um_fp layo = { .ptr = (void *)readBuf.self(), .width = readBuf.length() };
-    Serial.write((uint8_t *)layo.ptr, layo.width);
-    parseLayout(layo);
-
-
-    prettyPrintLayers();
-
-    char c = 0;
-    um_fp override_um = findKey(layo, (um_fp){.ptr = (char *)"OVERRIDE", .width = 8});
-    if(override_um.ptr){
-      c = ( (char*)override_um.ptr )[0];
-    }
-
-    while (c != 'y' && c != 'n') {
-      Serial.println("y/n to confirm");
-      while (!Serial.available()) { delay(10); }
-      c = Serial.read();
-      while (Serial.available()) { Serial.read(); }
-    }
-
-    if (c == 'y') {
-      Serial.println("using this layout");
-    } else {
-      parseLayout();  // fallback layout
-    }
+    serialRequestManager(layo);
     readBuf.unmake();
   }
   fillKeyStates();
