@@ -2,9 +2,11 @@
 #define HID_KEY_NAMES_H
 
 #include "hid_keys.h"
+#include "key.hpp"
+#include "kml/kml.h"
 #include "string-List/um_fp.h"
-#include <string.h>
 #include <stdint.h>
+#include <string.h>
 static const uint8_t keyCodes[] = {
     KEY_MOD_LCTRL,
     KEY_MOD_LSHIFT,
@@ -366,22 +368,46 @@ static const char *keyNames[] = {
     "KEY_MEDIA_CALC",
 };
 
-static uint8_t kn_Match(um_fp name) {
-    Serial.println("looking for key: ");
-    Serial.printf("%.*s\n", (int)name.width, (char*)name.ptr);
-
-    for (unsigned int i = 0; i < sizeof(keyCodes) / sizeof(uint8_t); i++) {
-        const char* keyName = keyNames[i]; // array of key names corresponding to keyCodes
-
-        // compare first 'name.width' characters
-        if (strncmp((char*)name.ptr, keyName, name.width) == 0
-            && keyName[name.width] == '\0') { // ensure exact match length
-            return keyCodes[i];
-        }
+#define um_asChar(um) ((char *)um.ptr)
+static KeyItem kn_Match_Special(um_fp name) {
+  name = removeSpacesPadding(name);
+  char D = um_asChar(name)[0];
+  um_fp id = removeSpacesPadding(inside("()", name));
+  switch (D) {
+  case 'M':
+    if (um_eq(id, ((um_fp){.ptr = (char *)"lc", .width = 2}))) {
+      return KeyItem(KEY_MOD_LCTRL, KeyItem::MODIFIER);
+    } else if (um_eq(id, ((um_fp){.ptr = (char *)"la", .width = 2}))) {
+      return KeyItem(KEY_MOD_LALT, KeyItem::MODIFIER);
+    } else if (um_eq(id, ((um_fp){.ptr = (char *)"ls", .width = 2}))) {
+      return KeyItem(KEY_MOD_LSHIFT, KeyItem::MODIFIER);
     }
-
-    Serial.println("couldn't find key:");
-    Serial.printf("%.*s\n", (int)name.width, (char*)name.ptr);
-    return KEY_NONE;
+    break;
+  case 'L':
+    return KeyItem(um_asChar(id)[0] - '0',KeyItem::LAYER);
+  }
+  Serial.print("couldn't find key from mods:  ");
+  Serial.printf("%.*s\n", (int)name.width, (char *)name.ptr);
+  return KeyItem();
 }
+static KeyItem kn_Match(um_fp name) {
+  if (um_indexOf(name, '(') < name.width) {
+    return kn_Match_Special(name);
+  }
+  for (unsigned int i = 0; i < sizeof(keyCodes) / sizeof(uint8_t); i++) {
+    const char *keyName =
+        keyNames[i]; // array of key names corresponding to keyCodes
+
+    // compare first 'name.width' characters
+    if (strncmp((char *)name.ptr, keyName, name.width) == 0 &&
+        keyName[name.width] == '\0') {
+      return KeyItem(keyCodes[i]);
+    }
+  }
+
+  Serial.print("couldn't find key:  ");
+  Serial.printf("%.*s\n", (int)name.width, (char *)name.ptr);
+  return KeyItem();
+}
+
 #endif

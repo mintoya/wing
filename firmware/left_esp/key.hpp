@@ -1,6 +1,9 @@
 #pragma once
+#include "debounce.hpp"
+#include <cstdint>
 #define TAPDANCEDEFAULTTIMEOUT ((unsigned long)200)
 
+#include "key.hpp"
 #include "my-list/my-list.h"
 #include "my-list/my-list.hpp"
 #include <stdint.h>
@@ -35,38 +38,39 @@ struct KeyItem {
 };
 static void printKeyItem(const KeyItem &k) {
   switch (k.type) {
-    case KeyItem::CHARACTER:
-      Serial.print("K(");
-      Serial.print(k.character, DEC); // raw number
-      Serial.print(")");
-      break;
-    case KeyItem::MODIFIER:
-      Serial.print("M(");
-      Serial.print(k.character, DEC);
-      Serial.print(")");
-      break;
-    case KeyItem::LAYER:
-      Serial.print("L(");
-      Serial.print(k.character, DEC);
-      Serial.print(")");
-      break;
-    case KeyItem::TAPDANCE:
-      Serial.print("TD(");
-      Serial.print(k.character, DEC);
-      Serial.print(")");
-      break;
-    case KeyItem::FUNCTIONCALL:
-      Serial.print("F(");
-      Serial.print(k.character, DEC);
-      Serial.print(")");
-      break;
-    case KeyItem::PASSTHROUGH:
-    default:
-      Serial.print(" . "); // blank/transparent
-      break;
+  case KeyItem::CHARACTER:
+    Serial.print("K(");
+    Serial.print(k.character, DEC); // raw number
+    Serial.print(")");
+    break;
+  case KeyItem::MODIFIER:
+    Serial.print("M(");
+    Serial.print(k.character, DEC);
+    Serial.print(")");
+    break;
+  case KeyItem::LAYER:
+    Serial.print("L(");
+    Serial.print(k.character, DEC);
+    Serial.print(")");
+    break;
+  case KeyItem::TAPDANCE:
+    Serial.print("TD(");
+    Serial.print(k.character, DEC);
+    Serial.print(")");
+    break;
+  case KeyItem::FUNCTIONCALL:
+    Serial.print("F(");
+    Serial.print(k.character, DEC);
+    Serial.print(")");
+    break;
+  case KeyItem::PASSTHROUGH:
+  default:
+    Serial.print(" . "); // blank/transparent
+    break;
   }
 }
 typedef void (*senderFunction)(uint8_t, uint8_t *);
+
 struct reportManager {
   reportManager() {
     wirelessSender = nullptr;
@@ -77,11 +81,40 @@ struct reportManager {
   reportManager(senderFunction wireless, senderFunction wired) {
     wirelessSender = wireless;
     wiredSender = wired;
+    keys.pad(6);
+    lastKeys.pad(6);
   }
-  // listPlus<uint8_t> modifiers;
-  uint8_t modifier;
+  uint8_t modifier = 0;
   listPlus<uint8_t> keys;
+  uint8_t lastModifier = 0;
+  listPlus<uint8_t> lastKeys;
 
+  void send() {
+    if (keys.length() < 6)
+      keys.pad(6 - keys.length());
+    if (lastKeys.length() < 6)
+      lastKeys.pad(6 - lastKeys.length());
+
+    bool different = false;
+
+    different |= lastModifier != modifier;
+    for (int i = 0; i < 6 && !different; i++)
+      different |= lastKeys.get(i) != keys.get(i);
+    if (different) {
+      if (wirelessSender)
+        wirelessSender(modifier, keys.self());
+      if (wiredSender)
+        wiredSender(modifier, keys.self());
+    }
+
+    lastModifier = modifier;
+    modifier = 0;
+
+    for (int i = 0; i < 6; i++)
+      lastKeys.set(i, keys.get(i));
+
+    keys.clear();
+  }
   void addKey(KeyItem k) {
     switch (k.type) {
     case KeyItem::MODIFIER:
@@ -94,17 +127,6 @@ struct reportManager {
     default:
       break;
     }
-  }
-  void send() {
-    if (keys.length() < 6) {
-      keys.pad(6 - keys.length());
-    }
-    if (wirelessSender)
-      wirelessSender(modifier, keys.self());
-    if (wiredSender)
-      wiredSender(modifier, keys.self());
-    modifier = 0;
-    keys.ptr->length = 0;
   }
 };
 
@@ -160,7 +182,8 @@ extern listPlus<tapDance> tapDances;
 
 namespace keyMap {
 
-void pressKeys(uint8_t length, listPlus<listPlus<KeyItem>> maps,bool *state, reportManager &rm,unsigned int currentLayer = 0) {
+void pressKeys(uint8_t length, listPlus<listPlus<KeyItem>> maps, dbool *state,
+               reportManager &rm, unsigned int currentLayer = 0) {
   static listPlus<KeyItem> que;
 
   unsigned long now = millis();
@@ -219,9 +242,9 @@ void pressKeys(uint8_t length, listPlus<listPlus<KeyItem>> maps,bool *state, rep
   */
   // check layers
   for (unsigned int i = 0; i < length; i++) {
-    if (state[i] &&
+    if (state[i].get() &&
         maps.get(currentLayer).get(i).type == KeyItem::kType::LAYER) {
-      state[i] = false;
+      state[i].set(false);
       return pressKeys(length, maps, state, rm,
                        maps.get(currentLayer).get(i).character);
     }
@@ -245,7 +268,7 @@ void pressKeys(uint8_t length, listPlus<listPlus<KeyItem>> maps,bool *state, rep
         }
       }
     }
-    if (state[i]) {
+    if (state[i].get()) {
       /*
         KeyItem::kType::CHARACTER
         KeyItem::kType::FUNCTIONCALL
