@@ -13,7 +13,6 @@ const unsigned int ncolGpios = sizeof(colGpios) / sizeof(colGpios[0]);
 
 #include <Wire.h>
 #define cSum_REDUNDANCY_AMMOUNT ((unsigned int)4)
-#include "kml/kml.h"
 #include "cSum/cSum.h"
 #include "key.hpp"
 #include "my-list/my-list.hpp"
@@ -186,6 +185,11 @@ void loop() {
     prettyPrintLayers();
 
     char c = 0;
+    um_fp override_um = findKey(layo, (um_fp){.ptr = (char *)"OVERRIDE", .width = 8});
+    if(override_um.ptr){
+      c = ( (char*)override_um.ptr )[0];
+    }
+
     while (c != 'y' && c != 'n') {
       Serial.println("y/n to confirm");
       while (!Serial.available()) { delay(10); }

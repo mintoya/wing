@@ -89,7 +89,7 @@
     transform 0.2s ease,
     background-color 0.2s ease;
   }
-  .key[keyValue="NONE"] { 
+  .key[keyValue="KEY_NONE"] { 
     opacity:.5;
   }
   .key[selected="true"] { 
