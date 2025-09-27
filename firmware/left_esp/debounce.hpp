@@ -6,8 +6,6 @@ struct dbool {
   bool tureState = 0;
   uint8_t states = 0;
   dbool(){}
-  // if the last three reads are true,
-  // truestate updates
   bool get() { return tureState; }
   
   void set(bool b) {

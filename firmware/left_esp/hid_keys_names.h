@@ -381,9 +381,9 @@ static inline uint8_t um_asUint(um_fp um) {
   return res;
 }
 static KeyItem kn_Match_Special(um_fp name) {
-  name = removeSpacesPadding(name);
+  name = kml_removeSpacesPadding(name);
   char D = um_asChar(name)[0];
-  um_fp id = removeSpacesPadding(inside("()", name));
+  um_fp id = kml_removeSpacesPadding(kml_inside("()", name));
   switch (D) {
   case 'M':
     if (id == um_from("lc"))
@@ -413,7 +413,7 @@ static KeyItem kn_Match_Special(um_fp name) {
   return KeyItem();
 }
 static KeyItem kn_Match(um_fp name) {
-  if (um_indexOf(name, '(') < name.width) {
+  if (kml_indexOf(name, '(') < name.width) {
     return kn_Match_Special(name);
   }
   for (unsigned int i = 0; i < sizeof(keyCodes) / sizeof(uint8_t); i++) {

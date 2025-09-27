@@ -216,7 +216,7 @@ void loop() {
     readBuf.unmake();
   }
   fillKeyStates();
-  keyMap::pressKeys(nrowGpios * ncolGpios * 2,  state, rm);
+  keyMap::pressKeys(state, rm);
   rm.send();
 }
 #endif
