@@ -1,0 +1,3 @@
+[submodule "firmware/my-lib"]
+	path = firmware/my-lib
+	url = https://github.com/mintoya/my-lib
