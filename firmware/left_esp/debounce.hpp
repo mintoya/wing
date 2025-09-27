@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
 
-#define dbounceT ((uint8_t)0b00001111)
+#define dbounceT ((uint8_t)0b00011111)
 struct dbool {
   bool tureState = 0;
   uint8_t states = 0;

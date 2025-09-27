@@ -375,16 +375,27 @@ static KeyItem kn_Match_Special(um_fp name) {
   um_fp id = removeSpacesPadding(inside("()", name));
   switch (D) {
   case 'M':
-    if (um_eq(id, ((um_fp){.ptr = (char *)"lc", .width = 2}))) {
+    if (id == um_from("lc"))
       return KeyItem(KEY_MOD_LCTRL, KeyItem::MODIFIER);
-    } else if (um_eq(id, ((um_fp){.ptr = (char *)"la", .width = 2}))) {
+    if (id == um_from("la"))
       return KeyItem(KEY_MOD_LALT, KeyItem::MODIFIER);
-    } else if (um_eq(id, ((um_fp){.ptr = (char *)"ls", .width = 2}))) {
+    if (id == um_from("ls"))
       return KeyItem(KEY_MOD_LSHIFT, KeyItem::MODIFIER);
-    }
+    if (id == um_from("lm"))
+      return KeyItem(KEY_MOD_LMETA, KeyItem::MODIFIER);
+    if (id == um_from("rc"))
+      return KeyItem(KEY_MOD_RCTRL, KeyItem::MODIFIER);
+    if (id == um_from("ra"))
+      return KeyItem(KEY_MOD_RALT, KeyItem::MODIFIER);
+    if (id == um_from("rs"))
+      return KeyItem(KEY_MOD_RSHIFT, KeyItem::MODIFIER);
+    if (id == um_from("rm"))
+      return KeyItem(KEY_MOD_RMETA, KeyItem::MODIFIER);
     break;
   case 'L':
     return KeyItem(um_asChar(id)[0] - '0', KeyItem::LAYER);
+  case 'T':
+    return KeyItem(um_asChar(id)[0] - '0', KeyItem::TAPDANCE);
   }
   Serial.print("couldn't find key from mods:  ");
   Serial.printf("%.*s\n", (int)name.width, (char *)name.ptr);

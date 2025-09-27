@@ -1,8 +1,7 @@
 #pragma once
 #include "debounce.hpp"
 #include <cstdint>
-#define TAPDANCEDEFAULTTIMEOUT ((unsigned long)200)
-
+#define TAPDANCEDEFAULTTIMEOUT ((unsigned long)300)
 #include "key.hpp"
 #include "my-list/my-list.h"
 #include "my-list/my-list.hpp"
@@ -11,7 +10,7 @@
 
 extern unsigned long millis(void);
 
-extern void (*keyboardFunctions[255])(void);
+extern void (*keyboardFunctions[10])(void);
 
 struct KeyItem {
   uint8_t character; // not really a character
@@ -21,7 +20,7 @@ struct KeyItem {
     LAYER = 2,
     TAPDANCE = 4,
     MODIFIER = 8,
-    FUNCTIONCALL = 64,
+    FUNCTIONCALL = 64,//not implemented 
   } type;
   inline KeyItem(void) {
     character = 0;
@@ -165,21 +164,11 @@ struct tapDance {
   KeyItem pressActions[10];
   KeyItem holdActions[10];
   unsigned int state; // 0: no state , 1: initial state
-  unsigned int length;
   unsigned long currentCountDown;
   KeyState keystate;
+  bool heldActionTriggered;
 };
 extern listPlus<tapDance> tapDances;
-// tapDance tapDances[1] = {
-//     {
-//         .actions = {KEY_A, KEY_B, KEY_C, KEY_D},
-//         .state = 0,
-//         .length = 3,
-//         .currentCountDown = 0,
-//         .keystate = KeyState::HELDUP,
-//     },
-// };
-
 namespace keyMap {
 
 void pressKeys(uint8_t length, listPlus<listPlus<KeyItem>> maps, dbool *state,
@@ -190,22 +179,27 @@ void pressKeys(uint8_t length, listPlus<listPlus<KeyItem>> maps, dbool *state,
 
   for (unsigned int i = 0; i < tapDances.length(); i++) {
     tapDance *td = tapDances.self() + i;
-    if (td->state == 0 and td->keystate == PRESSED) {
-      td->state++;
-      td->currentCountDown = now + TAPDANCEDEFAULTTIMEOUT;
-    } else if (td->keystate == PRESSED && now < td->currentCountDown) {
-      td->state++;
-      td->currentCountDown = now + TAPDANCEDEFAULTTIMEOUT;
-    } else if (td->state && now > td->currentCountDown) {
-      if (td->keystate == RELEASED) {
-        que.append(td->pressActions[td->state - 1]);
-        td->state = 0;
-      } else if (td->keystate == HELDDOWN) {
-        que.append(td->holdActions[td->state - 1]);
-        td->state = 0;
-      } else if (td->keystate == HELDUP) {
-        que.append(td->pressActions[td->state - 1]);
-        td->state = 0;
+
+    if (td->keystate == PRESSED) {
+      if (td->state == 0 || now < td->currentCountDown) {
+        td->state++;
+        td->currentCountDown = now + TAPDANCEDEFAULTTIMEOUT;
+      }
+    } else if (td->state) {
+      if (now > td->currentCountDown) {
+        if (td->keystate == RELEASED) {
+          if (!td->heldActionTriggered) {
+            que.append(td->pressActions[(td->state - 1) % 10]);
+          }
+          td->state = 0;
+          td->heldActionTriggered = false;
+        } else if (td->keystate == HELDDOWN) {
+          que.append(td->holdActions[(td->state - 1) % 10]);
+          td->heldActionTriggered = true;
+        } else if (td->keystate == HELDUP) {
+          que.append(td->pressActions[(td->state - 1) % 10]);
+          td->state = 0;
+        }
       }
     }
   }
