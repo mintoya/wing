@@ -150,7 +150,7 @@ static inline void fillKeyStates() {
 #endif
 void setup() {
   Serial.begin(115200);
-  delay(5000);
+  delay(2000);
   wireSetup();
   for (int i = 0; i < ncolGpios; i++) {
     pinMode(colGpios[i], OUTPUT);

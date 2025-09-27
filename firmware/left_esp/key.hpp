@@ -1,12 +1,10 @@
 #pragma once
 #include "debounce.hpp"
-#include <cstdint>
+#include <stdint.h>
+#include <stdio.h>
 #define TAPDANCEDEFAULTTIMEOUT ((unsigned long)300)
-#include "key.hpp"
 #include "my-list/my-list.h"
 #include "my-list/my-list.hpp"
-#include <stdint.h>
-#include <sys/types.h>
 
 extern unsigned long millis(void);
 
@@ -38,33 +36,22 @@ struct KeyItem {
 static void printKeyItem(const KeyItem &k) {
   switch (k.type) {
   case KeyItem::CHARACTER:
-    Serial.print("K(");
-    Serial.print(k.character, DEC); // raw number
-    Serial.print(")");
+    printf("K(%d)", k.character);
     break;
   case KeyItem::MODIFIER:
-    Serial.print("M(");
-    Serial.print(k.character, DEC);
-    Serial.print(")");
+    printf("M(%d)", k.character);
     break;
   case KeyItem::LAYER:
-    Serial.print("L(");
-    Serial.print(k.character, DEC);
-    Serial.print(")");
-    break;
+    printf("L(%d)", k.character);
   case KeyItem::TAPDANCE:
-    Serial.print("TD(");
-    Serial.print(k.character, DEC);
-    Serial.print(")");
+    printf("TD(%d)", k.character);
     break;
   case KeyItem::FUNCTIONCALL:
-    Serial.print("F(");
-    Serial.print(k.character, DEC);
-    Serial.print(")");
+    printf("F(%d)", k.character);
     break;
   case KeyItem::PASSTHROUGH:
   default:
-    Serial.print(" . "); // blank/transparent
+    printf(" . ");
     break;
   }
 }
@@ -170,10 +157,15 @@ struct tapDance {
 };
 extern listPlus<tapDance> tapDances;
 extern listPlus<listPlus<KeyItem>> keyMapLayers;
+extern const unsigned int nrowGpios;
+extern const unsigned int ncolGpios;
+
 namespace keyMap {
 
-void pressKeys(uint8_t length, dbool *state, reportManager &rm,
-               unsigned int currentLayer = 0) {
+static void pressKeys(dbool *state, reportManager &rm,
+                      unsigned int currentLayer = 0) {
+  unsigned int length = nrowGpios * ncolGpios * 2;
+
   static listPlus<KeyItem> que;
 
   unsigned long now = millis();
@@ -240,7 +232,7 @@ void pressKeys(uint8_t length, dbool *state, reportManager &rm,
     if (state[i].get() &&
         keyMapLayers.get(currentLayer).get(i).type == KeyItem::kType::LAYER) {
       state[i].set(false);
-      return pressKeys(length, state, rm,
+      return pressKeys(state, rm,
                        keyMapLayers.get(currentLayer).get(i).character);
     }
   }
