@@ -163,7 +163,7 @@ inline KeyState KeyState_down(KeyState state) {
 struct tapDance {
   KeyItem pressActions[10];
   KeyItem holdActions[10];
-  unsigned int state; // 0: no state , 1: initial state
+  unsigned int state;
   unsigned long currentCountDown;
   KeyState keystate;
   bool heldActionTriggered;
