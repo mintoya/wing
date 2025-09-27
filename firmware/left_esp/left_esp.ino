@@ -40,7 +40,7 @@ listPlus<tapDance> tapDances;
 uint8_t pinData[nrowGpios] = { 0 };
 uint8_t *oPinData = nullptr;
 dbool state[nrowGpios * ncolGpios * 2] = {};
-void (*keyboardFunctions[255])(void) = {};
+void (*keyboardFunctions[10])(void) = {};
 
 
 void fakeSender(uint8_t mod, uint8_t *keys) {
@@ -216,7 +216,7 @@ void loop() {
     readBuf.unmake();
   }
   fillKeyStates();
-  keyMap::pressKeys(nrowGpios * ncolGpios * 2, keyMapLayers, state, rm);
+  keyMap::pressKeys(nrowGpios * ncolGpios * 2,  state, rm);
   rm.send();
 }
 #endif

@@ -5,6 +5,7 @@
 #include "key.hpp"
 #include "kml/kml.h"
 #include "string-List/um_fp.h"
+#include <cstdint>
 #include <stdint.h>
 #include <string.h>
 static const uint8_t keyCodes[] = {
@@ -369,6 +370,16 @@ static const char *keyNames[] = {
 };
 
 #define um_asChar(um) ((char *)um.ptr)
+static inline uint8_t um_asUint(um_fp um) {
+  uint8_t res = 0;
+  for (size_t i = 0; i < um.width; i++) {
+    char c = um_asChar(um)[i];
+    if (c < '0' || c > '9')
+      break;
+    res = res * 10 + (c - '0');
+  }
+  return res;
+}
 static KeyItem kn_Match_Special(um_fp name) {
   name = removeSpacesPadding(name);
   char D = um_asChar(name)[0];
@@ -393,9 +404,9 @@ static KeyItem kn_Match_Special(um_fp name) {
       return KeyItem(KEY_MOD_RMETA, KeyItem::MODIFIER);
     break;
   case 'L':
-    return KeyItem(um_asChar(id)[0] - '0', KeyItem::LAYER);
+    return KeyItem(um_asUint(id), KeyItem::LAYER);
   case 'T':
-    return KeyItem(um_asChar(id)[0] - '0', KeyItem::TAPDANCE);
+    return KeyItem(um_asUint(id), KeyItem::TAPDANCE);
   }
   Serial.print("couldn't find key from mods:  ");
   Serial.printf("%.*s\n", (int)name.width, (char *)name.ptr);

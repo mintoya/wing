@@ -20,7 +20,7 @@ struct KeyItem {
     LAYER = 2,
     TAPDANCE = 4,
     MODIFIER = 8,
-    FUNCTIONCALL = 64,//not implemented 
+    FUNCTIONCALL = 64, // not implemented
   } type;
   inline KeyItem(void) {
     character = 0;
@@ -169,10 +169,11 @@ struct tapDance {
   bool heldActionTriggered;
 };
 extern listPlus<tapDance> tapDances;
+extern listPlus<listPlus<KeyItem>> keyMapLayers;
 namespace keyMap {
 
-void pressKeys(uint8_t length, listPlus<listPlus<KeyItem>> maps, dbool *state,
-               reportManager &rm, unsigned int currentLayer = 0) {
+void pressKeys(uint8_t length, dbool *state, reportManager &rm,
+               unsigned int currentLayer = 0) {
   static listPlus<KeyItem> que;
 
   unsigned long now = millis();
@@ -237,10 +238,10 @@ void pressKeys(uint8_t length, listPlus<listPlus<KeyItem>> maps, dbool *state,
   // check layers
   for (unsigned int i = 0; i < length; i++) {
     if (state[i].get() &&
-        maps.get(currentLayer).get(i).type == KeyItem::kType::LAYER) {
+        keyMapLayers.get(currentLayer).get(i).type == KeyItem::kType::LAYER) {
       state[i].set(false);
-      return pressKeys(length, maps, state, rm,
-                       maps.get(currentLayer).get(i).character);
+      return pressKeys(length, state, rm,
+                       keyMapLayers.get(currentLayer).get(i).character);
     }
   }
 
@@ -253,11 +254,11 @@ void pressKeys(uint8_t length, listPlus<listPlus<KeyItem>> maps, dbool *state,
   */
 
   for (unsigned int i = 0; i < length; i++) {
-    KeyItem currentKey = maps.get(currentLayer).get(i);
+    KeyItem currentKey = keyMapLayers.get(currentLayer).get(i);
     if (currentKey.type == KeyItem::kType::PASSTHROUGH) {
       for (int j = currentLayer; j >= 0; j--) {
-        if (!(maps.get(j).get(i).type == KeyItem::kType::PASSTHROUGH)) {
-          currentKey = maps.get(j).get(i);
+        if (!(keyMapLayers.get(j).get(i).type == KeyItem::kType::PASSTHROUGH)) {
+          currentKey = keyMapLayers.get(j).get(i);
           break;
         }
       }
