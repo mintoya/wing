@@ -43,13 +43,13 @@ static void printKeyItem(const KeyItem &k) {
     break;
   case KeyItem::LAYER:
     Serial.printf("L(%d)", k.character);
+    break;
   case KeyItem::TAPDANCE:
     Serial.printf("TD(%d)", k.character);
     break;
   case KeyItem::FUNCTIONCALL:
     Serial.printf("F(%d)", k.character);
     break;
-  case KeyItem::PASSTHROUGH:
   default:
     Serial.printf(" . ");
     break;

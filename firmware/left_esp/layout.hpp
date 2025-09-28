@@ -23,11 +23,14 @@ um_fp defaultLayout_um = um_from(R"d(
     ]
     layers:[
        [
-          KEY_TAB, KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T,        KEY_Y, KEY_U, KEY_I, KEY_O, KEY_P,  KEY_BACKSPACE,
+          KEY_TAB , KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T,        KEY_Y, KEY_U, KEY_I, KEY_O, KEY_P,  KEY_BACKSPACE,
           M( ls ) , KEY_A, KEY_S, KEY_D, KEY_F, KEY_G,        KEY_H, KEY_J, KEY_K, KEY_L, KEY_COMMA,  KEY_LEFTBRACE,
-          M( lc ) , KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B,        KEY_N, KEY_M, KEY_COMMA , KEY_DOT, KEY_SLASH,  KEY_ENTER,
-          0      , 0    , M( la ),T( 0 ),KEY_SPACE,  0,        L(1)  ,   L(2),      0,      0,      0,  0,
+          M( lc ) , KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B,        KEY_N, KEY_M, KEY_COMMA,KEY_DOT,KEY_SLASH,  KEY_ENTER,
+          _       , _    ,M( la ),L( 1 ),KEY_SPACE, _,        _    , L( 1 ), L( 2 )  ,      _,        _,          _,
       ],
+      [
+        KEY_ESC, KEY_0,
+      ]
     ]
   }
 )d");

@@ -413,6 +413,8 @@ static KeyItem kn_Match_Special(um_fp name) {
   return KeyItem();
 }
 static KeyItem kn_Match(um_fp name) {
+  Serial.write((uint8_t*)name.ptr,name.width);
+  Serial.println("");
   if (kml_indexOf(name, '(') < name.width) {
     return kn_Match_Special(name);
   }

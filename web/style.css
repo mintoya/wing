@@ -13,6 +13,7 @@
       flex:1;
       padding:20px;
       border-radius:5px;
+      background-color:var(--primary);
       border:none;
 }
 #keyItem-selector{
@@ -23,7 +24,18 @@
     input{
       flex:1;
       font-size:20px;
+      height:20px;
+      background-color:var(--primary);
+      padding:10px;
+      border-radius:5px;
+      border:none;
+    }
+    button{
+      flex:1;
+      font-size:20px;
       height:50px;
+      background-color:var(--primary_container);
+      color:var(--background);
       padding:10px;
       border-radius:5px;
       border:none;
@@ -88,6 +100,13 @@
     transition: 
     transform 0.2s ease,
     background-color 0.2s ease;
+  }
+  /* @keyframes pop{ */
+  /*   50%  {transform: scale(1.2);} */
+  /* } */
+  .key:hover{
+    --scale:scale(1.1);
+    /* animation: pop 0.3s linear 1; */
   }
   .key[keyValue="NONE"] { 
     opacity:.5;
