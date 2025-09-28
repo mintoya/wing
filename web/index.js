@@ -953,47 +953,6 @@ async function changeLayer(layerN) {
 
 changeLayer(0);
 search();
-function stripComments(str) {
-  return str.replace(/\/\/:\{[\s\S]*?\}/g, ""); // remove //:{ ... } blocks
-}
-function extractLayers(str) {
-  const cleanStr = stripComments(str);
-
-  // Match the outer layers array
-  const match = cleanStr.match(/layers\s*:\s*\[([\s\S]*?)\]\s*\]/);
-  if (!match) return [];
-
-  const layersContent = match[1]; // content inside the layers array
-  const layerMatches = layersContent.match(/\[([\s\S]*?)\]/g); // each layer
-
-  if (!layerMatches) return [];
-
-  // parse each layer
-  return layerMatches.map(layerStr => {
-    // Remove surrounding brackets
-    const inner = layerStr.replace(/^\[|\]$/g, "").trim();
-
-    // Split by commas outside quotes
-    const keys = [];
-    let buffer = "";
-    let inQuotes = false;
-
-    for (let i = 0; i < inner.length; i++) {
-      const char = inner[i];
-      if (char === '"') inQuotes = !inQuotes;
-      if (char === ',' && !inQuotes) {
-        keys.push(buffer.trim() || null);
-        buffer = "";
-      } else {
-        buffer += char;
-      }
-    }
-    if (buffer.length) keys.push(buffer.trim() || null);
-
-    // Convert "0" to null, otherwise leave as string
-    return keys.map(k => k === "0" ? null : k);
-  });
-}
 
 
 let port;
@@ -1005,6 +964,8 @@ async function initSerial() {
   });
   console.log("Serial connected");
   sendmsg("request:disableStrokes;");
+  await sleep(100);
+  requestLayout();
 }
 
 async function sendmsg(msg) {
