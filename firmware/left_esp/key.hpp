@@ -36,22 +36,22 @@ struct KeyItem {
 static void printKeyItem(const KeyItem &k) {
   switch (k.type) {
   case KeyItem::CHARACTER:
-    printf("K(%d)", k.character);
+    Serial.printf("K(%d)", k.character);
     break;
   case KeyItem::MODIFIER:
-    printf("M(%d)", k.character);
+    Serial.printf("M(%d)", k.character);
     break;
   case KeyItem::LAYER:
-    printf("L(%d)", k.character);
+    Serial.printf("L(%d)", k.character);
   case KeyItem::TAPDANCE:
-    printf("TD(%d)", k.character);
+    Serial.printf("TD(%d)", k.character);
     break;
   case KeyItem::FUNCTIONCALL:
-    printf("F(%d)", k.character);
+    Serial.printf("F(%d)", k.character);
     break;
   case KeyItem::PASSTHROUGH:
   default:
-    printf(" . ");
+    Serial.printf(" . ");
     break;
   }
 }
