@@ -40,6 +40,7 @@ listPlus<tapDance> tapDances;
 uint8_t pinData[nrowGpios] = { 0 };
 uint8_t *oPinData = nullptr;
 dbool state[nrowGpios * ncolGpios * 2] = {};
+bool state_presskeys[nrowGpios * ncolGpios * 2] ={false};
 void (*keyboardFunctions[10])(void) = {};
 
 bool fakeSenderEnabled = true;
@@ -147,6 +148,11 @@ static inline void fillKeyStates() {
       state[r * totalCols + c].set(getKeyState(r, c));
     }
   }
+  for (unsigned int r = 0; r < nrowGpios; r++) {
+    for (unsigned int c = 0; c < totalCols; c++) {
+      state_presskeys[r * totalCols + c] = state[r * totalCols + c].get();
+    }
+  }
 }
 #endif
 void setup() {
@@ -175,7 +181,10 @@ void loop() {}
 void serialRequestManager(um_fp layo) {
   um_fp requestType;
   if (!(requestType = findKey(layo, um_from("request"))).ptr) {
+    Serial.println("status:fail;");
     Serial.println("no requestType provided");
+    Serial.write((uint8_t*)layo.ptr,layo.width);
+    Serial.println();
     Serial.println(
       "examples\n\n"
       "request:setLayout;keyboard:{layers:{{KEY_A}}}\t\t-- sets layout\n"
@@ -184,7 +193,6 @@ void serialRequestManager(um_fp layo) {
       "request:disableStrokes;\t\t-- disables the keycode report\n"
       "request:enableStrokes;\t\t-- enables them \n"
       );
-    return;
   }
   if (requestType == um_from("setLayout")) {
     Serial.println("setting Layout");
@@ -197,7 +205,7 @@ void serialRequestManager(um_fp layo) {
   } else if (requestType == um_from("getLayout")) {
     um_fp savedLayout = readFile("/lay.kml");
     Serial.write((uint8_t *)savedLayout.ptr, savedLayout.width);
-    Serial.print("//EOF");
+    Serial.print("//EOT");
     free(savedLayout.ptr);
   } else if (requestType == um_from("getDefaultLayout")) {
     Serial.println("getting default Layout");
@@ -223,7 +231,7 @@ void loop() {
     readBuf.unmake();
   }
   fillKeyStates();
-  keyMap::pressKeys(state, rm);
+  keyMap::pressKeys(state_presskeys, rm);
   rm.send();
 }
 #endif

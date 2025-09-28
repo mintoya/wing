@@ -1,7 +1,5 @@
 #pragma once
-#include "debounce.hpp"
 #include <stdint.h>
-#include <stdio.h>
 #define TAPDANCEDEFAULTTIMEOUT ((unsigned long)300)
 #include "my-list/my-list.h"
 #include "my-list/my-list.hpp"
@@ -162,7 +160,7 @@ extern const unsigned int ncolGpios;
 
 namespace keyMap {
 
-static void pressKeys(dbool *state, reportManager &rm,
+static void pressKeys(bool *state, reportManager &rm,
                       unsigned int currentLayer = 0) {
   unsigned int length = nrowGpios * ncolGpios * 2;
 
@@ -229,9 +227,9 @@ static void pressKeys(dbool *state, reportManager &rm,
   */
   // check layers
   for (unsigned int i = 0; i < length; i++) {
-    if (state[i].get() &&
+    if (state[i] &&
         keyMapLayers.get(currentLayer).get(i).type == KeyItem::kType::LAYER) {
-      state[i].set(false);
+      state[i] = (false);
       return pressKeys(state, rm,
                        keyMapLayers.get(currentLayer).get(i).character);
     }
@@ -255,7 +253,7 @@ static void pressKeys(dbool *state, reportManager &rm,
         }
       }
     }
-    if (state[i].get()) {
+    if (state[i]) {
       /*
         KeyItem::kType::CHARACTER
         KeyItem::kType::FUNCTIONCALL

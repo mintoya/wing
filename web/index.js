@@ -1,3 +1,4 @@
+document.querySelector(".top #U").setAttribute("current","false");
 function levenshteinDistance(str1, str2) {
   let bias = 0;
   if (!str1 || !str2) {
@@ -914,6 +915,7 @@ function search(word) {
         keys[currentSelectedKey].textContent = button.textContent;
         keys[currentSelectedKey].setAttribute("keyValue", button.textContent)
         keyValueArrs[currentLayer][currentSelectedKey] = button.textContent;
+        document.querySelector(".top #U").setAttribute("current","false");
       }
     }
     container.appendChild(button);
@@ -928,11 +930,12 @@ function searchAndSelect(word) {
       keys[currentSelectedKey].textContent = vkv[0].item.name
       keys[currentSelectedKey].setAttribute("keyValue", vkv[0].item.name)
       keyValueArrs[currentLayer][currentSelectedKey] = vkv[0].item.name;
+      document.querySelector(".top #U").setAttribute("current","false");
     }
   }
 }
 function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 async function changeLayer(layerN) {
   currentLayer = layerN;
@@ -1018,7 +1021,7 @@ async function requestLayout() {
       const { value, done } = await reader.read();
       if (done) break;
       result += new TextDecoder().decode(value);
-      if (result.includes("//EOF")) break;
+      if (result.includes("//EOT")) break;
     }
   } catch (err) {
     console.error("Error reading from serial port:", err);
@@ -1053,6 +1056,6 @@ async function requestLayout() {
 
   // Update UI for the current layer
   changeLayer(currentLayer);
-
+  document.querySelector(".top #U").setAttribute("current","true");
   return parsedObj;
 }
