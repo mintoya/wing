@@ -101,7 +101,7 @@
         <input type="text" name="keyitem-text" value="search" oninput = "search(this.value)" onchange = "searchAndSelect( this.value )">
         <button class = "serialButton" id="C" onclick="initSerial()">Connect</button>
         <button class = "serialButton" id="D" onclick="requestLayout()">Download</button>
-        <button class = "serialButton" id="U" onclick="sendmsg(getLayoutAsKml())">Upload</button>
+        <button class = "serialButton" id="U" onclick="portWrite(getLayoutAsKml())">Upload</button>
       </div>
       <div class = "bottom">
         <div id = "search-results">
@@ -111,7 +111,8 @@
 
     </div>
   </body>
-  <script src="index.js"></script>
+  <script src="validKeyValues.js"></script>
   <script src="kmlparser.js"></script>
+  <script src="index.js"></script>
 </html>
 
