@@ -40,12 +40,12 @@ listPlus<tapDance> tapDances;
 uint8_t pinData[nrowGpios] = { 0 };
 uint8_t *oPinData = nullptr;
 dbool state[nrowGpios * ncolGpios * 2] = {};
-bool state_presskeys[nrowGpios * ncolGpios * 2] ={false};
+bool state_presskeys[nrowGpios * ncolGpios * 2] = { false };
 void (*keyboardFunctions[10])(void) = {};
 
 bool fakeSenderEnabled = true;
 void fakeSender(uint8_t mod, uint8_t *keys) {
-  if(!fakeSenderEnabled)return;
+  if (!fakeSenderEnabled) return;
   Serial.printf("%02X|%02X %02X %02X %02X %02X %02X\n",
                 mod,
                 keys[0], keys[1], keys[2],
@@ -180,10 +180,11 @@ void loop() {}
 #else
 void serialRequestManager(um_fp layo) {
   um_fp requestType;
+  Serial.println("//:{BOT}");
   if (!(requestType = findKey(layo, um_from("request"))).ptr) {
-    Serial.println("status:fail;");
+    Serial.println("response:fail;");
     Serial.println("no requestType provided");
-    Serial.write((uint8_t*)layo.ptr,layo.width);
+    Serial.write((uint8_t *)layo.ptr, layo.width);
     Serial.println();
     Serial.println(
       "examples\n\n"
@@ -191,32 +192,33 @@ void serialRequestManager(um_fp layo) {
       "request:getLayout;\t\t-- prints layout\n"
       "request:getDefaultLayout;\t\t-- prints default layout \n"
       "request:disableStrokes;\t\t-- disables the keycode report\n"
-      "request:enableStrokes;\t\t-- enables them \n"
-      );
+      "request:enableStrokes;\t\t-- enables them \n");
+  } else {
+
+    Serial.println("response:sucess;");
+    if (requestType == um_from("setLayout")) {
+      parseLayout(layo);
+    } else if (requestType == um_from("ls")) {
+      listDir("/");
+    } else if (requestType == um_from("setDefaultLayout")) {
+      Serial.println("setting default Layout");
+      parseLayout(defaultLayout_um);
+    } else if (requestType == um_from("getLayout")) {
+      um_fp savedLayout = readFile("/lay.kml");
+      Serial.write((uint8_t *)savedLayout.ptr, savedLayout.width);
+      Serial.println();
+      free(savedLayout.ptr);
+    } else if (requestType == um_from("getDefaultLayout")) {
+      Serial.println("getting default Layout");
+      Serial.write((uint8_t *)defaultLayout_um.ptr, defaultLayout_um.width);
+    } else if (requestType == um_from("disableStrokes")) {
+      fakeSenderEnabled = false;
+    } else if (requestType == um_from("enableStrokes")) {
+      Serial.println("enabling keycode report");
+      fakeSenderEnabled = true;
+    }
   }
-  if (requestType == um_from("setLayout")) {
-    Serial.println("setting Layout");
-    parseLayout(layo);
-  } else if (requestType == um_from("ls")) {
-    listDir("/");
-  } else if (requestType == um_from("setDefaultLayout")) {
-    Serial.println("setting default Layout");
-    parseLayout(defaultLayout_um);
-  } else if (requestType == um_from("getLayout")) {
-    um_fp savedLayout = readFile("/lay.kml");
-    Serial.write((uint8_t *)savedLayout.ptr, savedLayout.width);
-    Serial.print("//EOT");
-    free(savedLayout.ptr);
-  } else if (requestType == um_from("getDefaultLayout")) {
-    Serial.println("getting default Layout");
-    Serial.write((uint8_t *)defaultLayout_um.ptr, defaultLayout_um.width);
-  } else if (requestType == um_from("disableStrokes")) { 
-    // printing stuff to serial messes up the site's parsing
-    fakeSenderEnabled = false;
-  } else if (requestType == um_from("enableStrokes")) {
-    Serial.println("enabling keycode report");
-    fakeSenderEnabled = true;
-  }
+  Serial.println("//:{EOT}");
 }
 void loop() {
   if (Serial.available()) {
