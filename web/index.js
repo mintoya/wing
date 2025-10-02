@@ -289,7 +289,7 @@ async function initSerial() {
 }
 async function portWrite(msg) {
   if (!writer) {
-    console.error("Port not open, call initSerial() first");
+    alert("Port not open, call connect the board first");
     return;
   }
   try {
@@ -302,7 +302,7 @@ async function portWrite(msg) {
 }
 async function beginStream() {
   if (!reader) {
-    console.error("Port not open, call initSerial() first");
+    alert("Port not open, call connect the board first");
     return;
   }
   try {

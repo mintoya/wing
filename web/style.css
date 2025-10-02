@@ -64,9 +64,14 @@
   .bottom{
     flex:1;
     #search-results{
+      button:hover{
+        transform:scale(1.1);
+      }
       button{
         overflow-wrap: break-word;
         min-width:50px;
+        transition: 
+        transform 0.2s ease;
         height: 50px;
         margin: 5px;
         color:var(--primary);
