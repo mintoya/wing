@@ -1,4 +1,7 @@
 document.querySelector(".top #U").setAttribute("current", "false");
+function min(a, b) {
+  return a < b ? a : b;
+}
 function levenshteinDistance(str1, str2) {
   let bias = 0;
   if (!str1 || !str2) {
@@ -10,7 +13,7 @@ function levenshteinDistance(str1, str2) {
     return 999;
   }
   if (str1.includes(str2) || str2.includes(str1)) {
-    bias -= 100;
+    bias -= 100 * min(str1.length, str2.length);
   }
   let matrix = Array(len1 + 1)
     .fill(null)
@@ -41,7 +44,11 @@ function fuzzySearch(query, data, threshold = 10) {
   const lowerCaseQuery = query.toLowerCase();
   for (const item of data) {
     const lowerCaseItem = item.name.toLowerCase();
-    const distance = levenshteinDistance(lowerCaseQuery, lowerCaseItem);
+    const lowerCaseItem2 = item.value.toLowerCase();
+    const distance = min(
+      levenshteinDistance(lowerCaseQuery, lowerCaseItem),
+      levenshteinDistance(lowerCaseQuery, lowerCaseItem2),
+    );
     if (distance <= threshold) {
       results.push({
         item: item,
@@ -214,15 +221,13 @@ function getLayoutAsKml() {
   return msg;
 }
 async function requestLayout() {
-  buffer.beginRead();
-  await sleep(250);
-  await portWrite("request:getLayout;");
-  await sleep(250);
-  const r = buffer.endRead();
+  showSpinner();
+  const r = await writeWithResponse("request:getLayout;");
   const parsedObj = globalThis.parse(r);
   console.log(parsedObj);
   if (!parsedObj.keyboard || !parsedObj.keyboard.layers) {
-    console.error("couldnt find keyboard in response");
+    hideSpinner();
+    alert("couldnt find keyboard in response\n this is fine if it has no data on it");
     return null;
   }
   for (const [i, layer] of parsedObj.keyboard.layers.entries()) {
@@ -233,16 +238,17 @@ async function requestLayout() {
   }
   changeLayer(currentLayer);
   document.querySelector(".top #U").setAttribute("current", "true");
+  hideSpinner();
   return parsedObj;
 }
 async function saveLayout() {
-  buffer.beginRead();
-  await sleep(250);
-  await portWrite(getLayoutAsKml());
-  await sleep(250);
-  const r = buffer.endRead();
-  console.log("save result");
-  console.log(r);
+  showSpinner();
+  const response = await writeWithResponse(getLayoutAsKml());
+  const p = globalThis.parse(response);
+  hideSpinner();
+  if (p.status == "fail") {
+    alert("upload failed, try again!!");
+  }
 }
 const buffer = {
   data: "",
@@ -275,6 +281,13 @@ const buffer = {
 let port;
 let reader;
 let writer;
+async function writeWithResponse(msg) {
+  buffer.beginRead();
+  await sleep(250);
+  await portWrite(msg);
+  await sleep(250);
+  return buffer.endRead();
+}
 async function initSerial() {
   try {
     port = await navigator.serial.requestPort({});
@@ -283,6 +296,8 @@ async function initSerial() {
     reader = port.readable.getReader();
     console.log("Serial port opened");
     beginStream();
+    await sleep(500);
+    await requestLayout();
   } catch (err) {
     console.error("Serial error:", err);
   }
@@ -318,5 +333,62 @@ async function beginStream() {
     }
   } catch (err) {
     console.error("Serial error:", err);
+  }
+}
+function showSpinner() {
+  // Check if the overlay already exists to avoid duplication
+  if (document.getElementById("loading-overlay")) {
+    return;
+  }
+  // --- 1. Create the Styles (CSS) ---
+  const style = document.createElement("style");
+  style.id = "spinner-styles";
+  style.textContent = `
+        /* Overlay to cover the screen and block clicks */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        /* The Spinner itself */
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        /* The spinning animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    `;
+  document.head.appendChild(style);
+  // --- 2. Create the HTML Elements ---
+  const overlay = document.createElement("div");
+  overlay.id = "loading-overlay";
+  const spinner = document.createElement("div");
+  spinner.className = "spinner";
+  // Assemble the elements
+  overlay.appendChild(spinner);
+  document.body.appendChild(overlay);
+}
+function hideSpinner() {
+  const overlay = document.getElementById("loading-overlay");
+  const styles = document.getElementById("spinner-styles");
+  if (overlay) {
+    overlay.remove(); // Remove the HTML overlay element
+  }
+  if (styles) {
+    styles.remove(); // Remove the injected CSS styles
   }
 }

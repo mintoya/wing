@@ -110,8 +110,8 @@
   .key {
     opacity:1;
     --scale: scale(1) ;
-    font-weight:normal;
-    font-size:18px;
+    font-size:20px;
+    font-weight:bold;
     overflow-wrap: break-word;
     transform: var(--scale);
     width: var(--button-width);
@@ -132,7 +132,6 @@
     opacity:.5;
   }
   .key[selected="true"] { 
-    font-weight:bold;
     opacity:1;
     position:relative;
     background-color: var(--primary_container);

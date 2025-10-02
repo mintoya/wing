@@ -162,6 +162,7 @@ namespace keyMap {
 
 static void pressKeys(bool *state, reportManager &rm,
                       unsigned int currentLayer = 0) {
+  static bool forceDown = false;
   unsigned int length = nrowGpios * ncolGpios * 2;
 
   static listPlus<KeyItem> que;
@@ -177,7 +178,7 @@ static void pressKeys(bool *state, reportManager &rm,
         td->currentCountDown = now + TAPDANCEDEFAULTTIMEOUT;
       }
     } else if (td->state) {
-      if (now > td->currentCountDown) {
+      if (forceDown || now > td->currentCountDown) {
         if (td->keystate == RELEASED) {
           if (!td->heldActionTriggered) {
             que.append(td->pressActions[(td->state - 1) % 10]);
@@ -243,6 +244,7 @@ static void pressKeys(bool *state, reportManager &rm,
     KeyItem::kType::TAPDANCE
   */
 
+  forceDown = false;
   for (unsigned int i = 0; i < length; i++) {
     KeyItem currentKey = keyMapLayers.get(currentLayer).get(i);
     if (currentKey.type == KeyItem::kType::PASSTHROUGH) {
@@ -269,6 +271,7 @@ static void pressKeys(bool *state, reportManager &rm,
             KeyState_down(tapDances.self()[currentKey.character].keystate);
       } break;
       default:
+        forceDown = true;
         /*
           KeyItem::kType::CHARACTER
           KeyItem::kType::MODIFIER

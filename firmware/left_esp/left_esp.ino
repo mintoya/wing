@@ -180,9 +180,8 @@ void loop() {}
 #else
 void serialRequestManager(um_fp layo) {
   um_fp requestType;
-  Serial.println("//:{BOT}");
   if (!(requestType = findKey(layo, um_from("request"))).ptr) {
-    Serial.println("response:fail;");
+    Serial.println("status:fail;");
     Serial.println("no requestType provided");
     Serial.write((uint8_t *)layo.ptr, layo.width);
     Serial.println();
@@ -195,20 +194,29 @@ void serialRequestManager(um_fp layo) {
       "request:enableStrokes;\t\t-- enables them \n");
   } else {
 
-    Serial.println("response:sucess;");
+    Serial.println("status:sucess;");
     if (requestType == um_from("setLayout")) {
       parseLayout(layo);
     } else if (requestType == um_from("ls")) {
       listDir("/");
-    } else if (requestType == um_from("setDefaultLayout")) {
+    } else if (
+        requestType == um_from("setDefaultLayout") ||
+        requestType == um_from("set default layout")
+    ) {
       Serial.println("setting default Layout");
       parseLayout(defaultLayout_um);
-    } else if (requestType == um_from("getLayout")) {
+    } else if (
+        requestType == um_from("getLayout") || 
+        requestType == um_from("get layout") 
+    ) {
       um_fp savedLayout = readFile("/lay.kml");
       Serial.write((uint8_t *)savedLayout.ptr, savedLayout.width);
       Serial.println();
       free(savedLayout.ptr);
-    } else if (requestType == um_from("getDefaultLayout")) {
+    } else if (
+        requestType == um_from("getDefaultLayout") ||
+        requestType == um_from("get default layout")
+    ) {
       Serial.println("getting default Layout");
       Serial.write((uint8_t *)defaultLayout_um.ptr, defaultLayout_um.width);
     } else if (requestType == um_from("disableStrokes")) {
@@ -218,7 +226,6 @@ void serialRequestManager(um_fp layo) {
       fakeSenderEnabled = true;
     }
   }
-  Serial.println("//:{EOT}");
 }
 void loop() {
   if (Serial.available()) {
