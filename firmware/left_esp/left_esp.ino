@@ -222,13 +222,27 @@ void serialRequestManager(um_fp layo) {
 }
 void loop() {
   if (Serial.available()) {
+    unsigned long now = millis();
     listPlus<uint8_t> readBuf;
     while (Serial.available()) {
       uint8_t b = Serial.read();
       readBuf.append(b);
     }
-
     um_fp layo = { .ptr = (void *)readBuf.self(), .width = readBuf.length() };
+    um_fp requestLength = findKey(layo,um_from("requestLength"));
+    unsigned int msgLength = um_asUint(requestLength);
+    if (requestLength.ptr) {
+      while (layo.width < msgLength+13+requestLength.width && (millis() - now) < 5000) {
+        while (Serial.available()) {
+          uint8_t b = Serial.read();
+          readBuf.append(b);
+        }
+      }
+    }
+
+
+    layo = { .ptr = (void *)readBuf.self(), .width = readBuf.length() };
+
     serialRequestManager(layo);
     readBuf.unmake();
   }

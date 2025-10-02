@@ -60,9 +60,9 @@ function lookupKey(input, type) {
   }
   return type == "value" ? validKeyValues[0].value : validKeyValues[0].name;
 }
-var currentSelectedKey = null;
-var currentLayer = 0;
-var keys = [
+let currentSelectedKey = null;
+let currentLayer = 0;
+let keys = [
   "#left-half .pinky-extra .one",
   "#left-half .pinky       .one",
   "#left-half .ring        .one",
@@ -112,7 +112,7 @@ var keys = [
   null,
   null,
 ];
-var keyValueArrs = [
+let keyValueArrs = [
   [],
 ];
 keys.forEach((selector, index) => {
@@ -210,42 +210,68 @@ function getLayoutAsKml() {
   }
   msg += "]}";
   msg += "request:setLayout;";
+  msg = "requestLength:" + msg.length + ";" + msg;
   return msg;
 }
 async function requestLayout() {
-  console.log("requestLayout");
-  if (!port) {
-    console.error("Port not open. Call initSerial() first.");
-    return null;
-  }
-  console.log("gettingLayout");
+  buffer.beginRead();
+  await sleep(250);
   await portWrite("request:getLayout;");
-  let parsedObj = {};
-  for (let i = 0; !(parsedObj.keyboard && parsedObj.keyboard.layers); i++) {
-    console.log("parseing");
-    const result = await nextStructuredOutput();
-    parsedObj = globalThis.parse(result);
-    console.log(parsedObj);
-    if (i>0) {
-      console.log(`failed ${i} times`);
-    }
-  }
+  await sleep(250);
+  const r = buffer.endRead();
+  const parsedObj = globalThis.parse(r);
+  console.log(parsedObj);
   if (!parsedObj.keyboard || !parsedObj.keyboard.layers) {
     console.error("couldnt find keyboard in response");
     return null;
   }
-  console.log(parsedObj.keyboard.layers);
   for (const [i, layer] of parsedObj.keyboard.layers.entries()) {
     for (const [ii, key] of layer.entries()) {
       if (!keyValueArrs[i]) keyValueArrs[i] = [];
       keyValueArrs[i][ii] = lookupKey(key, "name");
     }
   }
-  // Update UI for the current layer
   changeLayer(currentLayer);
   document.querySelector(".top #U").setAttribute("current", "true");
   return parsedObj;
 }
+async function saveLayout() {
+  buffer.beginRead();
+  await sleep(250);
+  await portWrite(getLayoutAsKml());
+  await sleep(250);
+  const r = buffer.endRead();
+  console.log("save result");
+  console.log(r);
+}
+const buffer = {
+  data: "",
+  readData: "",
+  textarea: document.querySelector("#serialIn"),
+  maxWidth: 2048,
+  reading: false,
+  write: function (msg) {
+    if (this.reading) {
+      this.readData += msg;
+    }
+    this.data += msg;
+    if (this.data.length > this.maxWidth) {
+      this.data = this.data.substring(this.data.length - this.maxWidth);
+    }
+  },
+  beginRead: function () {
+    if (this.reading) {
+      console.error("one read at a time for now");
+      return;
+    }
+    this.readData = "";
+    this.reading = true;
+  },
+  endRead: function () {
+    this.reading = false;
+    return this.readData;
+  },
+};
 let port;
 let reader;
 let writer;
@@ -256,6 +282,7 @@ async function initSerial() {
     writer = port.writable.getWriter();
     reader = port.readable.getReader();
     console.log("Serial port opened");
+    beginStream();
   } catch (err) {
     console.error("Serial error:", err);
   }
@@ -266,21 +293,19 @@ async function portWrite(msg) {
     return;
   }
   try {
+    console.log("writer");
+    console.log(msg);
     await writer.write(new TextEncoder().encode(msg));
   } catch (e) {
     console.error(e);
-  } finally {
-    console.log("sent: ");
-    console.log(msg);
   }
 }
-let serialBuffer = "";
-async function nextStructuredOutput() {
+async function beginStream() {
   if (!reader) {
     console.error("Port not open, call initSerial() first");
     return;
   }
-  try{
+  try {
     while (true) {
       const { value, done } = await reader.read();
       if (done) {
@@ -288,22 +313,10 @@ async function nextStructuredOutput() {
         break;
       }
       if (value) {
-        serialBuffer += new TextDecoder().decode(value);
-        const startIdx = serialBuffer.indexOf("//:{BOT}");
-        const endIdx = serialBuffer.indexOf("//:{EOT}");
-        if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
-          const message = serialBuffer.substring(
-            startIdx,
-            endIdx + "//:{EOT}".length,
-          );
-          serialBuffer = serialBuffer.substring(endIdx + "//:{EOT}".length);
-          return message;
-        }
+        buffer.write(new TextDecoder().decode(value));
       }
     }
-  }catch(e){
-    console.error(e);}
-  finally{
-    reader.releaseLock();
+  } catch (err) {
+    console.error("Serial error:", err);
   }
 }
