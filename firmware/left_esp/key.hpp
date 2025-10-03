@@ -169,55 +169,6 @@ static void pressKeys(bool *state, reportManager &rm,
 
   unsigned long now = millis();
 
-  for (unsigned int i = 0; i < tapDances.length(); i++) {
-    tapDance *td = tapDances.self() + i;
-
-    if (td->keystate == PRESSED) {
-      if (td->state == 0 || now < td->currentCountDown) {
-        td->state++;
-        td->currentCountDown = now + TAPDANCEDEFAULTTIMEOUT;
-      }
-    } else if (td->state) {
-      if (forceDown || now > td->currentCountDown) {
-        if (td->keystate == RELEASED) {
-          if (!td->heldActionTriggered) {
-            que.append(td->pressActions[(td->state - 1) % 10]);
-          }
-          td->state = 0;
-          td->heldActionTriggered = false;
-        } else if (td->keystate == HELDDOWN) {
-          que.append(td->holdActions[(td->state - 1) % 10]);
-          td->heldActionTriggered = true;
-        } else if (td->keystate == HELDUP) {
-          que.append(td->pressActions[(td->state - 1) % 10]);
-          td->state = 0;
-        }
-      }
-    }
-  }
-
-  for (int i = 0; i < que.length(); i++) {
-    KeyItem currentKey = que.get(i);
-    switch (currentKey.type) {
-    case KeyItem::kType::FUNCTIONCALL: {
-      keyboardFunctions[currentKey.character]();
-    } break;
-    case KeyItem::kType::LAYER: {
-      currentLayer = currentKey.character; // idk
-    }
-    case KeyItem::kType::TAPDANCE: {
-      tapDances.self()[currentKey.character].keystate =
-          KeyState_down(tapDances.self()[currentKey.character].keystate);
-    } break;
-    default:
-      /*
-        KeyItem::kType::CHARACTER
-        KeyItem::kType::MODIFIER
-      */
-      rm.addKey(currentKey);
-    }
-  }
-
   /*
     KeyItem::kType::CHARACTER
     KeyItem::kType::FUNCTIONCALL
@@ -276,13 +227,66 @@ static void pressKeys(bool *state, reportManager &rm,
           KeyItem::kType::CHARACTER
           KeyItem::kType::MODIFIER
         */
-        rm.addKey(currentKey);
+        que.append(currentKey);
+        // rm.addKey(currentKey);
       }
     } else {
       if (currentKey.type == KeyItem::kType::TAPDANCE) {
         tapDances.self()[currentKey.character].keystate =
             KeyState_up(tapDances.self()[currentKey.character].keystate);
       }
+    }
+  }
+
+  for (unsigned int i = 0; i < tapDances.length(); i++) {
+    tapDance *td = tapDances.self() + i;
+
+    if (td->keystate == PRESSED) {
+      if (td->state == 0 || now < td->currentCountDown) {
+        td->state++;
+        td->currentCountDown = now + TAPDANCEDEFAULTTIMEOUT;
+      }
+    } else if (td->state) {
+      if (forceDown || now > td->currentCountDown) {
+        if (td->keystate == RELEASED) {
+          if (!td->heldActionTriggered) {
+            // que.append(td->pressActions[(td->state - 1) % 10]);
+            que.insert(td->pressActions[(td->state - 1) % 10], 0);
+          }
+          td->state = 0;
+          td->heldActionTriggered = false;
+        } else if (td->keystate == HELDDOWN) {
+          // que.append(td->holdActions[(td->state - 1) % 10]);
+          que.insert(td->holdActions[(td->state - 1) % 10], 0);
+          td->heldActionTriggered = true;
+        } else if (td->keystate == HELDUP) {
+          // que.append(td->pressActions[(td->state - 1) % 10]);
+          que.insert(td->pressActions[(td->state - 1) % 10], 0);
+          td->state = 0;
+        }
+      }
+    }
+  }
+
+  for (int i = 0; i < que.length(); i++) {
+    KeyItem currentKey = que.get(i);
+    switch (currentKey.type) {
+    case KeyItem::kType::FUNCTIONCALL: {
+      keyboardFunctions[currentKey.character]();
+    } break;
+    case KeyItem::kType::LAYER: {
+      currentLayer = currentKey.character; // idk
+    }
+    case KeyItem::kType::TAPDANCE: {
+      tapDances.self()[currentKey.character].keystate =
+          KeyState_down(tapDances.self()[currentKey.character].keystate);
+    } break;
+    default:
+      /*
+        KeyItem::kType::CHARACTER
+        KeyItem::kType::MODIFIER
+      */
+      rm.addKey(currentKey);
     }
   }
   que.clear();
