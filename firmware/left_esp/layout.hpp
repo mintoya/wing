@@ -12,7 +12,7 @@ um_fp defaultLayout_um = um_from(R"d(
   keyboard:{
     tapdances:[
       {
-        taps:[ KEY_A, KEY_B, KEY_C, KEY_D ]
+        taps:[ KEY_SPACE, KEY_B, KEY_C, KEY_D ]
         holds:[ M( la ), M( ls ), KEY_C, KEY_D ]
       }
     ]
@@ -26,7 +26,7 @@ um_fp defaultLayout_um = um_from(R"d(
           KEY_TAB , KEY_Q, KEY_W, KEY_E, KEY_R, KEY_T,        KEY_Y, KEY_U, KEY_I, KEY_O, KEY_P,  KEY_BACKSPACE,
           M( ls ) , KEY_A, KEY_S, KEY_D, KEY_F, KEY_G,        KEY_H, KEY_J, KEY_K, KEY_L, KEY_COMMA,  KEY_LEFTBRACE,
           M( lc ) , KEY_Z, KEY_X, KEY_C, KEY_V, KEY_B,        KEY_N, KEY_M, KEY_COMMA,KEY_DOT,KEY_SLASH,  KEY_ENTER,
-          _       , _    ,M(la) ,L( 1 ),T( 0 ),     _,        _    , L( 1 ), L( 2 )  ,      _,        _,          _,
+          _       , _    ,M( la ) ,L( 1 ),T( 0 ),   _,        _    , L( 1 ), L( 2 )  ,      _,        _,          _,
       ],
       [
         KEY_ESC, KEY_0,
