@@ -19,6 +19,7 @@ globalThis.requestLayout = async ()=>{
   }
 
   globalThis.tapDanceArr = parsedObj.keyboard.tapdances
+  globalThis.extendValidKeys();
 
   globalThis.changeLayer();
   globalThis.updateTapdancesDiv()

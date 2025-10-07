@@ -287,21 +287,30 @@
     flex: 1;
     overflow-y: auto;
     scrollbar-width: none;
+    margin-top:5px;
+    opacity:.7;
+    padding:2px;
+    border-radius: 20px;
+    border-width:1px;
+    border:solid;
     button{
-      min-width: var(--button-width, 60px);
-      min-height: var(--button-height, 20px);
-      margin: 5px;
+      min-width: 50px
+      min-height: 30px;
+      margin: 1px;
       border: solid;
       border-radius: 15px;
       font-weight: bold;
-      transition: transform 0.2s ease, background-color 0.2s ease;
+      color: var(--primary);
+      background-color: var(--secondary_container);
     }
   }
-  .taps button{
+  .taps {
+    margin-left:5px;
     color:orange;
     background-color:DarkOrange;
   }
-  .holds button{
+  .holds {
+    margin-right:5px;
     color:red;
     background-color:DarkRed;
   }
@@ -314,8 +323,11 @@
     color: pink;
     background-color: red;
     border: solid;
-    border-radius: 15px;
-    transition: transform 0.2s ease;
+    border-radius: 20px;
+    transition: transform 0.3s ease;
+  }
+  .remove:hover{
+    transform:scale(4) translateY(-25%);
   }
 }
 

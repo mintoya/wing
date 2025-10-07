@@ -1,4 +1,4 @@
-const validKeyValues = [
+globalThis.validKeyValues = [
   { name: "NONE", value: "KEY_NONE" },
   { name: "Layer 1", value: "L( 1 )" },
   { name: "Layer 2", value: "L( 2 )" },
@@ -187,6 +187,16 @@ const validKeyValues = [
   { name: "Media REFRESH", value: "KEY_MEDIA_REFRESH" },
   { name: "Media CALC", value: "KEY_MEDIA_CALC" },
 ];
+globalThis.tapDanceExtension = [];
+globalThis.extendValidKeys = () => {
+  tapDanceExtension = [];
+  globalThis.tapDanceArr.forEach((_, idx) => {
+    tapDanceExtension.push({
+      name: "Dance " + idx,
+      value: "T( " + idx + " )",
+    });
+  });
+};
 function levenshteinDistance(str1, str2) {
   let bias = 0;
   if (!str1 || !str2) {
@@ -221,8 +231,9 @@ function levenshteinDistance(str1, str2) {
   }
   return matrix[len1][len2] + bias;
 }
-function fuzzySearch(query, threshold = 10) {
-  const data = validKeyValues;
+globalThis.fuzzySearch = (query, threshold = 10) => {
+  globalThis.extendValidKeys();
+  const data = validKeyValues.concat(tapDanceExtension);
   if (query == "" || query == null) {
     query = "A";
   }
@@ -244,12 +255,14 @@ function fuzzySearch(query, threshold = 10) {
   }
   results.sort((a, b) => a.distance - b.distance);
   return results;
-}
-function lookupKey(input, type) {
-  for (const [i, key] of validKeyValues.entries()) {
+};
+globalThis.lookupKey = (input, type) => {
+  globalThis.extendValidKeys();
+  const all = validKeyValues.concat(tapDanceExtension);
+  for (const [_, key] of all.entries()) {
     if (key[type == "name" ? "value" : "name"] == input) {
       return key[type];
     }
   }
   return type == "value" ? validKeyValues[0].value : validKeyValues[0].name;
-}
+};
