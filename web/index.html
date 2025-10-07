@@ -8,6 +8,30 @@
   </head>
   <body>
     <div>
+      <select id="main-selector" >
+        <option value="Layers">Layers</option>
+        <option value="TapDances">TapDances</option>
+      </select>
+      <button class = "serialButton" id="C" onclick="initSerial()">Connect</button>
+      <button class = "serialButton" id="D" onclick="requestLayout()">Download</button>
+      <button class = "serialButton" id="U" onclick="saveLayout()">Upload</button>
+      <script>
+        document.querySelector("#main-selector").addEventListener("input", (e) => {
+          const tapdanceContainer = document.querySelector("#tapdanceContainer");
+          const keyboardContainer = document.querySelector("#keyboardContainer");
+
+          if (e.target.value === "Layers") {
+            tapdanceContainer.style.display = "none";
+            keyboardContainer.style.display = "flex";
+          } else if (e.target.value === "TapDances") {
+            keyboardContainer.style.display = "none";
+            tapdanceContainer.style.display = "flex";
+          }
+        });
+      </script>
+    </div>
+    <div class = "main tab">
+      <div id="keyboardContainer">
       <select id="layer-selector" onchange = "changeLayer(this.value)" >
         <option value="0">layer 0</option>
         <option value="1">layer 1</option>
@@ -16,9 +40,6 @@
         <option value="4">layer 4</option>
         <option value="5">layer 5</option>
       </select>
-    </div>
-    <div id="wrap-container">
-      <div id="container">
         <div id="left-half">
           <div class="finger pinky-extra">
             <button class="key one"></button>
@@ -56,7 +77,6 @@
             <button class="key three"></button>
           </div>
         </div>
-
         <div id="right-half">
           <div class="finger thumb">
             <button class="key one"></button>
@@ -95,24 +115,32 @@
           </div>
         </div>
       </div>
-    </div>
-    <div id = "keyItem-selector" >
-      <div class="top">
-        <input type="text" name="keyitem-text" value="search" oninput = "search(this.value)" onchange = "searchAndSelect( this.value )">
-        <button class = "serialButton" id="C" onclick="initSerial()">Connect</button>
-        <button class = "serialButton" id="D" onclick="requestLayout()">Download</button>
-        <button class = "serialButton" id="U" onclick="saveLayout()">Upload</button>
-      </div>
-      <div class = "bottom">
-        <div id = "search-results">
+      <div id="tapdanceContainer">
+        <div id = "tapdanceDiv">
         </div>
+        <button id = "addTD" >+</button>
       </div>
     </div>
-
+    <div id = "modalKeySelector"></div>
+    <div id = "modalTapdanceEditor"></div>
     </div>
   </body>
+
+  <script>
+    globalThis.sleep = function (ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    globalThis.keyValueArrs = [[]];
+    globalThis.tapDanceArr  = [];
+  </script>
+  <script src="serial.js"></script>
   <script src="validKeyValues.js"></script>
   <script src="kmlparser.js"></script>
-  <script src="index.js"></script>
+  <script src="keySelector.js"></script>
+  <script src="tapdanceEditor.js"></script>
+  <script src="interface.js"></script>
+
+  <script src="layer.js"></script>
+  <script src="tapDance.js"></script>
 </html>
 

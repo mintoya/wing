@@ -1,20 +1,16 @@
 // Create modal markup
-const modal = document.getElementById("modalKeySelector");
-modal.innerHTML = `
+const selectorModal = document.getElementById("modalKeySelector");
+selectorModal.innerHTML = `
   <div class="modal-box">
     <input type="text" id="searchInput" placeholder="Search..." />
     <div id="results"></div>
   </div>
 `;
-const searchInput = modal.querySelector("#searchInput");
-const resultsContainer = modal.querySelector("#results");
+const searchInput = selectorModal.querySelector("#searchInput");
+const resultsContainer = selectorModal.querySelector("#results");
 let resolveSelection = null;
-let thisindex = null;
-let thisLayer = null;
-globalThis.setLayerKey = function (layer,index) {
-  thisindex = index;
-  thisLayer = layer;
-  modal.style.display = "flex";
+globalThis.requestKeyPopup = function () {
+  selectorModal.style.display = "flex";
   searchInput.value = "";
   resultsContainer.innerHTML = "";
   searchInput.focus();
@@ -24,7 +20,7 @@ globalThis.setLayerKey = function (layer,index) {
 };
 // Close and cleanup modal
 function closeModal() {
-  modal.style.display = "none";
+  selectorModal.style.display = "none";
   resolveSelection = null;
 }
 // Render results
@@ -36,12 +32,12 @@ function renderResults(results) {
     div.textContent = item;
     div.onclick = () => {
       if (resolveSelection) {
-        resolveSelection(item);
-        globalThis.keyValueArrs[thisLayer][thisindex] = globalThis.lookupKey(
+        const value = globalThis.lookupKey(
           item,
           "value",
         );
-        resolveSelection(item);
+        resolveSelection({ name: item, value: value });
+        closeModal();
       }
       closeModal();
     };

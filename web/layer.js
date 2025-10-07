@@ -61,20 +61,25 @@ keys.forEach((selector, index) => {
 keys.forEach((key, index) => {
   if (key !== null) {
     key.onclick = async () => {
-      const name = await globalThis.setLayerKey(currentLayer, index);
+      const item = await globalThis.requestKeyPopup();
+      const name = item.name;
+      globalThis.keyValueArrs[currentLayer][index] = item.value
       key.textContent = name;
       key.setAttribute("keyValue", name);
     };
   }
 });
-globalThis.changeLayer = function (layerN) {
-  currentLayer;
+globalThis.changeLayer = function (layerN = currentLayer) {
   currentLayer = layerN;
+  console.log(globalThis.keyValueArrs[currentLayer]);
   keys.forEach((key, index) => {
     if (globalThis.keyValueArrs[currentLayer] === undefined) {
       globalThis.keyValueArrs[currentLayer] = [];
     }
-    const name = lookupKey(globalThis.keyValueArrs[currentLayer][index],"name");
+    const name = lookupKey(
+      globalThis.keyValueArrs[currentLayer][index],
+      "name",
+    );
     if (key) {
       key.textContent = name;
       key.setAttribute("keyValue", name);

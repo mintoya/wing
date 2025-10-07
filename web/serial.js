@@ -1,15 +1,18 @@
-async function writeWithResponse(msg) {
+let port;
+let reader;
+let writer;
+globalThis.writeWithResponse = async function (msg) {
   serialStream.beginRead();
   await sleep(250);
   await portWrite("requestLength:" + msg.length + ";" + msg);
   await sleep(250);
   return serialStream.endRead();
-}
+};
 const serialStream = {
-  data: "",
+  data: "", //for streaming
+  maxWidth: 2048, //buffer max, doesnt effect readdata
   readData: "",
   textarea: document.querySelector("#serialIn"),
-  maxWidth: 2048,
   reading: false,
   write: function (msg) {
     if (this.reading) {
@@ -33,10 +36,7 @@ const serialStream = {
     return this.readData;
   },
 };
-let port;
-let reader;
-let writer;
-async function initSerial() {
+globalThis.initSerial = async function () {
   try {
     port = await navigator.serial.requestPort({});
     await port.open({ baudRate: 115200 });
@@ -44,12 +44,12 @@ async function initSerial() {
     reader = port.readable.getReader();
     console.log("Serial port opened");
     beginStream();
-    await sleep(500);
-    await requestLayout();
+    // await sleep(500);
+    // await requestLayout();
   } catch (err) {
     console.error("Serial error:", err);
   }
-}
+};
 async function portWrite(msg) {
   if (!writer) {
     alert("Port not open, call connect the board first");
