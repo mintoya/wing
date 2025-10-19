@@ -22,3 +22,78 @@ kicad_v5/esp32_s3_port/fabrication-toolkit-options.json
 kicad_v5/esp32_s3_port/fp-info-cache
 kicad_v5/esp32_s3_port/fp-lib-table
 kicad_v5/esp32_s3_port/ssd1306.bak
+ # Adapted from:
+
+# https://github.com/github/gitignore/blob/master/KiCad.gitignore
+
+# For PCBs designed using KiCad: http://www.kicad-pcb.org/
+
+# Format documentation: http://kicad-pcb.org/help/file-formats/
+
+# Backup
+
+/*-backups/
+
+#JLC PCB generated files. Exclude everything except the database.
+
+/jlcpcb/production_files
+
+/jlcpcb/gerber
+
+# Temporary files
+
+*.000
+
+*.bak
+
+*.bck
+
+*.kicad_pcb-bak
+
+*.kicad_sch-bak
+
+*.kicad_prl
+
+*.sch-bak
+
+*~
+
+~*
+
+_autosave-*
+
+\#auto_saved_files\#
+
+*.tmp
+
+*-save.pro
+
+*-save.kicad_pcb
+
+fp-info-cache
+
+/build
+
+# Netlist files (exported from Eeschema)
+
+*.net
+
+# Autorouter files (exported from Pcbnew)
+
+*.dsn
+
+*.ses
+
+# Footprint association file (exported from Pcbnew)
+
+*.cmp
+
+# Misc
+
+*.log
+
+*.raw
+
+.svg2shenzhen-cache
+10
+
