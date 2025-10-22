@@ -84,7 +84,7 @@ struct reportManager {
     different |= lastModifier != modifier;
     for (int i = 0; i < 6 && !different; i++)
       different |= lastKeys.get(i) != keys.get(i);
-    if (different) {
+    if (different || millis()%1000<1) {
       if (wirelessSender)
         wirelessSender(modifier, keys.self());
       if (wiredSender)

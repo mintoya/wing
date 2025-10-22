@@ -64,9 +64,9 @@ static void prettyPrintLayers() {
 
       // Print the individual key item
       KeyItem k = currentLayer.get(keyIndex);
-      printKeyItem(k); // Assuming this function exists
+      printKeyItem(k);  // Assuming this function exists
     }
-    Serial.println(); // Empty line between layers
+    Serial.println();  // Empty line between layers
   }
   Serial.println("=======================");
 }
@@ -88,13 +88,13 @@ static void parseLayers(um_fp layersBuf) {
     } else {
       thisLayer = listPlus<KeyItem>();
     }
-    thisLayer.pad(2 * nrowGpios * ncolGpios); // force fill with enough keys
+    thisLayer.pad(2 * nrowGpios * ncolGpios);  // force fill with enough keys
     thisLayer.clear();
 
     um_fp thisKeyBuf;
     for (unsigned int ii = 0; ii < 2 * nrowGpios * ncolGpios; ii++) {
       thisKeyBuf = findIndex(thisLayerBuf, ii);
-      thisLayer.append(KeyItem(kn_Match(thisKeyBuf))); // can handle null
+      thisLayer.append(KeyItem(kn_Match(thisKeyBuf)));  // can handle null
     }
     keyMapLayers.append(thisLayer);
   }
@@ -108,12 +108,12 @@ static void parseTapDances(um_fp tapDancesBuf) {
   um_fp tapdanceum;
   for (unsigned int i = 0; (tapdanceum = findIndex(tapDancesBuf, i)).ptr; i++) {
     tapDance t = {
-        .pressActions = {0},
-        .holdActions = {0},
-        .state = 0,
-        .currentCountDown = 0,
-        .keystate = KeyState::HELDUP,
-        .heldActionTriggered = false,
+      .pressActions = { 0 },
+      .holdActions = { 0 },
+      .state = 0,
+      .currentCountDown = 0,
+      .keystate = KeyState::HELDUP,
+      .heldActionTriggered = false,
     };
     um_fp taps = findKey(tapdanceum, um_from("taps"));
     um_fp holds = findKey(tapdanceum, um_from("holds"));
@@ -138,5 +138,9 @@ static void parseLayout(um_fp layoutBuf = readFile("/lay.kml")) {
   um_fp tapDancesBuf = findKey(keyboard, um_from("tapdances"));
   parseLayers(layersBuf);
   parseTapDances(tapDancesBuf);
+  Serial.printf("layoutBuf.ptr=%p, width=%u\n", layoutBuf.ptr, layoutBuf.width);
+  delay(100);
+
   writeFile("/lay.kml", layoutBuf);
+  Serial.printf("write finished");
 }

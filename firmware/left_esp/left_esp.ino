@@ -97,6 +97,9 @@ void onRequest() {
   checkData cd = cSum_toSum(dc, (um_fp){ .ptr = pinData, .width = sizeof(pinData) });
   Wire.write(cd.data.width);
   Wire.write((uint8_t *)cd.data.ptr, cd.data.width);
+  for (int i = 0; i < sizeof(pinData); i++)
+    Serial.printf("%02X", pinData[i]);
+  Serial.println();
 }
 #endif
 void wireSetup() {
@@ -115,14 +118,12 @@ void wireUpdate() {
 
   if (!Wire.available()) {
   } else {
+    // Serial.println("recieved");
     int lSize = Wire.read();
     retBuf.clear();
-    while (retBuf.length() < lSize) {
-      for (int i = 0; i < rSize; i++) {
-        if (Wire.available())
-          retBuf.append((uint8_t)Wire.read());
-      }
-      rSize = Wire.requestFrom(SLAVE_ADDR, 0xFF, true);
+    for (int i = 0; i < lSize; i++) {
+      if (Wire.available())
+        retBuf.append((uint8_t)Wire.read());
     }
   }
 
@@ -134,9 +135,13 @@ void wireUpdate() {
 
   um_fp result = cSum_fromSum(cd);
   if (!result.ptr) {
+    // Serial.println("recieve fail");
     oPinData = nullptr;
   } else {
     oPinData = (uint8_t *)result.ptr;
+    // for (int i = 0; i < result.width; i++)
+    //   Serial.printf("%02X", oPinData[i]);
+    // Serial.println();
   }
 }
 static inline void fillKeyStates() {
@@ -197,26 +202,34 @@ void serialRequestManager(um_fp layo) {
     Serial.println("status:sucess;");
     if (requestType == um_from("setLayout")) {
       parseLayout(layo);
+    } else if (requestType == um_from("format")) {
+      Serial.println(esp_reset_reason());
+      Serial.println("Unmounting FFat ...");
+      FFat.end();
+      if (FFat.format()) {  
+        Serial.println("FFat formatted successfully. Attempting to remount...");
+        if (FFat.begin()) {
+          Serial.println("FFat remounted successfully. Filesystem is now empty.");
+        } else {
+          Serial.println("ERROR: FFat failed to remount after format! Please reset the device.");
+        }
+      } else {
+        Serial.println("ERROR: FFat format failed!");
+      }
     } else if (requestType == um_from("ls")) {
       listDir("/");
     } else if (
-        requestType == um_from("setDefaultLayout") ||
-        requestType == um_from("set default layout")
-    ) {
+      requestType == um_from("setDefaultLayout") || requestType == um_from("set default layout")) {
       Serial.println("setting default Layout");
       parseLayout(defaultLayout_um);
     } else if (
-        requestType == um_from("getLayout") || 
-        requestType == um_from("get layout") 
-    ) {
+      requestType == um_from("getLayout") || requestType == um_from("get layout")) {
       um_fp savedLayout = readFile("/lay.kml");
       Serial.write((uint8_t *)savedLayout.ptr, savedLayout.width);
       Serial.println();
       free(savedLayout.ptr);
     } else if (
-        requestType == um_from("getDefaultLayout") ||
-        requestType == um_from("get default layout")
-    ) {
+      requestType == um_from("getDefaultLayout") || requestType == um_from("get default layout")) {
       Serial.println("getting default Layout");
       Serial.write((uint8_t *)defaultLayout_um.ptr, defaultLayout_um.width);
     } else if (requestType == um_from("disableStrokes")) {
@@ -236,10 +249,10 @@ void loop() {
       readBuf.append(b);
     }
     um_fp layo = { .ptr = (void *)readBuf.self(), .width = readBuf.length() };
-    um_fp requestLength = findKey(layo,um_from("requestLength"));
+    um_fp requestLength = findKey(layo, um_from("requestLength"));
     unsigned int msgLength = um_asUint(requestLength);
     if (requestLength.ptr) {
-      while (layo.width < msgLength+13+requestLength.width && (millis() - now) < 5000) {
+      while (layo.width < msgLength + 13 + requestLength.width && (millis() - now) < 5000) {
         while (Serial.available()) {
           uint8_t b = Serial.read();
           readBuf.append(b);
