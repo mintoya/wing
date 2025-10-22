@@ -1,4 +1,4 @@
-
+#define ISRIGHT
 #ifdef ISRIGHT
 static const unsigned int rowGpios[] = { 2, 3, 4, 5 };
 static const unsigned int colGpios[] = { 10, 11, 9, 8, 7, 6 };
@@ -108,8 +108,8 @@ void wireSetup() {
   Wire.onRequest(onRequest);
 #else
   Wire.begin();
-
 #endif
+  Wire.setClock(400000UL);
 }
 #ifndef ISRIGHT
 listPlus<uint8_t> retBuf;
@@ -206,7 +206,7 @@ void serialRequestManager(um_fp layo) {
       Serial.println(esp_reset_reason());
       Serial.println("Unmounting FFat ...");
       FFat.end();
-      if (FFat.format()) {  
+      if (FFat.format()) {
         Serial.println("FFat formatted successfully. Attempting to remount...");
         if (FFat.begin()) {
           Serial.println("FFat remounted successfully. Filesystem is now empty.");

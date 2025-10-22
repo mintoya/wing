@@ -101,6 +101,7 @@ void deleteFile(const char *path) {
   }
 }
 void FSISetup() {
+  
     if (!FFat.begin()) {
         Serial.println("FFat Mount Failed, formatting file system");
         FFat.format();
