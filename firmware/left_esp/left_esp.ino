@@ -1,4 +1,4 @@
-#define ISRIGHT
+
 #ifdef ISRIGHT
 static const unsigned int rowGpios[] = { 2, 3, 4, 5 };
 static const unsigned int colGpios[] = { 10, 11, 9, 8, 7, 6 };
