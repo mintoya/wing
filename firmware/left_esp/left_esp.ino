@@ -1,4 +1,4 @@
-
+// #define ISRIGHT
 #ifdef ISRIGHT
 static const unsigned int rowGpios[] = { 2, 3, 4, 5 };
 static const unsigned int colGpios[] = { 10, 11, 9, 8, 7, 6 };
@@ -12,7 +12,7 @@ const unsigned int ncolGpios = sizeof(colGpios) / sizeof(colGpios[0]);
 
 
 #include <Wire.h>
-#define cSum_REDUNDANCY_AMMOUNT ((unsigned int)4)
+#define cSum_REDUNDANCY_AMMOUNT ((unsigned int)2)
 #include "cSum/cSum.h"
 #include "key.hpp"
 #include "my-list/my-list.hpp"
@@ -72,9 +72,11 @@ void sendHidReport(uint8_t modifiers, uint8_t *key_codes) {
 }
 
 
-
+//TODO flip these around
 static inline bool getKeyState(unsigned int row, unsigned int col) {
-  uint8_t res = (col < ncolGpios) ? (pinData[row] & (((uint8_t)1) << col)) : (oPinData ? (oPinData[row] & (((uint8_t)1) << (col - ncolGpios))) : 0);
+  uint8_t res = (col < ncolGpios) ?
+    (pinData[row] & (((uint8_t)1) << col)) :
+    (oPinData ? (oPinData[row] & (((uint8_t)1) << (col - ncolGpios))) : 0);
   return res;
 }
 
@@ -108,12 +110,14 @@ void wireSetup() {
   Wire.onRequest(onRequest);
 #else
   Wire.begin();
+  Wire.setTimeout(500);
 #endif
-  Wire.setClock(400000UL);
+  Wire.setClock(400000);
 }
 #ifndef ISRIGHT
 listPlus<uint8_t> retBuf;
 void wireUpdate() {
+  // Wire.clearTimeoutFlag();//not on twowire?
   int rSize = Wire.requestFrom(SLAVE_ADDR, 0xFF, true);
 
   if (!Wire.available()) {
@@ -145,8 +149,6 @@ void wireUpdate() {
   }
 }
 static inline void fillKeyStates() {
-  updatePins();
-  wireUpdate();
   unsigned int totalCols = ncolGpios * 2;  // primary + optional
   for (unsigned int r = 0; r < nrowGpios; r++) {
     for (unsigned int c = 0; c < totalCols; c++) {
@@ -206,6 +208,7 @@ void serialRequestManager(um_fp layo) {
       Serial.println(esp_reset_reason());
       Serial.println("Unmounting FFat ...");
       FFat.end();
+      Serial.println("Formatting...");
       if (FFat.format()) {
         Serial.println("FFat formatted successfully. Attempting to remount...");
         if (FFat.begin()) {
@@ -216,6 +219,9 @@ void serialRequestManager(um_fp layo) {
       } else {
         Serial.println("ERROR: FFat format failed!");
       }
+    } else if (requestType == um_from("printFile")) {
+      um_fp result = readFile(findKey(layo, um_from("fileName")));
+      Serial.write((uint8_t*)result.ptr,result.width);
     } else if (requestType == um_from("ls")) {
       listDir("/");
     } else if (
@@ -240,34 +246,54 @@ void serialRequestManager(um_fp layo) {
     }
   }
 }
+int counter = 0;
 void loop() {
-  if (Serial.available()) {
-    unsigned long now = millis();
-    listPlus<uint8_t> readBuf;
-    while (Serial.available()) {
-      uint8_t b = Serial.read();
-      readBuf.append(b);
-    }
-    um_fp layo = { .ptr = (void *)readBuf.self(), .width = readBuf.length() };
-    um_fp requestLength = findKey(layo, um_from("requestLength"));
-    unsigned int msgLength = um_asUint(requestLength);
-    if (requestLength.ptr) {
-      while (layo.width < msgLength + 13 + requestLength.width && (millis() - now) < 5000) {
+  switch(counter%9){
+    case 0:
+    case 4:
+      wireUpdate();
+      break;
+    case 1:
+    case 5:
+      updatePins();
+      fillKeyStates();
+      break;
+    case 2:
+    case 6:
+      keyMap::pressKeys(state_presskeys, rm);
+      break;
+    case 3:
+    case 7:
+      rm.send();
+      break;
+    case 8:
+      if (Serial.available()) {
+        unsigned long now = millis();
+        listPlus<uint8_t> readBuf;
         while (Serial.available()) {
           uint8_t b = Serial.read();
           readBuf.append(b);
         }
+        um_fp layo = { .ptr = (void *)readBuf.self(), .width = readBuf.length() };
+        um_fp requestLength = findKey(layo, um_from("requestLength"));
+        unsigned int msgLength = um_asUint(requestLength);
+        if (requestLength.ptr) {
+          while (layo.width < msgLength + 13 + requestLength.width && (millis() - now) < 5000) {
+            while (Serial.available()) {
+              uint8_t b = Serial.read();
+              readBuf.append(b);
+            }
+          }
+        }
+
+
+        layo = { .ptr = (void *)readBuf.self(), .width = readBuf.length() };
+
+        serialRequestManager(layo);
+        readBuf.unmake();
       }
-    }
-
-
-    layo = { .ptr = (void *)readBuf.self(), .width = readBuf.length() };
-
-    serialRequestManager(layo);
-    readBuf.unmake();
+      break;
   }
-  fillKeyStates();
-  keyMap::pressKeys(state_presskeys, rm);
-  rm.send();
+  counter++;
 }
 #endif
