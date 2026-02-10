@@ -1,8 +1,8 @@
-#pragma once
 #include <stdint.h>
 #define TAPDANCEDEFAULTTIMEOUT ((unsigned long)300)
-#include "my-list/my-list.h"
-#include "my-list/my-list.hpp"
+#include "../my-lib/my-list.h"
+#include "../my-lib/print.h"
+#include "../my-lib/types.h"
 
 extern unsigned long millis(void);
 
@@ -11,7 +11,7 @@ extern void (*keyboardFunctions[10])(void);
 struct KeyItem {
   uint8_t character; // not really a character
   enum kType : char {
-    PASSTHROUGH = 0,
+    PASSTHROUGH_ = 0,
     CHARACTER = 1,
     LAYER = 2,
     TAPDANCE = 4,
@@ -20,11 +20,11 @@ struct KeyItem {
   } type;
   inline KeyItem(void) {
     character = 0;
-    type = kType::PASSTHROUGH;
+    type = kType::PASSTHROUGH_;
   }
   inline KeyItem(uint8_t data) {
     character = data;
-    type = (data) ? (kType::CHARACTER) : (kType::PASSTHROUGH);
+    type = (data) ? (kType::CHARACTER) : (kType::PASSTHROUGH_);
   }
   inline KeyItem(uint8_t data, kType t) {
     character = data;
@@ -34,22 +34,22 @@ struct KeyItem {
 static void printKeyItem(const KeyItem &k) {
   switch (k.type) {
   case KeyItem::CHARACTER:
-    Serial.printf("K(%d)", k.character);
+    print("K({})", k.character);
     break;
   case KeyItem::MODIFIER:
-    Serial.printf("M(%d)", k.character);
+    print("M({})", k.character);
     break;
   case KeyItem::LAYER:
-    Serial.printf("L(%d)", k.character);
+    print("L({})", k.character);
     break;
   case KeyItem::TAPDANCE:
-    Serial.printf("TD(%d)", k.character);
+    print("TD({})", k.character);
     break;
   case KeyItem::FUNCTIONCALL:
-    Serial.printf("F(%d)", k.character);
+    print("F({})", k.character);
     break;
   default:
-    Serial.printf(" . ");
+    print(" . ");
     break;
   }
 }
@@ -65,49 +65,46 @@ struct reportManager {
   reportManager(senderFunction wireless, senderFunction wired) {
     wirelessSender = wireless;
     wiredSender = wired;
-    keys.pad(6);
-    lastKeys.pad(6);
+    mList_pad(keys, 6);
+    mList_pad(lastKeys, 6);
   }
-  uint8_t modifier = 0;
-  listPlus<uint8_t> keys;
-  uint8_t lastModifier = 0;
-  listPlus<uint8_t> lastKeys;
+  u8 modifier = 0;
+  mList(u8) keys = mList_init(stdAlloc, u8, 6);
+  u8 lastModifier = 0;
+  mList(u8) lastKeys = mList_init(stdAlloc, u8, 6);
 
   void send() {
-    if (keys.length() < 6)
-      keys.pad(6 - keys.length());
-    if (lastKeys.length() < 6)
-      lastKeys.pad(6 - lastKeys.length());
-
+    if (mList_len(keys) < 6)
+      mList_pad(keys, 6 - mList_len(keys));
+    if (mList_len(lastKeys) < 6)
+      mList_pad(lastKeys, 6 - mList_len(lastKeys));
     bool different = false;
 
     different |= lastModifier != modifier;
     for (int i = 0; i < 6 && !different; i++)
-      different |= lastKeys.get(i) != keys.get(i);
-    if (different || millis()%1000<2) {
-      //in case some updates get missed
+      different |= mList_get(lastKeys, i) != mList_get(keys, i);
+    if (different || millis() % 1000 < 2) {
+      // in case some updates get missed
       if (wirelessSender)
-        wirelessSender(modifier, keys.self());
+        wirelessSender(modifier, mList_arr(keys));
       if (wiredSender)
-        wiredSender(modifier, keys.self());
+        wiredSender(modifier, mList_arr(keys));
     }
 
     lastModifier = modifier;
     modifier = 0;
 
     for (int i = 0; i < 6; i++)
-      lastKeys.set(i, keys.get(i));
-
-    keys.clear();
+      mList_set(lastKeys, i, *(mList_get(keys, i) ?: REF(u8, 0)));
+    ((List *)keys)->length = 0;
   }
   void addKey(KeyItem k) {
     switch (k.type) {
     case KeyItem::MODIFIER:
       modifier |= k.character;
-      // modifiers.append(k.character);
       break;
     case KeyItem::CHARACTER:
-      keys.append(k.character);
+      mList_push(keys, k.character);
       break;
     default:
       break;
@@ -154,10 +151,12 @@ struct tapDance {
   KeyState keystate;
   bool heldActionTriggered;
 };
-extern listPlus<tapDance> tapDances;
-extern listPlus<listPlus<KeyItem>> keyMapLayers;
-extern const unsigned int nrowGpios;
-extern const unsigned int ncolGpios;
+
+extern mList(tapDance) tapDances;
+extern mList(mList(KeyItem)) keyMapLayers;
+
+extern const uint nrowGpios;
+extern const uint ncolGpios;
 
 namespace keyMap {
 
@@ -166,7 +165,7 @@ static void pressKeys(bool *state, reportManager &rm,
   static bool forceDown = false;
   unsigned int length = nrowGpios * ncolGpios * 2;
 
-  static listPlus<KeyItem> que;
+  static mList(KeyItem) que = mList_init(stdAlloc, KeyItem);
 
   unsigned long now = millis();
 
@@ -175,16 +174,17 @@ static void pressKeys(bool *state, reportManager &rm,
     KeyItem::kType::FUNCTIONCALL
     KeyItem::kType::LAYER
     KeyItem::kType::MODIFIER
-    KeyItem::kType::PASSTHROUGH
+    KeyItem::kType::PASSTHROUGH_
     KeyItem::kType::TAPDANCE
   */
   // check layers
+  mList(KeyItem) keyMapLayers_arr = *mList_get(keyMapLayers, currentLayer);
   for (unsigned int i = 0; i < length; i++) {
     if (state[i] &&
-        keyMapLayers.get(currentLayer).get(i).type == KeyItem::kType::LAYER) {
+        mList_get(keyMapLayers_arr, i)->type == KeyItem::kType::LAYER) {
+      // keyMapLayers.get(currentLayer).get(i).type == KeyItem::kType::LAYER) {
       state[i] = (false);
-      return pressKeys(state, rm,
-                       keyMapLayers.get(currentLayer).get(i).character);
+      return pressKeys(state, rm, mList_get(keyMapLayers_arr, i)->character);
     }
   }
 
@@ -192,17 +192,18 @@ static void pressKeys(bool *state, reportManager &rm,
     KeyItem::kType::CHARACTER
     KeyItem::kType::FUNCTIONCALL
     KeyItem::kType::MODIFIER
-    KeyItem::kType::PASSTHROUGH
+    KeyItem::kType::PASSTHROUGH_
     KeyItem::kType::TAPDANCE
   */
 
   forceDown = false;
   for (unsigned int i = 0; i < length; i++) {
-    KeyItem currentKey = keyMapLayers.get(currentLayer).get(i);
-    if (currentKey.type == KeyItem::kType::PASSTHROUGH) {
+    KeyItem currentKey = *mList_get(keyMapLayers_arr, i);
+    if (currentKey.type == KeyItem::kType::PASSTHROUGH_) {
       for (int j = currentLayer; j >= 0; j--) {
-        if (!(keyMapLayers.get(j).get(i).type == KeyItem::kType::PASSTHROUGH)) {
-          currentKey = keyMapLayers.get(j).get(i);
+        auto temp = mList_get(*mList_get(keyMapLayers, j), i);
+        if (!(temp->type == KeyItem::PASSTHROUGH_)) {
+          currentKey = *temp;
           break;
         }
       }
@@ -219,8 +220,8 @@ static void pressKeys(bool *state, reportManager &rm,
         keyboardFunctions[currentKey.character]();
       } break;
       case KeyItem::kType::TAPDANCE: {
-        tapDances.self()[currentKey.character].keystate =
-            KeyState_down(tapDances.self()[currentKey.character].keystate);
+        mList_arr(tapDances)[currentKey.character].keystate =
+            KeyState_down(mList_arr(tapDances)[currentKey.character].keystate);
       } break;
       default:
         forceDown = true;
@@ -228,19 +229,18 @@ static void pressKeys(bool *state, reportManager &rm,
           KeyItem::kType::CHARACTER
           KeyItem::kType::MODIFIER
         */
-        que.append(currentKey);
-        // rm.addKey(currentKey);
+        mList_push(que, currentKey);
       }
     } else {
       if (currentKey.type == KeyItem::kType::TAPDANCE) {
-        tapDances.self()[currentKey.character].keystate =
-            KeyState_up(tapDances.self()[currentKey.character].keystate);
+        mList_arr(tapDances)[currentKey.character].keystate =
+            KeyState_up(mList_arr(tapDances)[currentKey.character].keystate);
       }
     }
   }
 
-  for (unsigned int i = 0; i < tapDances.length(); i++) {
-    tapDance *td = tapDances.self() + i;
+  for (unsigned int i = 0; i < mList_len(tapDances); i++) {
+    tapDance *td = mList_get(tapDances, i);
 
     if (td->keystate == PRESSED) {
       if (td->state == 0 || now < td->currentCountDown) {
@@ -251,46 +251,44 @@ static void pressKeys(bool *state, reportManager &rm,
       if (forceDown || now > td->currentCountDown) {
         if (td->keystate == RELEASED) {
           if (!td->heldActionTriggered) {
-            // que.append(td->pressActions[(td->state - 1) % 10]);
-            que.insert(td->pressActions[(td->state - 1) % 10], 0);
+            mList_ins(que, 0, td->pressActions[(td->state - 1) % 10]);
           }
           td->state = 0;
           td->heldActionTriggered = false;
         } else if (td->keystate == HELDDOWN) {
-          // que.append(td->holdActions[(td->state - 1) % 10]);
-          que.insert(td->holdActions[(td->state - 1) % 10], 0);
+          mList_ins(que, 0, td->holdActions[(td->state - 1) % 10]);
           td->heldActionTriggered = true;
         } else if (td->keystate == HELDUP) {
-          // que.append(td->pressActions[(td->state - 1) % 10]);
-          que.insert(td->pressActions[(td->state - 1) % 10], 0);
+          mList_ins(que, 0, td->pressActions[(td->state - 1) % 10]);
           td->state = 0;
         }
       }
     }
   }
 
-  for (int i = 0; i < que.length(); i++) {
-    KeyItem currentKey = que.get(i);
-    switch (currentKey.type) {
+  auto que_arr = mList_arr(que);
+  for (int i = 0; i < mList_len(que); i++) {
+
+    switch (que_arr[i].type) {
     case KeyItem::kType::FUNCTIONCALL: {
-      keyboardFunctions[currentKey.character]();
+      keyboardFunctions[que_arr[i].character]();
     } break;
     case KeyItem::kType::LAYER: {
-      currentLayer = currentKey.character; // idk
+      currentLayer = que_arr[i].character; // idk
     }
     case KeyItem::kType::TAPDANCE: {
-      tapDances.self()[currentKey.character].keystate =
-          KeyState_down(tapDances.self()[currentKey.character].keystate);
+      mList_arr(tapDances)[que_arr[i].character].keystate =
+          KeyState_down(mList_arr(tapDances)[que_arr[i].character].keystate);
     } break;
     default:
       /*
         KeyItem::kType::CHARACTER
         KeyItem::kType::MODIFIER
       */
-      rm.addKey(currentKey);
+      rm.addKey(que_arr[i]);
     }
   }
-  que.clear();
+  ((List *)que)->length = 0;
 }
 
 } // namespace keyMap

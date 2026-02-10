@@ -1,42 +1,43 @@
 #pragma once
+#include "../my-lib/fptr.h"
+#include "../my-lib/my-list.h"
+// #include "../my-lib/print.h"
 #include "FFat.h"
 #include "FS.h"
-#include "my-list/my-list.h"
-#include "string-List/um_fp.h"
 #include <cstring>
 
 inline bool fsActive() { return FFat.begin(); }
 
-um_fp readFile(const char *path) {
+fptr readFile(const char *path) {
   if (!fsActive())
-    return nullUmf;
+    return nullFptr;
 
   Serial.print("reading ");
   Serial.println(path);
   File file = FFat.open(path, FILE_READ);
   if (!file)
-    return nullUmf;
+    return nullFptr;
 
   size_t size = file.size();
   void *buffer = malloc(size);
   if (!buffer) {
     file.close();
-    return nullUmf;
+    return nullFptr;
   }
 
   file.readBytes((char *)buffer, size);
   file.close();
-  return (um_fp){.ptr = buffer, .width = size};
+  return (fptr){size, (u8 *)buffer};
 }
-um_fp readFile(um_fp path) {
-  char *fname = (char *)calloc(sizeof(char) , path.width + 1);
+fptr readFile(fptr path) {
+  char *fname = (char *)calloc(sizeof(char), path.width + 1);
   memcpy(fname, path.ptr, path.width);
-  um_fp res = readFile(fname);
+  fptr res = readFile(fname);
   free(fname);
   return res;
 }
 
-void writeFile(const char *path, um_fp buffer) {
+void writeFile(const char *path, fptr buffer) {
   if (!fsActive())
     return;
 
