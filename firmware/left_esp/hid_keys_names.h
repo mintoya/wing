@@ -4,7 +4,7 @@
 #include "hid_keys.h"
 #include "key.hpp"
 // #include "kml/kml.h"
-#include "../my-lib/fptr.h"
+#include "my-lib/fptr.h"
 #include <cstdint>
 #include <stdint.h>
 #include <string.h>

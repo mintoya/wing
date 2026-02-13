@@ -1,62 +1,77 @@
+// #define noAssertMessage
 // #define ISRIGHT
+#define PRINTER_NOC32TOMB
+
+#include "my-lib/types.h"
+#include "my-lib/print.h"
+#undef print
+#undef println
+#undef print_
+#undef println_
+#include "my-lib/printers/vason.c"
+
+void (serialOutputFunction)(
+    const c32 *c,
+    void *_,
+    unsigned int len,
+    bool flush
+){
+  for(u32 i = 0;i<len;i++)
+  Serial.write((char)( c[i] ));
+if(flush)Serial.flush();
+}
+#define print_(fmt,...) print_wfO(serialOutputFunction,0,fmt,__VA_ARGS__)
+#define println_(fmt,...) print_(fmt"\n",__VA_ARGS__);
 #ifdef ISRIGHT
-static const unsigned int rowGpios[] = { 2, 3, 4, 5 };
-static const unsigned int colGpios[] = { 10, 11, 9, 8, 7, 6 };
-#else  //ISLEFT
-static const unsigned int rowGpios[] = { 2, 3, 4, 5 };
-static const unsigned int colGpios[] = { 6, 7, 8, 9, 11, 10 };
+static const uint rowGpios[] = { 2, 3, 4, 5 };
+static const uint colGpios[] = { 10, 11, 9, 8, 7, 6 };
+#else  // ISLEFT
+static const uint rowGpios[] = { 2, 3, 4, 5 };
+static const uint colGpios[] = { 6, 7, 8, 9, 11, 10 };
 #endif
 
-const unsigned int nrowGpios = sizeof(rowGpios) / sizeof(rowGpios[0]);
-const unsigned int ncolGpios = sizeof(colGpios) / sizeof(colGpios[0]);
-
+const uint nrowGpios = countof(rowGpios);
+const uint ncolGpios = countof(colGpios);
 
 #include <Wire.h>
 #define cSum_REDUNDANCY_AMMOUNT ((unsigned int)2)
-#include "cSum/cSum.h"
+#include "my-lib/cSum.h"
 #include "key.hpp"
-#include "my-list/my-list.hpp"
 #include "layout.hpp"
-#define KML_PARSER_C
-#include "kml/kml.h"
+#include "debounce.hpp"
+#include "fileSystemInterface.hpp"
 #include <USB.h>
 #include <USBHID.h>
 #include <USBHIDKeyboard.h>
-#include "debounce.hpp"
-#include "fileSystemInterface.hpp"
 
-
-#define MY_LIST_C
-#include "my-list/my-list.h"
 
 #define SLAVE_ADDR 0x42
 
 USBHIDKeyboard Keyboard;
-dataChecker dc = cSum_new();
+dataChecker dc = cSum_new(stdAlloc);
 reportManager rm;
 
-listPlus<listPlus<KeyItem>> keyMapLayers;
-listPlus<tapDance> tapDances;
-uint8_t pinData[nrowGpios] = { 0 };
-uint8_t *oPinData = nullptr;
+mList(mList(KeyItem)) keyMapLayers = mList_init(stdAlloc, mList(KeyItem));
+mList(tapDance) tapDances = mList_init(stdAlloc, tapDance);
+u8 pinData[nrowGpios] = { 0 };
+u8 *oPinData = nullptr;
 dbool state[nrowGpios * ncolGpios * 2] = {};
 bool state_presskeys[nrowGpios * ncolGpios * 2] = { false };
 void (*keyboardFunctions[10])(void) = {};
 
 bool fakeSenderEnabled = true;
-void fakeSender(uint8_t mod, uint8_t *keys) {
-  if (!fakeSenderEnabled) return;
-  Serial.printf("%02X|%02X %02X %02X %02X %02X %02X\n",
-                mod,
-                keys[0], keys[1], keys[2],
-                keys[3], keys[4], keys[5]);
+void fakeSender(u8 mod, u8 *keys) {
+  if (!fakeSenderEnabled)
+    return;
+  println_("{x}|{x} {x} {x} {x} {x} {x}", mod, keys[0], keys[1],
+                keys[2], keys[3], keys[4], keys[5]);
 }
-void sendHidReport(uint8_t modifiers, uint8_t *key_codes) {
+void sendHidReport(u8 modifiers, uint8_t *key_codes) {
   // typedef struct
   // {
-  //   uint8_t modifiers;
-  //   uint8_t reserved;
-  //   uint8_t keys[6];
+  //   u8 modifiers;
+  //   u8 reserved;
+  //   u8 keys[6];
   // } KeyReport;
   static KeyReport k;
   k.modifiers = modifiers;
@@ -71,19 +86,18 @@ void sendHidReport(uint8_t modifiers, uint8_t *key_codes) {
   Keyboard.sendReport(&k);
 }
 
-
-//TODO flip these around
-static inline bool getKeyState(unsigned int row, unsigned int col) {
-  uint8_t res = (col < ncolGpios) ?
-    (pinData[row] & (((uint8_t)1) << col)) :
-    (oPinData ? (oPinData[row] & (((uint8_t)1) << (col - ncolGpios))) : 0);
+// TODO flip these around
+static inline bool getKeyState(uint row, uint col) {
+  u8 res =
+    (col < ncolGpios)
+      ? (pinData[row] & (((u8)1) << col))
+      : (oPinData ? (oPinData[row] & (((u8)1) << (col - ncolGpios)))
+                  : 0);
   return res;
 }
 
-
-
 void updatePins() {
-  memset(pinData, 0, sizeof(uint8_t) * nrowGpios);
+  memset(pinData, 0, sizeof(u8) * nrowGpios);
   for (int i = 0; i < ncolGpios; i++) {
     digitalWrite(colGpios[i], HIGH);
     for (int ii = 0; ii < nrowGpios; ii++) {
@@ -96,12 +110,13 @@ void updatePins() {
 #ifdef ISRIGHT
 void onRequest() {
   updatePins();
-  checkData cd = cSum_toSum(dc, (um_fp){ .ptr = pinData, .width = sizeof(pinData) });
+  checkData cd =
+    cSum_toSum(dc, (fptr){ .ptr = pinData, .width = sizeof(pinData) });
   Wire.write(cd.data.width);
-  Wire.write((uint8_t *)cd.data.ptr, cd.data.width);
+  Wire.write((u8 *)cd.data.ptr, cd.data.width);
   for (int i = 0; i < sizeof(pinData); i++)
-    Serial.printf("%02X", pinData[i]);
-  Serial.println();
+    printf_("{x}", pinData[i]);
+  println_();
 }
 #endif
 void wireSetup() {
@@ -115,54 +130,53 @@ void wireSetup() {
   Wire.setClock(400000);
 }
 #ifndef ISRIGHT
-listPlus<uint8_t> retBuf;
+mList(u8) retBuf = mList_init(stdAlloc, u8);
 void wireUpdate() {
   // Wire.clearTimeoutFlag();//not on twowire?
   int rSize = Wire.requestFrom(SLAVE_ADDR, 0xFF, true);
 
   if (!Wire.available()) {
   } else {
-    // Serial.println("recieved");
+    // println_("recieved");
     int lSize = Wire.read();
-    retBuf.clear();
+    mList_clear(retBuf);
     for (int i = 0; i < lSize; i++) {
       if (Wire.available())
-        retBuf.append((uint8_t)Wire.read());
+        mList_push(retBuf, (u8)Wire.read());
     }
   }
 
   checkData cd = (checkData){
-    .data = (um_fp){
-      .ptr = retBuf.self(),
-      .width = retBuf.length() },
+    .data = (fptr){ mList_len(retBuf), mList_arr(retBuf) },
   };
 
-  um_fp result = cSum_fromSum(cd);
+  fptr result = cSum_fromSum(cd);
   if (!result.ptr) {
-    // Serial.println("recieve fail");
+    // println_("recieve fail");
     oPinData = nullptr;
   } else {
-    oPinData = (uint8_t *)result.ptr;
+    oPinData = (u8 *)result.ptr;
     // for (int i = 0; i < result.width; i++)
-    //   Serial.printf("%02X", oPinData[i]);
-    // Serial.println();
+    //   printf_("%02X", oPinData[i]);
+    // println_();
   }
 }
 static inline void fillKeyStates() {
-  unsigned int totalCols = ncolGpios * 2;  // primary + optional
-  for (unsigned int r = 0; r < nrowGpios; r++) {
-    for (unsigned int c = 0; c < totalCols; c++) {
+  uint totalCols = ncolGpios * 2;  // primary + optional
+  for (uint r = 0; r < nrowGpios; r++) {
+    for (uint c = 0; c < totalCols; c++) {
       state[r * totalCols + c].set(getKeyState(r, c));
     }
   }
-  for (unsigned int r = 0; r < nrowGpios; r++) {
-    for (unsigned int c = 0; c < totalCols; c++) {
+  for (uint r = 0; r < nrowGpios; r++) {
+    for (uint c = 0; c < totalCols; c++) {
       state_presskeys[r * totalCols + c] = state[r * totalCols + c].get();
     }
   }
 }
 #endif
 void setup() {
+
   Serial.begin(115200);
   delay(2000);
   wireSetup();
@@ -174,25 +188,39 @@ void setup() {
     pinMode(rowGpios[i], INPUT_PULLDOWN);
   }
 #ifndef ISRIGHT
+  println_("keyboard function begin");
   Keyboard.begin();
+  println_("file-system begin");
   FSISetup();
+  println_("layout parsing begin");
   parseLayout();
+  println_("printing");
   prettyPrintLayers();
+  println_("reportmanager begin");
   rm = reportManager(sendHidReport, fakeSender);
+  println_("loop begin");
 #endif
 }
 
 #ifdef ISRIGHT
 void loop() {}
 #else
-void serialRequestManager(um_fp layo) {
-  um_fp requestType;
-  if (!(requestType = findKey(layo, um_from("request"))).ptr) {
-    Serial.println("status:fail;");
-    Serial.println("no requestType provided");
-    Serial.write((uint8_t *)layo.ptr, layo.width);
-    Serial.println();
-    Serial.println(
+#include "my-lib/arenaAllocator.h"
+void seerialRequestManager(fptr layo) {
+  // 1. Parse the raw input string (layo) into a vason object
+  // Note: Replace 'allocator' with your actual AllocatorV instance
+  Arena_scoped* local = arena_new_ext(stdAlloc,512);
+  vason v = { parseStr(local, (slice(c8)){ layo.width,(c8*)layo.ptr,}) };
+
+  // 2. Use the vason object 'v' for lookups
+  fptr requestType = v["request"].asString();
+
+  if (!requestType.ptr) {
+    println_("status:fail;");
+    println_("no requestType provided");
+    // Serial.write((u8 *)layo.ptr, layo.width); 
+    println_();
+    println_(
       "examples\n\n"
       "request:setLayout;keyboard:{layers:{{KEY_A}}}\t\t-- sets layout\n"
       "request:getLayout;\t\t-- prints layout\n"
@@ -201,99 +229,86 @@ void serialRequestManager(um_fp layo) {
       "request:enableStrokes;\t\t-- enables them \n");
   } else {
 
-    Serial.println("status:sucess;");
-    if (requestType == um_from("setLayout")) {
-      parseLayout(layo);
-    } else if (requestType == um_from("format")) {
-      Serial.println(esp_reset_reason());
-      Serial.println("Unmounting FFat ...");
+    println_("status:sucess;");
+    
+    // 3. Compare using fp()
+    if (requestType == fp("setLayout")) {
+      // Pass 'v' (the parsed object) or 'layo' (raw string) depending on parseLayout's signature
+      parseLayout(layo); //TODO change sig
+    } else if (requestType == fp("format")) {
+      println_("{}",esp_reset_reason());
+      println_("Unmounting FFat ...");
       FFat.end();
-      Serial.println("Formatting...");
+      println_("Formatting...");
       if (FFat.format()) {
-        Serial.println("FFat formatted successfully. Attempting to remount...");
+        println_("FFat formatted successfully. Attempting to remount...");
         if (FFat.begin()) {
-          Serial.println("FFat remounted successfully. Filesystem is now empty.");
+          println_(
+            "FFat remounted successfully. Filesystem is now empty.");
         } else {
-          Serial.println("ERROR: FFat failed to remount after format! Please reset the device.");
+          println_("ERROR: FFat failed to remount after format! Please "
+                         "reset the device.");
         }
       } else {
-        Serial.println("ERROR: FFat format failed!");
+        println_("ERROR: FFat format failed!");
       }
-    } else if (requestType == um_from("printFile")) {
-      um_fp result = readFile(findKey(layo, um_from("fileName")));
-      Serial.write((uint8_t*)result.ptr,result.width);
-    } else if (requestType == um_from("ls")) {
+    } else if (requestType == fp("printFile")) {
+      // Use vason syntax for lookup
+      fptr fileName = v["fileName"].asString();
+      if (fileName.ptr) {
+        println_("{}",readFile(fileName));
+      }
+    } else if (requestType == fp("ls")) {
       listDir("/");
-    } else if (
-      requestType == um_from("setDefaultLayout") || requestType == um_from("set default layout")) {
-      Serial.println("setting default Layout");
-      parseLayout(defaultLayout_um);
-    } else if (
-      requestType == um_from("getLayout") || requestType == um_from("get layout")) {
-      um_fp savedLayout = readFile("/lay.kml");
-      Serial.write((uint8_t *)savedLayout.ptr, savedLayout.width);
-      Serial.println();
-      free(savedLayout.ptr);
-    } else if (
-      requestType == um_from("getDefaultLayout") || requestType == um_from("get default layout")) {
-      Serial.println("getting default Layout");
-      Serial.write((uint8_t *)defaultLayout_um.ptr, defaultLayout_um.width);
-    } else if (requestType == um_from("disableStrokes")) {
+    } else if (requestType == fp("setDefaultLayout") || requestType == fp("set default layout")) {
+      println_("setting default Layout");
+      // Assuming parseLayout can handle the default layout object/string
+      parseLayout();
+    } else if (requestType == fp("getLayout") || requestType == fp("get layout")) {
+      fptr t = readFile("/lay.kml");
+      println_("{}",t);
+      free(t.ptr);
+    } else if (requestType == fp("getDefaultLayout") || requestType == fp("get default layout")) {
+      println_("getting default Layout \n {}\n",defaultLayout_chars);
+    } else if (requestType == fp("disableStrokes")) {
       fakeSenderEnabled = false;
-    } else if (requestType == um_from("enableStrokes")) {
-      Serial.println("enabling keycode report");
+    } else if (requestType == fp("enableStrokes")) {
+      println_("enabling keycode report");
       fakeSenderEnabled = true;
     }
   }
 }
-int counter = 0;
 void loop() {
-  switch(counter%9){
-    case 0:
-    case 4:
-      wireUpdate();
-      break;
-    case 1:
-    case 5:
-      updatePins();
-      fillKeyStates();
-      break;
-    case 2:
-    case 6:
-      keyMap::pressKeys(state_presskeys, rm);
-      break;
-    case 3:
-    case 7:
-      rm.send();
-      break;
-    case 8:
-      if (Serial.available()) {
-        unsigned long now = millis();
-        listPlus<uint8_t> readBuf;
-        while (Serial.available()) {
-          uint8_t b = Serial.read();
-          readBuf.append(b);
-        }
-        um_fp layo = { .ptr = (void *)readBuf.self(), .width = readBuf.length() };
-        um_fp requestLength = findKey(layo, um_from("requestLength"));
-        unsigned int msgLength = um_asUint(requestLength);
-        if (requestLength.ptr) {
-          while (layo.width < msgLength + 13 + requestLength.width && (millis() - now) < 5000) {
-            while (Serial.available()) {
-              uint8_t b = Serial.read();
-              readBuf.append(b);
-            }
-          }
-        }
 
+  wireUpdate();
+  updatePins();
+  fillKeyStates();
 
-        layo = { .ptr = (void *)readBuf.self(), .width = readBuf.length() };
+  keyMap::pressKeys(state_presskeys, rm);
 
-        serialRequestManager(layo);
-        readBuf.unmake();
-      }
-      break;
+  rm.send();
+
+  if (Serial.available()) {
+    unsigned long now = millis();
+    mList_scoped(u8) readBuf = mList_init(stdAlloc,u8);
+    while (Serial.available())
+      mList_push(readBuf, (u8)Serial.read());
+    auto layo = (fptr){
+      mList_len(readBuf),
+      mList_arr(readBuf),
+    };
+
+    // fptr requestLength = findKey(layo, um_from("requestLength"));
+    // uint msgLength = um_asUint(requestLength);
+    // if (requestLength.ptr) {
+    //   while (layo.width < msgLength + 13 + requestLength.width && (millis() - now) < 5000) {
+    //     while (Serial.available())
+    //       mList_push(readBuf, (u8)Serial.read());
+    //   }
+    // }
+
+    seerialRequestManager(layo);
   }
-  counter++;
 }
 #endif
+#include "my-lib/wheels.h"

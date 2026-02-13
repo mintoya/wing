@@ -1,13 +1,14 @@
+#pragma once
+#include "fileSystemInterface.hpp"
+#include "my-lib/fptr.h"
 #include <stdint.h>
 #define TAPDANCEDEFAULTTIMEOUT ((unsigned long)300)
-#include "../my-lib/my-list.h"
-#include "../my-lib/print.h"
-#include "../my-lib/types.h"
+#include "my-lib/my-list.h"
+#include "my-lib/types.h"
 
 extern unsigned long millis(void);
 
 extern void (*keyboardFunctions[10])(void);
-
 struct KeyItem {
   uint8_t character; // not really a character
   enum kType : char {
@@ -34,22 +35,22 @@ struct KeyItem {
 static void printKeyItem(const KeyItem &k) {
   switch (k.type) {
   case KeyItem::CHARACTER:
-    print("K({})", k.character);
+    print_("K({u8})", k.character);
     break;
   case KeyItem::MODIFIER:
-    print("M({})", k.character);
+    print_("M({u8})", k.character);
     break;
   case KeyItem::LAYER:
-    print("L({})", k.character);
+    print_("L({u8})", k.character);
     break;
   case KeyItem::TAPDANCE:
-    print("TD({})", k.character);
+    print_("TD({u8})", k.character);
     break;
   case KeyItem::FUNCTIONCALL:
-    print("F({})", k.character);
+    print_("FN({u8})", k.character);
     break;
   default:
-    print(" . ");
+    print_(" . ");
     break;
   }
 }
@@ -83,7 +84,7 @@ struct reportManager {
     different |= lastModifier != modifier;
     for (int i = 0; i < 6 && !different; i++)
       different |= mList_get(lastKeys, i) != mList_get(keys, i);
-    if (different || millis() % 1000 < 2) {
+    if (different) {
       // in case some updates get missed
       if (wirelessSender)
         wirelessSender(modifier, mList_arr(keys));
@@ -95,7 +96,7 @@ struct reportManager {
     modifier = 0;
 
     for (int i = 0; i < 6; i++)
-      mList_set(lastKeys, i, *(mList_get(keys, i) ?: REF(u8, 0)));
+      mList_set(lastKeys, i, mList_getOr(keys, i, 0));
     ((List *)keys)->length = 0;
   }
   void addKey(KeyItem k) {
@@ -162,13 +163,14 @@ namespace keyMap {
 
 static void pressKeys(bool *state, reportManager &rm,
                       unsigned int currentLayer = 0) {
+  if (currentLayer > mList_len(keyMapLayers))
+    return;
   static bool forceDown = false;
   unsigned int length = nrowGpios * ncolGpios * 2;
 
   static mList(KeyItem) que = mList_init(stdAlloc, KeyItem);
 
   unsigned long now = millis();
-
   /*
     KeyItem::kType::CHARACTER
     KeyItem::kType::FUNCTIONCALL
@@ -177,7 +179,6 @@ static void pressKeys(bool *state, reportManager &rm,
     KeyItem::kType::PASSTHROUGH_
     KeyItem::kType::TAPDANCE
   */
-  // check layers
   mList(KeyItem) keyMapLayers_arr = *mList_get(keyMapLayers, currentLayer);
   for (unsigned int i = 0; i < length; i++) {
     if (state[i] &&
@@ -197,7 +198,7 @@ static void pressKeys(bool *state, reportManager &rm,
   */
 
   forceDown = false;
-  for (unsigned int i = 0; i < length; i++) {
+  for (auto i = 0; i < length; i++) {
     KeyItem currentKey = *mList_get(keyMapLayers_arr, i);
     if (currentKey.type == KeyItem::kType::PASSTHROUGH_) {
       for (int j = currentLayer; j >= 0; j--) {
@@ -241,6 +242,8 @@ static void pressKeys(bool *state, reportManager &rm,
 
   for (unsigned int i = 0; i < mList_len(tapDances); i++) {
     tapDance *td = mList_get(tapDances, i);
+    if (!td)
+      break;
 
     if (td->keystate == PRESSED) {
       if (td->state == 0 || now < td->currentCountDown) {
@@ -275,7 +278,7 @@ static void pressKeys(bool *state, reportManager &rm,
     } break;
     case KeyItem::kType::LAYER: {
       currentLayer = que_arr[i].character; // idk
-    }
+    } break;
     case KeyItem::kType::TAPDANCE: {
       mList_arr(tapDances)[que_arr[i].character].keystate =
           KeyState_down(mList_arr(tapDances)[que_arr[i].character].keystate);

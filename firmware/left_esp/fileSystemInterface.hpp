@@ -1,22 +1,23 @@
 #pragma once
-#include "../my-lib/fptr.h"
-#include "../my-lib/my-list.h"
-// #include "../my-lib/print.h"
 #include "FFat.h"
 #include "FS.h"
+#include "my-lib/fptr.h"
+#include "my-lib/my-list.h"
 #include <cstring>
 
 inline bool fsActive() { return FFat.begin(); }
+#include "my-lib/print.h"
 
 fptr readFile(const char *path) {
   if (!fsActive())
     return nullFptr;
 
-  Serial.print("reading ");
-  Serial.println(path);
+  println_("reading {cstr}", path);
   File file = FFat.open(path, FILE_READ);
-  if (!file)
+  if (!file) {
+    println_("file doesnt exist");
     return nullFptr;
+  }
 
   size_t size = file.size();
   void *buffer = malloc(size);
@@ -27,6 +28,7 @@ fptr readFile(const char *path) {
 
   file.readBytes((char *)buffer, size);
   file.close();
+  println_("sucessful file read");
   return (fptr){size, (u8 *)buffer};
 }
 fptr readFile(fptr path) {
@@ -65,14 +67,12 @@ void listDir(const char *dirname, uint8_t levels = 10) {
   File file = root.openNextFile();
   while (file && levels > 0) {
     if (file.isDirectory()) {
-      Serial.print("DIR ");
-      Serial.println(file.path());
+      println_("DIR {cstr}", file.path());
       if (levels > 1) {
         listDir(file.path(), levels - 1);
       }
     } else {
-      Serial.print("FILE ");
-      Serial.println(file.path());
+      println_("FILE {}",file.path());
     }
     file = root.openNextFile();
   }
