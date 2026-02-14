@@ -1,6 +1,6 @@
 [
  {
-  "directory": "/home/paa/Github/wing/firmware/left_esp",
+  "directory": "/home/paa/Github/wing/firmware/newmain",
   "arguments": [
    "/home/paa/.arduino15/packages/esp32/tools/s3-gcc/2021r2-p5/bin/xtensa-esp32s3-elf-g++",
    "-DHAVE_CONFIG_H",

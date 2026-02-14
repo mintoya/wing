@@ -4,7 +4,7 @@
 #include <stdint.h>
 #define TAPDANCEDEFAULTTIMEOUT ((unsigned long)300)
 #include "my-lib/my-list.h"
-#include "my-lib/types.h"
+#include "my-lib/mytypes.h"
 
 extern unsigned long millis(void);
 extern void (*keyboardFunctions[10])(void);
@@ -151,14 +151,15 @@ struct tapDance {
   bool heldActionTriggered;
 };
 
-extern mList(tapDance) tapDances;
-extern mList(mList(KeyItem)) keyMapLayers;
+extern slice(tapDance) tapDances;
+
+extern slice(slice(KeyItem)) keyMapLayers;
 
 namespace keyMap {
 
 template <usize rows, usize cols>
 static void pressKeys(bool keyState[rows][cols * 2], reportManager &rm, unsigned int currentLayer = 0) {
-  if (currentLayer > mList_len(keyMapLayers))
+  if (currentLayer > keyMapLayers.len)
     return;
   static bool forceDown = false;
   unsigned int length = rows * cols * 2;
@@ -180,13 +181,12 @@ static void pressKeys(bool keyState[rows][cols * 2], reportManager &rm, unsigned
     KeyItem::kType::PASSTHROUGH_
     KeyItem::kType::TAPDANCE
   */
-  mList(KeyItem) keyMapLayers_arr = *mList_get(keyMapLayers, currentLayer);
+  slice(KeyItem) keyMapLayers_arr = keyMapLayers[currentLayer];
   for (unsigned int i = 0; i < length; i++) {
     if (keystate_get(i) &&
-        mList_get(keyMapLayers_arr, i)->type == KeyItem::kType::LAYER) {
-      // keyMapLayers.get(currentLayer).get(i).type == KeyItem::kType::LAYER) {
+        keyMapLayers_arr[i].type == KeyItem::kType::LAYER) {
       keystate_get(i) = (false);
-      return pressKeys<rows, cols>(keyState, rm, mList_get(keyMapLayers_arr, i)->character);
+      return pressKeys<rows, cols>(keyState, rm, keyMapLayers_arr[i].character);
     }
   }
 
@@ -200,12 +200,12 @@ static void pressKeys(bool keyState[rows][cols * 2], reportManager &rm, unsigned
 
   forceDown = false;
   for (auto i = 0; i < length; i++) {
-    KeyItem currentKey = *mList_get(keyMapLayers_arr, i);
+    KeyItem currentKey = keyMapLayers_arr[i];
     if (currentKey.type == KeyItem::kType::PASSTHROUGH_) {
       for (int j = currentLayer; j >= 0; j--) {
-        auto temp = mList_get(*mList_get(keyMapLayers, j), i);
-        if (!(temp->type == KeyItem::PASSTHROUGH_)) {
-          currentKey = *temp;
+        KeyItem temp = keyMapLayers[j][i];
+        if (temp.type != KeyItem::PASSTHROUGH_) {
+          currentKey = temp;
           break;
         }
       }
@@ -222,8 +222,8 @@ static void pressKeys(bool keyState[rows][cols * 2], reportManager &rm, unsigned
           keyboardFunctions[currentKey.character]();
         } break;
         case KeyItem::kType::TAPDANCE: {
-          mList_arr(tapDances)[currentKey.character].keystate =
-              KeyState_down(mList_arr(tapDances)[currentKey.character].keystate);
+          tapDances[currentKey.character].keystate =
+              KeyState_down(tapDances[currentKey.character].keystate);
         } break;
         default:
           forceDown = true;
@@ -235,14 +235,14 @@ static void pressKeys(bool keyState[rows][cols * 2], reportManager &rm, unsigned
       }
     } else {
       if (currentKey.type == KeyItem::kType::TAPDANCE) {
-        mList_arr(tapDances)[currentKey.character].keystate =
-            KeyState_up(mList_arr(tapDances)[currentKey.character].keystate);
+        tapDances[currentKey.character].keystate =
+            KeyState_up(tapDances[currentKey.character].keystate);
       }
     }
   }
 
-  for (unsigned int i = 0; i < mList_len(tapDances); i++) {
-    tapDance *td = mList_get(tapDances, i);
+  for (unsigned int i = 0; i < tapDances.len; i++) {
+    tapDance *td = tapDances.ptr + i;
     if (!td)
       break;
 
@@ -281,8 +281,8 @@ static void pressKeys(bool keyState[rows][cols * 2], reportManager &rm, unsigned
         currentLayer = que_arr[i].character; // idk
       } break;
       case KeyItem::kType::TAPDANCE: {
-        mList_arr(tapDances)[que_arr[i].character].keystate =
-            KeyState_down(mList_arr(tapDances)[que_arr[i].character].keystate);
+        tapDances[que_arr[i].character].keystate =
+            KeyState_down(tapDances[que_arr[i].character].keystate);
       } break;
       default:
         /*

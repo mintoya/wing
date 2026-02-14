@@ -3,7 +3,7 @@
 #include "hid_keys_names.h"
 #include "key.hpp"
 #include "my-lib/my-list.h"
-#include "my-lib/types.h"
+#include "my-lib/mytypes.h"
 #include "my-lib/vason.h"
 #include "stdint.h"
 extern void delay(usize);
@@ -35,47 +35,43 @@ auto defaultLayout_chars = R"d(
 extern const unsigned int nrowGpios;
 extern const unsigned int ncolGpios;
 
-extern mList(mList(KeyItem)) keyMapLayers;
-extern mList(tapDance) tapDances;
+extern slice(slice(KeyItem)) keyMapLayers;
+extern slice(tapDance) tapDances;
 #include "my-lib/print.h"
 static void prettyPrintLayers() {
   println_("=== Keyboard Layers ===");
   // println_("{} layers", mList_len(keyMapLayers));
-  for (auto lI = 0; lI < mList_len(keyMapLayers); lI++) {
-    println_("layer {}", lI);
-    mList(KeyItem) layer = *mList_get(keyMapLayers, lI);
-    if (layer) {
-      println_("layer {}", lI);
-      for (auto i = 0; i < mList_len(layer); i++)
-        print_("{},", *mList_get(layer, i));
+  for (slice(KeyItem) layer : keyMapLayers) {
+    if (layer.ptr) {
+      for (KeyItem key : layer)
+        print_("{},", key);
       println_();
     } else {
       println_("null layer? exiting ");
-      delay(1000);
+      delay(10000);
       exit(1);
     }
   }
   println_("=======================");
 }
-extern mList(mList(KeyItem)) keyMapLayers;
 void addLayers(vason in) {
-  if (in.tag() == vason_ARR && in.countChildren() > 0) {
-    auto layerCount = in.countChildren();
-    for (auto layerIdx = 0; layerIdx < layerCount; layerIdx++) {
-      mList(KeyItem) layerList = mList_init(stdAlloc, KeyItem);
-      mList_push(keyMapLayers, layerList);
-      auto layerVason = in[layerIdx];
-      for (auto i = 0; i < nrowGpios * ncolGpios * 2; i++)
-        mList_push(layerList, kn_Match(in[i].asString()));
-    }
-  } else {
-    mList(KeyItem) stub = mList_init(stdAlloc, KeyItem);
-    mList_push(keyMapLayers, stub);
-    for (auto i = 0; i < nrowGpios * ncolGpios * 2; i++)
-      mList_push(stub, KeyItem{});
+  auto layerCount = in.countChildren();
+  keyMapLayers = {.len = 0, .ptr = aCreate(stdAlloc, slice(KeyItem), layerCount)};
+  if (in.tag() == vason_ARR && layerCount > 0)
+    return;
+  for (; keyMapLayers.len < layerCount; keyMapLayers.len++) {
+    auto layerVason = in[keyMapLayers.len];
+    auto thisLayerLen = layerVason.countChildren();
+    slice(KeyItem) thisLayer = {.len = 0, .ptr = aCreate(stdAlloc, KeyItem, thisLayerLen)};
+    if (layerVason.tag() != vason_ARR)
+      break;
+    else
+      for (; thisLayer.len < thisLayerLen; thisLayer.len++)
+        thisLayer[thisLayer.len] = kn_Match(layerVason[thisLayer.len].asString());
+    keyMapLayers[keyMapLayers.len] = thisLayer;
   }
 }
-extern mList(tapDance) tapDances;
+extern slice(tapDance) tapDances;
 void addDances(vason in) {}
 #include "my-lib/arenaAllocator.h"
 static void parseLayout(fptr string = {}, vason parsed = {}) {
@@ -87,7 +83,6 @@ static void parseLayout(fptr string = {}, vason parsed = {}) {
     else
       layoutBuf = fp(defaultLayout_chars);
     println_("parsing \n{}", layoutBuf);
-
     parsed = {parseStr(local, {layoutBuf.width, layoutBuf.ptr})};
   }
 
@@ -100,8 +95,7 @@ static void parseLayout(fptr string = {}, vason parsed = {}) {
   addLayers(layers);
   addDances(tapdances);
 
-  println_("Layout parsed. Layers: {}, TapDances: {}", mList_len(keyMapLayers),
-           mList_len(tapDances));
+  println_("Layout parsed. Layers: {}, TapDances: {}", keyMapLayers.len, tapDances.len);
 
   writeFile("/lay.kml", layoutBuf);
 }

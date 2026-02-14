@@ -26,29 +26,23 @@ void(serialOutputFunction)(
 //
 // #define noAssertMessage
 #include "Arduino.h"
-#include "esp32-hal-gpio.h"
-// #include "esp32-hal.h"
 
 #include "key.hpp"
-#include "my-lib/printers/vason.c"
-#include "my-lib/stringList.h"
-#include "my-lib/types.h"
+#include "my-lib/mytypes.h"
+// #include "my-lib/printers/vason.c"
 
 //
 //
 //
 #include <Wire.h>
-#define cSum_REDUNDANCY_AMMOUNT ((unsigned int)2)
-#include "my-lib/cSum.h"
-dataChecker dc = cSum_new(stdAlloc);
 
 constexpr u8 SLAVE_ADDR = 0x42;
 constexpr usize WIRE_CLOCK = 400000;
 
-// #define ISMAINHALF (1)
+#define ISMAINHALF (1)
 #if defined(ISMAINHALF) // main side
   #include "fileSystemInterface.hpp"
-  #include "key.hpp"
+  // #include "key.hpp"
   #include "layout.hpp"
   #include <USB.h>
   #include <USBHID.h>
@@ -65,52 +59,42 @@ static bool sateTable[countof(rowGpios)][countof(colGpios) * 2] = {};
 //
 // keyboard report variables
 USBHIDKeyboard Keyboard;
-reportManager rm;
+// reportManager rm;
 
 //
 // keyboard configuration variables
 //
-void (*keyboardFunctions[10])(void) = {};
-mList(mList(KeyItem)) keyMapLayers = mList_init(
-    stdAlloc,
-    mList(KeyItem)
-);
-mList(tapDance) tapDances = mList_init(
-    stdAlloc,
-    tapDance
-);
+// void (*keyboardFunctions[10])(void) = {};
+slice(slice(KeyItem)) keyMapLayers{};
+slice(tapDance) tapDances = {};
+
 //
 // report senders
 //
-static bool fakeSenderEnabled = true;
-void fakeSender(u8 mod, u8 *keys) {
-  if (fakeSenderEnabled)
-    println_(
-        "{x}|{x} {x} {x} {x} {x} {x}",
-        mod,
-        keys[0], keys[1], keys[2],
-        keys[3], keys[4], keys[5]
-    );
-}
-void sendHidReport(u8 modifiers, uint8_t *key_codes) {
-  // typedef struct
-  // {
-  //   u8 modifiers;
-  //   u8 reserved;
-  //   u8 keys[6];
-  // } KeyReport;
-  static KeyReport k;
-  k.modifiers = modifiers;
-  k.reserved = 0;
-  k.keys[0] = key_codes[0];
-  k.keys[1] = key_codes[1];
-  k.keys[2] = key_codes[2];
-  k.keys[3] = key_codes[3];
-  k.keys[4] = key_codes[4];
-  k.keys[5] = key_codes[5];
+// static bool fakeSenderEnabled = true;
+// void fakeSender(u8 mod, u8 *keys) {
+//   if (fakeSenderEnabled)
+//     println_(
+//         "{x}|{x} {x} {x} {x} {x} {x}",
+//         mod,
+//         keys[0], keys[1], keys[2],
+//         keys[3], keys[4], keys[5]
+//     );
+// }
+// void sendHidReport(u8 modifiers, uint8_t *key_codes) {
+//   static KeyReport k;
+//   k.modifiers = modifiers;
+//   k.reserved = 0;
+//   k.keys[0] = key_codes[0];
+//   k.keys[1] = key_codes[1];
+//   k.keys[2] = key_codes[2];
+//   k.keys[3] = key_codes[3];
+//   k.keys[4] = key_codes[4];
+//   k.keys[5] = key_codes[5];
+//
+//   Keyboard.sendReport(&k);
+// }
 
-  Keyboard.sendReport(&k);
-}
 //
 // communication
 //
@@ -119,76 +103,144 @@ void wireSetup() {
   Wire.setTimeout(500);
   Wire.setClock(WIRE_CLOCK);
 }
+REGISTER_SPECIAL_PRINTER("reset_reason", int, {
+  switch (in) {
+    case 1:
+      PUTS(U"Vbat power on reset");
+      break;
+    case 3:
+      PUTS(U"Software reset digital core");
+      break;
+    case 4:
+      PUTS(U"Legacy watch dog reset digital core");
+      break;
+    case 5:
+      PUTS(U"Deep Sleep reset digital core");
+      break;
+    case 6:
+      PUTS(U"Reset by SLC module, reset digital core");
+      break;
+    case 7:
+      PUTS(U"Timer Group0 Watch dog reset digital core");
+      break;
+    case 8:
+      PUTS(U"Timer Group1 Watch dog reset digital core");
+      break;
+    case 9:
+      PUTS(U"RTC Watch dog Reset digital core");
+      break;
+    case 10:
+      PUTS(U"Instrusion tested to reset CPU");
+      break;
+    case 11:
+      PUTS(U"Time Group reset CPU");
+      break;
+    case 12:
+      PUTS(U"Software reset CPU");
+      break;
+    case 13:
+      PUTS(U"RTC Watch dog Reset CPU");
+      break;
+    case 14:
+      PUTS(U"for APP CPU, reseted by PRO CPU");
+      break;
+    case 15:
+      PUTS(U"Reset when the vdd voltage is not stable");
+      break;
+    case 16:
+      PUTS(U"RTC Watch dog reset digital core and rtc module");
+      break;
+    default:
+      PUTS(U"NO_MEAN");
+  }
+});
 void remote_stateTable_update() {
-  usize readSize = Wire.requestFrom(SLAVE_ADDR, (usize)255, true);
-  u8 readBuffer[sizeof(sateTable) * 2];
-  usize readBufLen;
-  // known bug?
-  // requestFrom just returns the second parameter
-  checkData cd;
-  fptr result;
-  u64_vl_max maxB = {};
-  vlength *ptr = maxB._;
-  vlength v_curr = {};
-  if (!Wire.available())
-    goto skip;
-  while ((v_curr = bitcast(vlength, Wire.read())).hasNext)
-    *ptr++ = v_curr;
-  *ptr++ = v_curr;
-  readSize = vlen_toU64(maxB._);
-  readBufLen = Wire.readBytes(readBuffer, readSize);
-  if (readBufLen != readSize)
-    goto skip;
-  cd = (checkData){
-      .data = (fptr){readBufLen, readBuffer},
-  };
-  result = cSum_fromSum(cd);
-  if (!result.ptr)
-    goto skip;
+  usize requestSize = 32;
+  usize receivedBytes = Wire.requestFrom(SLAVE_ADDR, requestSize, true);
+
+  if (receivedBytes == 0 || !Wire.available())
+    return;
+
+  int dataLen = Wire.read();
+
+  if (dataLen > receivedBytes - 1)
+    dataLen = receivedBytes - 1;
+
   for (int i = 0; i < countof(rowGpios); i++) {
     for (int j = 0; j < countof(colGpios); j++) {
       sateTable[i][j + countof(colGpios)] = 0;
     }
   }
-  for (int i = 0; i < result.width; i += 2) {
-    u8 col = result.ptr[i];
-    u8 row = result.ptr[i + 1];
-    sateTable[row][col + countof(colGpios)] = 1;
-  }
 
-skip:;
+  for (int i = 0; i < dataLen; i += 2) {
+    if (Wire.available() < 2)
+      break;
+
+    u8 col = Wire.read();
+    u8 row = Wire.read();
+
+    // Bounds check to prevent crashes
+    if (col < countof(colGpios) && row < countof(rowGpios)) {
+      sateTable[row][col + countof(colGpios)] = 1;
+    }
+  }
 }
 void local_stateTable_update() {
   for (auto i = 0; i < countof(colGpios); i++) {
     digitalWrite(colGpios[i], HIGH);
     for (auto j = 0; j < countof(rowGpios); j++)
-      sateTable[i][j] = digitalRead(rowGpios[j]);
+      sateTable[j][i] = digitalRead(rowGpios[j]);
     digitalWrite(colGpios[i], LOW);
   }
 }
 void setup() {
   Serial.begin(115200);
+  delay(1000);
   wireSetup();
+  // delay(1000);
+  println_(
+      "reset reason : {reset_reason}",
+      esp_rom_get_reset_reason(0)
+  );
   for (int i = 0; i < countof(colGpios); i++)
     pinMode(colGpios[i], OUTPUT);
   for (int i = 0; i < countof(rowGpios); i++)
     pinMode(rowGpios[i], INPUT_PULLDOWN);
+  delay(1000);
   println_("keyboard function begin");
+  delay(1000);
   Keyboard.begin();
   println_("file-system begin");
+  delay(1000);
   FSISetup();
   println_("layout parsing begin");
+  for(int i = 0;i<100;i++)print_("skd");
+  delay(1000);
   parseLayout();
-  println_("printing");
-  prettyPrintLayers();
+  // println_("printing");
+  // delay(1000);
+  // prettyPrintLayers();
   println_("reportmanager begin");
-  rm = reportManager(sendHidReport, fakeSender);
+  delay(1000);
+  // rm = reportManager(sendHidReport, fakeSender);
   println_("loop begin");
+  delay(1000);
 }
 void loop() {
   local_stateTable_update();
+  // println_("remote update");
   remote_stateTable_update();
-  keyMap::pressKeys<countof(rowGpios), countof(colGpios)>(sateTable, rm); // !!will modify stateTable
+  // keyMap::pressKeys<countof(rowGpios), countof(colGpios)>(sateTable, rm); // !!will modify stateTable
+  static auto last = millis();
+  if (millis() > last + 10) [[unlikely]] {
+    last = millis();
+    for (auto i = 0; i < countof(colGpios) * 2; i++) {
+      for (auto j = 0; j < countof(rowGpios); j++)
+        print_("{c8}", sateTable[j][i] ? 'X' : ' ');
+      print_("|");
+    }
+    println_();
+  }
 }
 //
 //
@@ -209,16 +261,6 @@ volatile static std::atomic<bool> flipper(false);
 //
 //
 //
-// void onRequest() {
-//   updatePins();
-//   checkData cd =
-//       cSum_toSum(dc, (fptr){.ptr = pinData, .width = sizeof(pinData)});
-//   Wire.write(cd.data.width);
-//   Wire.write((u8 *)cd.data.ptr, cd.data.width);
-//   for (int i = 0; i < sizeof(pinData); i++)
-//     printf_("{x}", pinData[i]);
-//   println_();
-// }
 static u8 message[countof(rowGpios) * countof(colGpios) * 2];
 void wireSetup() {
   Wire.begin(SLAVE_ADDR);
@@ -231,19 +273,8 @@ void wireSetup() {
           message[messagelen++] = j;
         }
 
-    checkData cd = cSum_toSum(dc, (fptr){messagelen, message});
-    auto vl_struct = u64_toVlen(cd.data.width);
-    auto vl_ptr = vl_struct._;
-    while (
-        bitcast(u8, *vl_ptr) ==
-        bitcast(u8, ((vlength){.hasNext = true, .data = 0}))
-    )
-      vl_ptr++;
-    do
-      Wire.write(bitcast(u8, *vl_ptr));
-    while (vl_ptr++->hasNext);
-    // Wire.write((uint)cd.data.width);
-    Wire.write((u8 *)cd.data.ptr, cd.data.width);
+    Wire.write((uint)messagelen);
+    Wire.write((u8 *)message, messagelen);
   });
   Wire.setClock(WIRE_CLOCK);
 }
