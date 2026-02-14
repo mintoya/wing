@@ -78,16 +78,17 @@ void addLayers(vason in) {
 extern mList(tapDance) tapDances;
 void addDances(vason in) {}
 #include "my-lib/arenaAllocator.h"
-static void parseLayout(vason parsed = {}) {
+static void parseLayout(fptr string = {}, vason parsed = {}) {
   Arena_scoped *local = arena_new_ext(stdAlloc, 512);
-  if (!parsed.self) {
-    // if (!layoutBuf.ptr) {
-    //   println_("layout not available, loading default layout");
-    fptr layoutBuf = fp(defaultLayout_chars);
-    // }
+  fptr layoutBuf;
+  if (!parsed.self.objects.ptr) {
+    if (string.ptr)
+      layoutBuf = string;
+    else
+      layoutBuf = fp(defaultLayout_chars);
     println_("parsing \n{}", layoutBuf);
 
-    vason parsed = {parseStr(local, {layoutBuf.width, layoutBuf.ptr})};
+    parsed = {parseStr(local, {layoutBuf.width, layoutBuf.ptr})};
   }
 
   println_("top( {vason_container} )", parsed.self);

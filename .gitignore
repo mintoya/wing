@@ -97,3 +97,5 @@ fp-info-cache
 .svg2shenzhen-cache
 10
 
+/firmware/left_esp/build/compile_commands.json
+/firmware/left_esp/build

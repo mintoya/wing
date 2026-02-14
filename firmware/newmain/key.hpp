@@ -25,40 +25,30 @@ struct KeyItem {
   inline constexpr KeyItem(u8 data, kType t) : character(data), type(t) {}
 };
 REGISTER_PRINTER(KeyItem, {
+  // clang-format off
   switch (in.type) {
-  case KeyItem::CHARACTER: {
-    PUTS(U"K");
-  } break;
-  case KeyItem::MODIFIER: {
-    PUTS(U"M");
-  } break;
-  case KeyItem::LAYER: {
-    PUTS(U"L");
-  } break;
-  case KeyItem::TAPDANCE: {
-    PUTS(U"T");
-  } break;
-  case KeyItem::FUNCTIONCALL: {
-    PUTS(U"F");
-  } break;
-  case KeyItem::PASSTHROUGH_: {
-    PUTS(U"_");
-  } break;
+    case KeyItem::CHARACTER    : { PUTS(U"K"); } break;
+    case KeyItem::MODIFIER     : { PUTS(U"M"); } break;
+    case KeyItem::LAYER        : { PUTS(U"L"); } break;
+    case KeyItem::TAPDANCE     : { PUTS(U"T"); } break;
+    case KeyItem::FUNCTIONCALL : { PUTS(U"F"); } break;
+    case KeyItem::PASSTHROUGH_ : { PUTS(U"_"); } break;
   }
+  // clang-format on
   PUTS(U":");
   switch (in.type) {
-  case KeyItem::CHARACTER:
-    USENAMEDPRINTER("x", in.character);
-    break;
-  case KeyItem::MODIFIER:
-  case KeyItem::LAYER:
-  case KeyItem::TAPDANCE:
-  case KeyItem::FUNCTIONCALL:
-    USENAMEDPRINTER("u8", in.character);
-    break;
-  case KeyItem::PASSTHROUGH_:
-    PUTS(U"_");
-    break;
+    case KeyItem::CHARACTER:
+      USENAMEDPRINTER("x", in.character);
+      break;
+    case KeyItem::MODIFIER:
+    case KeyItem::LAYER:
+    case KeyItem::TAPDANCE:
+    case KeyItem::FUNCTIONCALL:
+      USENAMEDPRINTER("u8", in.character);
+      break;
+    case KeyItem::PASSTHROUGH_:
+      PUTS(U"_");
+      break;
   }
 });
 MAKE_PRINT_ARG_TYPE(KeyItem);
@@ -109,14 +99,14 @@ struct reportManager {
   }
   void addKey(KeyItem k) {
     switch (k.type) {
-    case KeyItem::MODIFIER:
-      modifier |= k.character;
-      break;
-    case KeyItem::CHARACTER:
-      mList_push(keys, k.character);
-      break;
-    default:
-      break;
+      case KeyItem::MODIFIER:
+        modifier |= k.character;
+        break;
+      case KeyItem::CHARACTER:
+        mList_push(keys, k.character);
+        break;
+      default:
+        break;
     }
   }
 };
@@ -164,17 +154,20 @@ struct tapDance {
 extern mList(tapDance) tapDances;
 extern mList(mList(KeyItem)) keyMapLayers;
 
-extern const uint nrowGpios;
-extern const uint ncolGpios;
-
 namespace keyMap {
 
-static void pressKeys(bool *state, reportManager &rm,
-                      unsigned int currentLayer = 0) {
+template <usize rows, usize cols>
+static void pressKeys(bool keyState[rows][cols * 2], reportManager &rm, unsigned int currentLayer = 0) {
   if (currentLayer > mList_len(keyMapLayers))
     return;
   static bool forceDown = false;
-  unsigned int length = nrowGpios * ncolGpios * 2;
+  unsigned int length = rows * cols * 2;
+  auto keystate_get = [&](uint index) -> bool & {
+    uint width = cols * 2;
+    uint r = index / width;
+    uint c = index % width;
+    return keyState[r][c];
+  };
 
   static mList(KeyItem) que = mList_init(stdAlloc, KeyItem);
 
@@ -189,11 +182,11 @@ static void pressKeys(bool *state, reportManager &rm,
   */
   mList(KeyItem) keyMapLayers_arr = *mList_get(keyMapLayers, currentLayer);
   for (unsigned int i = 0; i < length; i++) {
-    if (state[i] &&
+    if (keystate_get(i) &&
         mList_get(keyMapLayers_arr, i)->type == KeyItem::kType::LAYER) {
       // keyMapLayers.get(currentLayer).get(i).type == KeyItem::kType::LAYER) {
-      state[i] = (false);
-      return pressKeys(state, rm, mList_get(keyMapLayers_arr, i)->character);
+      keystate_get(i) = (false);
+      return pressKeys<rows, cols>(keyState, rm, mList_get(keyMapLayers_arr, i)->character);
     }
   }
 
@@ -217,7 +210,7 @@ static void pressKeys(bool *state, reportManager &rm,
         }
       }
     }
-    if (state[i]) {
+    if (keystate_get(i)) {
       /*
         KeyItem::kType::CHARACTER
         KeyItem::kType::FUNCTIONCALL
@@ -225,20 +218,20 @@ static void pressKeys(bool *state, reportManager &rm,
         KeyItem::kType::TAPDANCE
       */
       switch (currentKey.type) {
-      case KeyItem::kType::FUNCTIONCALL: {
-        keyboardFunctions[currentKey.character]();
-      } break;
-      case KeyItem::kType::TAPDANCE: {
-        mList_arr(tapDances)[currentKey.character].keystate =
-            KeyState_down(mList_arr(tapDances)[currentKey.character].keystate);
-      } break;
-      default:
-        forceDown = true;
-        /*
-          KeyItem::kType::CHARACTER
-          KeyItem::kType::MODIFIER
-        */
-        mList_push(que, currentKey);
+        case KeyItem::kType::FUNCTIONCALL: {
+          keyboardFunctions[currentKey.character]();
+        } break;
+        case KeyItem::kType::TAPDANCE: {
+          mList_arr(tapDances)[currentKey.character].keystate =
+              KeyState_down(mList_arr(tapDances)[currentKey.character].keystate);
+        } break;
+        default:
+          forceDown = true;
+          /*
+            KeyItem::kType::CHARACTER
+            KeyItem::kType::MODIFIER
+          */
+          mList_push(que, currentKey);
       }
     } else {
       if (currentKey.type == KeyItem::kType::TAPDANCE) {
@@ -281,22 +274,22 @@ static void pressKeys(bool *state, reportManager &rm,
   for (int i = 0; i < mList_len(que); i++) {
 
     switch (que_arr[i].type) {
-    case KeyItem::kType::FUNCTIONCALL: {
-      keyboardFunctions[que_arr[i].character]();
-    } break;
-    case KeyItem::kType::LAYER: {
-      currentLayer = que_arr[i].character; // idk
-    } break;
-    case KeyItem::kType::TAPDANCE: {
-      mList_arr(tapDances)[que_arr[i].character].keystate =
-          KeyState_down(mList_arr(tapDances)[que_arr[i].character].keystate);
-    } break;
-    default:
-      /*
-        KeyItem::kType::CHARACTER
-        KeyItem::kType::MODIFIER
-      */
-      rm.addKey(que_arr[i]);
+      case KeyItem::kType::FUNCTIONCALL: {
+        keyboardFunctions[que_arr[i].character]();
+      } break;
+      case KeyItem::kType::LAYER: {
+        currentLayer = que_arr[i].character; // idk
+      } break;
+      case KeyItem::kType::TAPDANCE: {
+        mList_arr(tapDances)[que_arr[i].character].keystate =
+            KeyState_down(mList_arr(tapDances)[que_arr[i].character].keystate);
+      } break;
+      default:
+        /*
+          KeyItem::kType::CHARACTER
+          KeyItem::kType::MODIFIER
+        */
+        rm.addKey(que_arr[i]);
     }
   }
   ((List *)que)->length = 0;

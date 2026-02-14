@@ -1,13 +1,11 @@
 #pragma once
 #include "FFat.h"
 #include "FS.h"
-zRnclude "my-lib/fptr.h"
+#include "my-lib/fptr.h"
 #include "my-lib/my-list.h"
 #include <cstring>
 
-    inline bool fsActive() {
-  return FFat.begin();
-}
+inline bool fsActive() { return FFat.begin(); }
 #include "my-lib/print.h"
 
 fptr readFile(const char *path) {
@@ -15,7 +13,7 @@ fptr readFile(const char *path) {
     return nullFptr;
 
   println_("reading {cstr}", path);
-  File file = FFat.open(path, FILE_READ);
+  File file = FFat.open(path, "r");
   if (!file) {
     println_("file doesnt exist");
     return nullFptr;
