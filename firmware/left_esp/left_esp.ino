@@ -18,7 +18,7 @@ void (serialOutputFunction)(
 ){
   for(u32 i = 0;i<len;i++)
   Serial.write((char)( c[i] ));
-if(flush)Serial.flush();
+  if(flush)Serial.flush();
 }
 #define print_(fmt,...) print_wfO(serialOutputFunction,0,fmt,__VA_ARGS__)
 #define println_(fmt,...) print_(fmt"\n",__VA_ARGS__);
@@ -207,8 +207,6 @@ void loop() {}
 #else
 #include "my-lib/arenaAllocator.h"
 void seerialRequestManager(fptr layo) {
-  // 1. Parse the raw input string (layo) into a vason object
-  // Note: Replace 'allocator' with your actual AllocatorV instance
   Arena_scoped* local = arena_new_ext(stdAlloc,512);
   vason v = { parseStr(local, (slice(c8)){ layo.width,(c8*)layo.ptr,}) };
 

@@ -1,11 +1,12 @@
 #pragma once
 #include "fileSystemInterface.hpp"
-#include "hid_keys.h"
 #include "hid_keys_names.h"
 #include "key.hpp"
 #include "my-lib/my-list.h"
+#include "my-lib/types.h"
 #include "my-lib/vason.h"
 #include "stdint.h"
+extern void delay(usize);
 auto defaultLayout_chars = R"d(
   {keyboard:{
     tapdances:[
@@ -39,18 +40,18 @@ extern mList(tapDance) tapDances;
 #include "my-lib/print.h"
 static void prettyPrintLayers() {
   println_("=== Keyboard Layers ===");
-  println_("{} layers", mList_len(keyMapLayers));
-
+  // println_("{} layers", mList_len(keyMapLayers));
   for (auto lI = 0; lI < mList_len(keyMapLayers); lI++) {
     println_("layer {}", lI);
     mList(KeyItem) layer = *mList_get(keyMapLayers, lI);
     if (layer) {
       println_("layer {}", lI);
       for (auto i = 0; i < mList_len(layer); i++)
-        printKeyItem(*mList_get(layer, i));
+        print_("{},", *mList_get(layer, i));
       println_();
     } else {
       println_("null layer? exiting ");
+      delay(1000);
       exit(1);
     }
   }
@@ -76,19 +77,24 @@ void addLayers(vason in) {
 }
 extern mList(tapDance) tapDances;
 void addDances(vason in) {}
-static void parseLayout(fptr layoutBuf = readFile("/lay.kml")) {
-  // if (!layoutBuf.ptr) {
-  //   println_("layout not available, loading default layout");
-  layoutBuf = fp(defaultLayout_chars);
-  // }
-  println_("parsing \n{}", layoutBuf);
+#include "my-lib/arenaAllocator.h"
+static void parseLayout(vason parsed = {}) {
+  Arena_scoped *local = arena_new_ext(stdAlloc, 512);
+  if (!parsed.self) {
+    // if (!layoutBuf.ptr) {
+    //   println_("layout not available, loading default layout");
+    fptr layoutBuf = fp(defaultLayout_chars);
+    // }
+    println_("parsing \n{}", layoutBuf);
 
-  vason parsed = {parseStr(stdAlloc, {layoutBuf.width, layoutBuf.ptr})};
+    vason parsed = {parseStr(local, {layoutBuf.width, layoutBuf.ptr})};
+  }
+
   println_("top( {vason_container} )", parsed.self);
 
   vason layers = parsed["keyboard"]["layers"];
   vason tapdances = parsed["keyboard"]["tapdances"];
-  println_("layers( {vason_container} )", layers.self);
+  println_("layers   ( {vason_container} )", layers.self);
   println_("tapdances( {vason_container} )", tapdances.self);
   addLayers(layers);
   addDances(tapdances);

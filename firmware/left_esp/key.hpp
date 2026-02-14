@@ -7,54 +7,62 @@
 #include "my-lib/types.h"
 
 extern unsigned long millis(void);
-
 extern void (*keyboardFunctions[10])(void);
+
 struct KeyItem {
-  uint8_t character; // not really a character
+  u8 character; // not really a character
   enum kType : char {
     PASSTHROUGH_ = 0,
-    CHARACTER = 1,
-    LAYER = 2,
-    TAPDANCE = 4,
-    MODIFIER = 8,
-    FUNCTIONCALL = 64, // not implemented
+    CHARACTER /*   */ = (1 << 0),
+    LAYER /*       */ = (1 << 1),
+    TAPDANCE /*    */ = (1 << 2),
+    MODIFIER /*    */ = (1 << 3),
+    FUNCTIONCALL /**/ = (1 << 4), // not implemented
   } type;
-  inline KeyItem(void) {
-    character = 0;
-    type = kType::PASSTHROUGH_;
-  }
-  inline KeyItem(uint8_t data) {
-    character = data;
-    type = (data) ? (kType::CHARACTER) : (kType::PASSTHROUGH_);
-  }
-  inline KeyItem(uint8_t data, kType t) {
-    character = data;
-    type = t;
-  }
+  inline constexpr KeyItem(void) : character(0), type(kType::PASSTHROUGH_) {}
+  inline constexpr KeyItem(u8 data)
+      : character(data), type(data ? kType::CHARACTER : kType::PASSTHROUGH_) {}
+  inline constexpr KeyItem(u8 data, kType t) : character(data), type(t) {}
 };
-static void printKeyItem(const KeyItem &k) {
-  switch (k.type) {
+REGISTER_PRINTER(KeyItem, {
+  switch (in.type) {
+  case KeyItem::CHARACTER: {
+    PUTS(U"K");
+  } break;
+  case KeyItem::MODIFIER: {
+    PUTS(U"M");
+  } break;
+  case KeyItem::LAYER: {
+    PUTS(U"L");
+  } break;
+  case KeyItem::TAPDANCE: {
+    PUTS(U"T");
+  } break;
+  case KeyItem::FUNCTIONCALL: {
+    PUTS(U"F");
+  } break;
+  case KeyItem::PASSTHROUGH_: {
+    PUTS(U"_");
+  } break;
+  }
+  PUTS(U":");
+  switch (in.type) {
   case KeyItem::CHARACTER:
-    print_("K({u8})", k.character);
+    USENAMEDPRINTER("x", in.character);
     break;
   case KeyItem::MODIFIER:
-    print_("M({u8})", k.character);
-    break;
   case KeyItem::LAYER:
-    print_("L({u8})", k.character);
-    break;
   case KeyItem::TAPDANCE:
-    print_("TD({u8})", k.character);
-    break;
   case KeyItem::FUNCTIONCALL:
-    print_("FN({u8})", k.character);
+    USENAMEDPRINTER("u8", in.character);
     break;
-  default:
-    print_(" . ");
+  case KeyItem::PASSTHROUGH_:
+    PUTS(U"_");
     break;
   }
-}
-typedef void (*senderFunction)(uint8_t, uint8_t *);
+});
+MAKE_PRINT_ARG_TYPE(KeyItem);
+typedef void (*senderFunction)(u8, u8 *);
 
 struct reportManager {
   reportManager() {

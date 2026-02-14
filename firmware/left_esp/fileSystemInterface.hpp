@@ -1,11 +1,13 @@
 #pragma once
 #include "FFat.h"
 #include "FS.h"
-#include "my-lib/fptr.h"
+zRnclude "my-lib/fptr.h"
 #include "my-lib/my-list.h"
 #include <cstring>
 
-inline bool fsActive() { return FFat.begin(); }
+    inline bool fsActive() {
+  return FFat.begin();
+}
 #include "my-lib/print.h"
 
 fptr readFile(const char *path) {
@@ -72,7 +74,7 @@ void listDir(const char *dirname, uint8_t levels = 10) {
         listDir(file.path(), levels - 1);
       }
     } else {
-      println_("FILE {}",file.path());
+      println_("FILE {}", file.path());
     }
     file = root.openNextFile();
   }
@@ -86,12 +88,9 @@ void deleteFile(const char *path) {
 }
 
 void FSISetup() {
-  // Try to mount existing filesystem first
   if (FFat.begin()) {
     return;
   }
-
-  // If mounting fails, format and create new filesystem
   FFat.format();
   FFat.begin();
 }
