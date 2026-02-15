@@ -6,7 +6,6 @@
 #include "my-lib/mytypes.h"
 #include "my-lib/vason.h"
 #include "stdint.h"
-extern void delay(usize);
 auto defaultLayout_chars = R"d(
   {keyboard:{
     tapdances:[
@@ -36,39 +35,52 @@ extern const unsigned int nrowGpios;
 extern const unsigned int ncolGpios;
 
 extern slice(slice(KeyItem)) keyMapLayers;
-extern slice(tapDance) tapDances;
 #include "my-lib/print.h"
 static void prettyPrintLayers() {
   println_("=== Keyboard Layers ===");
-  // println_("{} layers", mList_len(keyMapLayers));
+  println_("{} layers", keyMapLayers.len);
   for (slice(KeyItem) layer : keyMapLayers) {
     if (layer.ptr) {
       for (KeyItem key : layer)
         print_("{},", key);
       println_();
-    } else {
-      println_("null layer? exiting ");
-      delay(10000);
-      exit(1);
-    }
+    } else
+      println_("null layer?");
   }
   println_("=======================");
 }
 void addLayers(vason in) {
   auto layerCount = in.countChildren();
-  keyMapLayers = {.len = 0, .ptr = aCreate(stdAlloc, slice(KeyItem), layerCount)};
-  if (in.tag() == vason_ARR && layerCount > 0)
+  if (in.tag() != vason_ARR || layerCount == 0)
     return;
-  for (; keyMapLayers.len < layerCount; keyMapLayers.len++) {
-    auto layerVason = in[keyMapLayers.len];
-    auto thisLayerLen = layerVason.countChildren();
-    slice(KeyItem) thisLayer = {.len = 0, .ptr = aCreate(stdAlloc, KeyItem, thisLayerLen)};
-    if (layerVason.tag() != vason_ARR)
+
+  keyMapLayers = {
+      .len = 0,
+      .ptr = aCreate(stdAlloc, slice(KeyItem), layerCount)
+  };
+  println_("parsing {} layers", layerCount);
+
+  for (usize i = 0; i < layerCount; i++) {
+    auto layerVason = in[i];
+    if (layerVason.tag() != vason_ARR) {
+      println_(
+          "parsing interrupted by non-array :\n"
+          " it:({vason_container})\n"
+          "parent:({vason_container})",
+          layerVason,
+          in
+      );
       break;
-    else
-      for (; thisLayer.len < thisLayerLen; thisLayer.len++)
-        thisLayer[thisLayer.len] = kn_Match(layerVason[thisLayer.len].asString());
-    keyMapLayers[keyMapLayers.len] = thisLayer;
+    }
+    auto thisLayerLen = layerVason.countChildren();
+    println_("layer has {} keys", thisLayerLen);
+    slice(KeyItem) thisLayer = {
+        .len = thisLayerLen,
+        .ptr = aCreate(stdAlloc, KeyItem, thisLayerLen)
+    };
+    for (usize k = 0; k < thisLayerLen; k++)
+      thisLayer[k] = kn_Match(layerVason[k].asString());
+    keyMapLayers[keyMapLayers.len++] = thisLayer;
   }
 }
 extern slice(tapDance) tapDances;
