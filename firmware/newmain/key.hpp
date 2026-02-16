@@ -39,16 +39,14 @@ REGISTER_PRINTER(KeyItem, {
   PUTS(U":");
   switch (in.type) {
     case KeyItem::CHARACTER:
-      USENAMEDPRINTER("x", in.character);
-      break;
     case KeyItem::MODIFIER:
     case KeyItem::LAYER:
     case KeyItem::TAPDANCE:
     case KeyItem::FUNCTIONCALL:
-      USENAMEDPRINTER("u8", in.character);
+      USENAMEDPRINTER("x", in.character);
       break;
     case KeyItem::PASSTHROUGH_:
-      PUTS(U"_");
+      PUTS(U"_ ");
       break;
   }
 });

@@ -51,38 +51,66 @@ void writeFile(const char *path, fptr buffer) {
   file.close();
 }
 
-void listDir(const char *dirname, uint8_t levels = 10) {
+void listDir(const char *dirname, uint8_t levels = -1) {
   if (!fsActive())
     return;
+  const char *target = (dirname == nullptr || strlen(dirname) == 0) ? "/" : dirname;
 
-  File root = FFat.open(dirname);
-  if (!root)
-    return;
-
-  if (!root.isDirectory()) {
-    root.close();
+  File root = FFat.open(target);
+  if (!root || !root.isDirectory()) {
+    if (root && !root.isDirectory())
+      println_("FILE: {cstr}", target);
+    if (root)
+      root.close();
     return;
   }
 
   File file = root.openNextFile();
-  while (file && levels > 0) {
+  if (!file)
+    println_("(Directory is empty)");
+
+  while (file) {
     if (file.isDirectory()) {
-      println_("DIR {cstr}", file.path());
-      if (levels > 1) {
+      println_("DIR  {cstr}", file.name());
+      if (levels > 1)
         listDir(file.path(), levels - 1);
-      }
     } else {
-      println_("FILE {}", file.path());
+      println_("FILE {cstr}  ({} bytes)", file.name(), file.size());
     }
     file = root.openNextFile();
   }
   root.close();
+}
+void listDir(const fptr dirname, uint8_t levels = 10) {
+  char name[dirname.width + 1];
+  name[dirname.width] = 0;
+  memcpy(name, dirname.ptr, dirname.width);
+  listDir(name, levels);
 }
 
 void deleteFile(const char *path) {
   if (!fsActive())
     return;
   FFat.remove(path);
+}
+void deleteFile(const fptr ptr) {
+  char name[ptr.width + 1];
+  name[ptr.width] = 0;
+  memcpy(name, ptr.ptr, ptr.width);
+  deleteFile(name);
+}
+FILE *getFilePtr(const char *path, const char mode[]) {
+  char fullPath[64];
+  snprintf(fullPath, sizeof(fullPath), "/ffat%s", path);
+
+  FILE *f = fopen(fullPath, mode);
+  return f;
+}
+FILE *getFilePtr(const fptr path, const char mode[]) {
+  char temp[path.width + 1];
+  temp[path.width] = 0;
+  memcpy(temp, path.ptr, path.width);
+  return getFilePtr(temp, mode);
 }
 
 void FSISetup() {

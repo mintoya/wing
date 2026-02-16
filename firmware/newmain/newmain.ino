@@ -179,7 +179,7 @@ void setup() {
 
   USB.begin();
   Keyboard.begin();
-  // FSISetup();
+  FSISetup();
   println_("layout parsing begin");
   parseLayout();
   println_("reportmanager begin");
@@ -189,6 +189,7 @@ void setup() {
 usize counter = 0;
 usize start = 0;
 usize finish = 0;
+#include "command.hpp"
 void loop() {
   counter++;
   if(!( counter% 10000)) [[ unlikeley ]]{
@@ -196,13 +197,21 @@ void loop() {
     finish = millis();
     counter = 1;
   }
-  if (ESP_IO::available()) {
-    while (ESP_IO::available())
-      ESP_IO::read();
-    print_("pretty printing layers");
-    delay(1000);
-    prettyPrintLayers();
-    delay(10000);
+  if (ESP_IO::available())[[unlikeley]] {
+    mList_scoped(u8) readlist = mList_init(stdAlloc,u8);
+    {
+    readmore:
+      while(ESP_IO::available())
+        mList_push(readlist,ESP_IO::read());
+    }
+    if(*mList_get(readlist,mList_len(readlist)-1)!='\n')goto readmore;
+    fptr input = mList_slice(readlist);
+    ESP_IO::write(input.ptr,input.width);
+    commands::execute(input);
+    // print_("pretty printing layers");
+    // delay(1000);
+    // prettyPrintLayers();
+    // delay(10000);
   }
   local_stateTable_update();
   remote_stateTable_update();

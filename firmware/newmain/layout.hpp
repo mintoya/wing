@@ -41,8 +41,11 @@ static void prettyPrintLayers() {
   println_("{} layers", keyMapLayers.len);
   for (slice(KeyItem) layer : keyMapLayers) {
     if (layer.ptr) {
-      for (KeyItem key : layer)
-        print_("{},", key);
+      for (auto i = 0; i < layer.len; i++) {
+        i % (ncolGpios * 2)
+            ? print_(" {},", layer[i])
+            : print_("\n\t{}", layer[i]);
+      }
       println_();
     } else
       println_("null layer?");

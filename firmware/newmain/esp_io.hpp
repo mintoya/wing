@@ -12,8 +12,8 @@ extern inline uint32_t usb_serial_jtag_ll_read_rxfifo(uint8_t *buf, uint32_t rd_
 static inline uint32_t usb_serial_jtag_ll_write_txfifo(const uint8_t *buf, uint32_t wr_len);
 
 // namespace ESP_IO {
-// static bool available(void) {
-//   return usb_serial_jtag_ll_rxfifo_data_available() > 0;
+// static usize available(void) {
+//   return usb_serial_jtag_ll_rxfifo_data_available();
 // }
 // static u8 read(void) {
 //   u8 r = -1;
@@ -43,8 +43,8 @@ static inline uint32_t usb_serial_jtag_ll_write_txfifo(const uint8_t *buf, uint3
 // }; // namespace ESP_IO
 
 namespace ESP_IO {
-static bool available(void) {
-  return Serial.available() > 0;
+static usize available(void) {
+  return Serial.available();
 }
 static u8 read(void) {
   return Serial.read();
