@@ -53,10 +53,23 @@ void(serialOutputFunction)(
 #include "key.hpp"
 #include "my-lib/mytypes.h"
 
-constexpr u8 SLAVE_ADDR = 0x42;
-// constexpr usize WIRE_CLOCK = 400000;
+static inline umax minihash(const fptr str) {
+  umax hash = 5381;
+  for (usize i = 0; i < str.width; i++) {
+    hash ^= hash >> 3;
+    hash = hash * 65;
+    hash ^= (str.ptr[i]);
+  }
+}
 
-#define ISMAINHALF (1)
+constexpr u8 SLAVE_ADDR = 0x42;
+#define WIREA A5
+#define WIREB A5
+#define SERIAL_SPEED 9600
+// #define SERIAL_SPEED  74880
+// #define SERIAL_SPEED 115200
+
+// #define ISMAINHALF (1)
 #if defined(ISMAINHALF) // main side
   #include "fileSystemInterface.hpp"
   // #include "key.hpp"
@@ -127,83 +140,32 @@ void sendHidReport(u8 modifiers, uint8_t *key_codes) {
 // communication
 //
 void wireSetup() {
-  Serial1.begin(115200, SERIAL_8N1, A5, A4); 
+  Serial1.begin(SERIAL_SPEED, SERIAL_8N1, WIREA, WIREB);
   Serial1.setTimeout(2);
-  // Wire.begin();
-  // Wire.setTimeout(5);
-  // Wire.setClock(WIRE_CLOCK);
 }
 
 void remote_stateTable_update() {
-  // 1. If no data, do NOTHING. This makes the loop instant (0ms).
-  if (Serial1.available() < 2) return;
+  while (Serial1.read() != 0xff)
+    Serial1.read();
 
-  // 2. Clear garbage until we find the Header (0xFF)
-  //    This re-aligns the data if it gets desynced.
-  if (Serial1.peek() != 0xFF) {
-    Serial1.read(); 
-    return;
-  }
-
-  // 3. Read the packet
-  //    Packet Format: [0xFF] [Count] [Col, Row, Col, Row...]
-  Serial1.read(); // Consume Header
   int keyCount = Serial1.read(); // Read Number of Keys
+  fptr message = {(usize)keyCount, aCreate(stdAlloc, u8, keyCount)};
+  defer_(aFree(stdAlloc, message.ptr));
 
-  // Safety check: Don't read if the data hasn't arrived yet
-  if (Serial1.available() < keyCount * 2) {
-      // Allow a tiny retry for bytes to arrive
-      delayMicroseconds(500); 
-      if (Serial1.available() < keyCount * 2) return; 
-  }
+  Serial1.read(message.ptr, message.width);
+  usize hash = minihash(message);
+  usize inhash;
+  Serial1.read((u8 *)&inhash, sizeof(inhash));
+  if (inhash != hash)
+    return;
 
-  // 4. Wipe the old remote state
-  for (int i = 0; i < countof(rowGpios); i++) {
-    for (int j = 0; j < countof(colGpios); j++) {
-      sateTable[i][j + countof(colGpios)] = 0;
-    }
-  }
+  for (int i = 0; i < message.width; i += 2) {
+    u8 col = message.ptr[i];
+    u8 row = message.ptr[i + 1];
 
-  // 5. Fill in the new keys
-  for (int i = 0; i < keyCount; i++) {
-    u8 col = Serial1.read();
-    u8 row = Serial1.read();
-    
-    if (col < countof(colGpios) && row < countof(rowGpios)) {
+    if (col < countof(colGpios) && row < countof(rowGpios))
       sateTable[row][col + countof(colGpios)] = 1;
-    }
   }
-  
-  // Flush remaining junk if any (optional)
-  while(Serial1.available() > 32) Serial1.read();
-  // usize requestSize = 32;
-  // usize receivedBytes = Wire.requestFrom(SLAVE_ADDR, requestSize, true);
-  //
-  // if (receivedBytes == 0 || !Wire.available())
-  //   return;
-  //
-  // int dataLen = Wire.read();
-  //
-  // if (dataLen > receivedBytes - 1)
-  //   dataLen = receivedBytes - 1;
-  //
-  // for (int i = 0; i < countof(rowGpios); i++) {
-  //   for (int j = 0; j < countof(colGpios); j++) {
-  //     sateTable[i][j + countof(colGpios)] = 0;
-  //   }
-  // }
-  //
-  // for (int i = 0; i < dataLen; i += 2) {
-  //   if (Wire.available() < 2)
-  //     break;
-  //
-  //   u8 col = Wire.read();
-  //   u8 row = Wire.read();
-  //
-  //   if (col < countof(colGpios) && row < countof(rowGpios)) {
-  //     sateTable[row][col + countof(colGpios)] = 1;
-  //   }
-  // }
 }
 void local_stateTable_update() {
   for (auto i = 0; i < countof(colGpios); i++) {
@@ -290,30 +252,14 @@ void loop() {
 static const uint rowGpios[] = {2, 3, 4, 5};
 static const uint colGpios[] = {10, 11, 9, 8, 7, 6};
 
-static u8 messagesBuf[2][countof(rowGpios) * countof(colGpios) * 2];
-volatile static fptr statemessatge[2] = {
-    (fptr){
-        .ptr = messagesBuf[0],
-    },
-    (fptr){
-        .ptr = messagesBuf[1],
-    }
-};
-  #include <atomic>
-volatile static std::atomic<bool> flipper(false);
+static u8 messagesBuf[countof(rowGpios) * countof(colGpios) * 2];
+static fptr statemessatge = {.ptr = messagesBuf};
 //
 //
 //
 //
 void wireSetup() {
-  // Wire.begin(SLAVE_ADDR);
-  // Wire.onRequest([]() {
-  //   Wire.write((uint)statemessatge[!flipper].width);
-  //   Wire.write(statemessatge[!flipper].ptr, statemessatge[!flipper].width);
-  // });
-  // Wire.setClock(WIRE_CLOCK);
-
-  Serial1.begin(115200, SERIAL_8N1, A4, A5); 
+  Serial1.begin(SERIAL_SPEED, SERIAL_8N1, WIREB, WIREA);
   Serial1.setTimeout(2);
 }
 void setup() {
@@ -324,22 +270,46 @@ void setup() {
   for (int i = 0; i < countof(rowGpios); i++)
     pinMode(rowGpios[i], INPUT_PULLDOWN);
 }
+// void remote_stateTable_update() {
+//   while (Serial1.read() != 0xff)
+//     Serial1.read();
+//
+//   int keyCount = Serial1.read(); // Read Number of Keys
+//   fptr message = {(usize)keyCount, aCreate(stdAlloc, u8, keyCount)};
+//   defer_(aFree(stdAlloc, message.ptr));
+//
+//   Serial1.read(message.ptr, message.width);
+//   usize hash = minihash(message);
+//   usize inhash;
+//   Serial1.read((u8 *)&inhash, sizeof(inhash));
+//   if (inhash != hash)
+//     return;
+//
+//   for (int i = 0; i < message.width; i += 2) {
+//     u8 col = message.ptr[i];
+//     u8 row = message.ptr[i + 1];
+//
+//     if (col < countof(colGpios) && row < countof(rowGpios))
+//       sateTable[row][col + countof(colGpios)] = 1;
+//   }
+// }
 void loop() {
-  statemessatge[flipper].width = 0;
+  statemessatge.width = 0;
   for (auto i = 0; i < countof(colGpios); i++) {
     digitalWrite(colGpios[i], HIGH);
     for (auto j = 0; j < countof(rowGpios); j++) {
       if (digitalRead(rowGpios[j])) {
-        statemessatge[flipper].ptr[statemessatge[flipper].width++] = (u8)i;
-        statemessatge[flipper].ptr[statemessatge[flipper].width++] = (u8)j;
+        statemessatge.ptr[statemessatge.width++] = (u8)i;
+        statemessatge.ptr[statemessatge.width++] = (u8)j;
       }
     }
     digitalWrite(colGpios[i], LOW);
   }
-  flipper = !flipper;
-  Serial1.write(0xFF);       
-  Serial1.write((uint)statemessatge[!flipper].width);
-  Serial1.write(statemessatge[!flipper].ptr, statemessatge[!flipper].width);
+  Serial1.write(0xFF);
+  Serial1.write((uint)statemessatge.width);
+  Serial1.write(statemessatge.ptr, statemessatge.width);
+  usize hash = minihash(statemessatge);
+  Serial1.write((u8 *)&hash, sizeof(hash));
 
   static auto last = millis();
   if (millis() > last + 10) [[unlikely]] {
