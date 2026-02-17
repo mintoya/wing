@@ -10,6 +10,8 @@
 extern unsigned long millis(void);
 extern void (*keyboardFunctions[10])(void);
 
+#include "hid_keys.h"
+#include <string_view>
 struct KeyItem {
   u8 character; // not really a character
   enum kType : char {
@@ -20,10 +22,29 @@ struct KeyItem {
     MODIFIER /*    */ = (1 << 3),
     FUNCTIONCALL /**/ = (1 << 4), // not implemented
   } type;
+
   inline constexpr KeyItem(void) : character(0), type(kType::PASSTHROUGH_) {}
   inline constexpr KeyItem(u8 data)
       : character(data), type(data ? kType::CHARACTER : kType::PASSTHROUGH_) {}
   inline constexpr KeyItem(u8 data, kType t) : character(data), type(t) {}
+  // static inline constexpr u8 M(const char str[2]) {
+  //   // clang-format off
+  //   if (str[0] == 'l') {
+  //       if (str[1] == 'c') return KEY_MOD_LCTRL;
+  //       if (str[1] == 's') return KEY_MOD_LSHIFT;
+  //       if (str[1] == 'a') return KEY_MOD_LALT;
+  //       if (str[1] == 'm') return KEY_MOD_LMETA;
+  //   }
+  //   else if (str[0] == 'r') {
+  //       if (str[1] == 'c') return KEY_MOD_RCTRL;
+  //       if (str[1] == 's') return KEY_MOD_RSHIFT;
+  //       if (str[1] == 'a') return KEY_MOD_RALT;
+  //       if (str[1] == 'm') return KEY_MOD_RMETA;
+  //   }
+  //   // clang-format on
+  //   return 0;
+  // }
+  // clang-format on
 };
 REGISTER_PRINTER(KeyItem, {
   // clang-format off

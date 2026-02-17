@@ -5,6 +5,8 @@
 #include <memory>
 
 extern void prettyPrintLayers(void);
+
+extern void parseLayout(fptr,vason );
 namespace commands {
 typedef void (*command)(AllocatorV, vason *args);
 typedef fptr commandName;
@@ -79,14 +81,30 @@ void writeFile(AllocatorV _, vason filename, vason content) {
   fclose(file);
 }
 void removeFile(AllocatorV _, vason filename) { deleteFile(filename.asString()); }
+#define sel_first(a, ...) a
+
+int j = COUNT_ARGS();
 static kv basicMap[] =
     {
+
         makeCommand(
             "save",
             [](AllocatorV a, vason *args) {
               writeFile(a, args[0], args[1]);
             },
             (char *[]){"filename", "content"}
+        ),
+        makeCommand(
+            "reset-layout",
+            [](AllocatorV a, vason *args) {
+              parseLayout(fp(defaultLayout_chars));
+            }
+        ),
+        makeCommand(
+            "save",
+            [](AllocatorV a, vason *args) {
+              writeFile(a, args[0], args[1]);
+            }
         ),
         makeCommand(
             "rm",
@@ -144,19 +162,18 @@ static void execute(fptr commandText) {
     for (auto pair : basicMap) {
       if (pair.key == command) {
         vason *args = aCreate(allocator, vason, pair.nargs);
-
+        defer_({ aFree(allocator, args); });
         for (auto i = 0; i < pair.nargs; i++) {
-          args[i] = v["args"][((char *)pair.args[i])];
-          if (args[i].tag() == vason_INVALID) {
+          auto inargs = v["args"];
+          if (inargs)
+            return;
+          args[i] = inargs[((char *)pair.args[i])];
+          if (args[i]) {
             println_("missing required arg {cstr}", pair.args[i]);
-            goto freeargs;
+            return;
           }
         }
         pair.value(allocator, args);
-        {
-        freeargs:
-          aFree(allocator, args);
-        }
         return;
       }
     }

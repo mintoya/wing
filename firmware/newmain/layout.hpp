@@ -6,12 +6,27 @@
 #include "my-lib/mytypes.h"
 #include "my-lib/vason.h"
 #include "stdint.h"
+// slice(slice(KeyItem)) defaultLayout_keyitems = slice_stat(
+//     ((slice(KeyItem)[2]){
+//         slice(KeyItem) slice_stat(((KeyItem[]){
+//             // clang-format off
+//             KEY_TAB,KEY_Q,KEY_W,KEY_E,KEY_R,KEY_T,KEY_Y,KEY_U,KEY_I,KEY_O,KEY_P,KEY_LEFTBRACE,
+//             {'M',MOD_ALT},KEY_Q,KEY_W,KEY_E,KEY_R,KEY_T,KEY_Y,KEY_U,KEY_I,KEY_O,KEY_P,KEY_LEFTBRACE,
+//             0      ,KEY_Q,KEY_W,KEY_E,KEY_R,KEY_T,KEY_Y,KEY_U,KEY_I,KEY_O,KEY_P,KEY_LEFTBRACE,
+//             0      ,    0,    0,KEY_E,KEY_R,KEY_T,KEY_Y,KEY_U,KEY_I,KEY_O,KEY_P,KEY_LEFTBRACE,
+//             // clang-format on
+//         })),
+//         slice(KeyItem) slice_stat(((KeyItem[]){
+//
+//         }))
+//     })
+// );
 auto defaultLayout_chars = R"d(
   {keyboard:{
     tapdances:[
       {
-        taps:[ KEY_SPACE, KEY_B, KEY_C, KEY_D ];
-        holds:[ M( la ), M( ls ), KEY_C, KEY_D ];
+        taps:[ KEY_SPACE, K(B), K(C), KEY_D ];
+        holds:[ M( la ), M( ls ), K(C), KEY_D ];
       }
     ];
     functions:[
@@ -21,12 +36,16 @@ auto defaultLayout_chars = R"d(
     ];
     layers:[
        [
-          KEY_TAB , KEY_Q, KEY_W  ,  KEY_E,  KEY_R, KEY_T,           KEY_Y,  KEY_U, KEY_I    ,  KEY_O,     KEY_P,  KEY_BACKSPACE,
-          M( ls ) , KEY_A, KEY_S  ,  KEY_D,  KEY_F, KEY_G,           KEY_H,  KEY_J, KEY_K    ,  KEY_L, KEY_COMMA,  KEY_LEFTBRACE,
-          M( lc ) , KEY_Z, KEY_X  ,  KEY_C,  KEY_V, KEY_B,           KEY_N,  KEY_M, KEY_COMMA,KEY_DOT, KEY_SLASH,  KEY_ENTER    ,
-                  ,      ,  M(la) ,  L(1) ,  T(0) ,      ,                ,  L(1) ,  L(2)    ,       ,          ,               ,
+          K(TAB), K(Q),  K(W),  K(E),    K(R), K(T),    K(Y),  K(U),   K(I), K(O),   K(P),  K(/[),
+           M(ls), K(A),  K(S),  K(D),    K(F), K(G),    K(H),  K(J),   K(K), K(L), `K(;)',  K(/'),
+           M(lc), K(Z),  K(X),  K(C),    K(V), K(B),    K(N),  K(M), `K(,)', K(.),  K(//), K(ENT),
+                ,     , M(la),  L(1),  K(SPC),     ,        ,  K(V),  L(1) ,     ,       ,        ,
       ],
-      [    KEY_ESC, KEY_0, ]
+      [
+          K(ESC),  K(1),  K(2),    K(3), K(4), K(5),    K(6),   K(7),  K(8),  K(9),  K(0),  K(ESC),
+                ,     ,      ,      ,        ,     ,        ,       ,      ,      ,      ,        ,
+              ,     ,      ,      ,        ,     ,        ,  K(-) ,  K(/=),       ,      ,  K(BKS),
+      ]
     ];
   }}
 )d";

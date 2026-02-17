@@ -9,7 +9,7 @@
 #undef print_
 #undef println_
 #define print_(fmt, ...) print_wfO(serialOutputFunction, 0, fmt, __VA_ARGS__)
-#define println_(fmt, ...) print_(fmt "\n", __VA_ARGS__);
+#define println_(fmt, ...) print_(fmt "\r\n", __VA_ARGS__);
 // #include "esp_io.hpp"
 
 void(serialOutputFunction)(
@@ -55,7 +55,7 @@ void(serialOutputFunction)(
 constexpr u8 SLAVE_ADDR = 0x42;
 constexpr usize WIRE_CLOCK = 400000;
 
-#define ISMAINHALF (1)
+// #define ISMAINHALF (1)
 #if defined(ISMAINHALF) // main side
   #include "fileSystemInterface.hpp"
   // #include "key.hpp"
@@ -65,7 +65,7 @@ constexpr usize WIRE_CLOCK = 400000;
 //
 //
 static const uint rowGpios[] = {2, 3, 4, 5};
-static const uint colGpios[] = {10, 11, 9, 8, 7, 6};
+static const uint colGpios[] = {6, 7, 8, 9, 11, 10};
 const uint nrowGpios = countof(rowGpios);
 const uint ncolGpios = countof(colGpios);
 static bool sateTable[countof(rowGpios)][countof(colGpios) * 2] = {};
@@ -127,7 +127,7 @@ void sendHidReport(u8 modifiers, uint8_t *key_codes) {
 //
 void wireSetup() {
   Wire.begin();
-  Wire.setTimeout(500);
+  Wire.setTimeout(5);
   Wire.setClock(WIRE_CLOCK);
 }
 
@@ -184,6 +184,7 @@ void setup() {
   parseLayout();
   println_("reportmanager begin");
   rm = reportManager(sendHidReport, fakeSender);
+  // rm = reportManager(nullptr, fakeSender);
   println_("loop begin");
 }
 usize counter = 0;
@@ -198,20 +199,21 @@ void loop() {
     counter = 1;
   }
   if (ESP_IO::available())[[unlikeley]] {
+    usize startTime = millis();
     mList_scoped(u8) readlist = mList_init(stdAlloc,u8);
     {
     readmore:
       while(ESP_IO::available())
         mList_push(readlist,ESP_IO::read());
     }
-    if(*mList_get(readlist,mList_len(readlist)-1)!='\n')goto readmore;
+    if(
+        *mList_get(readlist,mList_len(readlist)-1)!='\n' &&
+        millis()<startTime+5000
+    )
+      goto readmore;
     fptr input = mList_slice(readlist);
-    ESP_IO::write(input.ptr,input.width);
+    println_("{}",input);
     commands::execute(input);
-    // print_("pretty printing layers");
-    // delay(1000);
-    // prettyPrintLayers();
-    // delay(10000);
   }
   local_stateTable_update();
   remote_stateTable_update();
@@ -229,7 +231,8 @@ void loop() {
         print_("{c8}", bounceTable::lstate[j][i] ? 'X' : ' ');
       print_("|");
     }
-    println_("{}",finish-start);
+    println_();
+    println_("10K_time:{}",finish-start);
   }
 }
 //
@@ -244,7 +247,8 @@ void loop() {
 //
 static const uint rowGpios[] = {2, 3, 4, 5};
 static const uint colGpios[] = {10, 11, 9, 8, 7, 6};
-volatile static bool sateTable[2][countof(rowGpios)][countof(colGpios)] = {};
+volatile static bool sateTable[countof(rowGpios)][countof(colGpios)] = {};
+volatile static fptr statemessatge[2] = {};
   #include <atomic>
 volatile static std::atomic<bool> flipper(false);
 //
@@ -255,16 +259,8 @@ static u8 message[countof(rowGpios) * countof(colGpios) * 2];
 void wireSetup() {
   Wire.begin(SLAVE_ADDR);
   Wire.onRequest([]() {
-    usize messagelen = 0;
-    for (auto i = 0; i < countof(colGpios); i++)
-      for (auto j = 0; j < countof(rowGpios); j++)
-        if (sateTable[!flipper][j][i]) {
-          message[messagelen++] = i;
-          message[messagelen++] = j;
-        }
-
-    Wire.write((uint)messagelen);
-    Wire.write((u8 *)message, messagelen);
+    Wire.write((uint)statemessatge[flipper].width);
+    Wire.write(statemessatge[flipper].ptr, statemessatge[flipper].width);
   });
   Wire.setClock(WIRE_CLOCK);
 }
@@ -280,7 +276,7 @@ void loop() {
   for (auto i = 0; i < countof(colGpios); i++) {
     digitalWrite(colGpios[i], HIGH);
     for (auto j = 0; j < countof(rowGpios); j++)
-      sateTable[flipper][j][i] = digitalRead(rowGpios[j]);
+      sateTable[j][i] = digitalRead(rowGpios[j]);
     digitalWrite(colGpios[i], LOW);
   }
   flipper = !flipper;
