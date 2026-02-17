@@ -1,4 +1,5 @@
 #include "Arduino.h"
+#include "esp32-hal-gpio.h"
 #include "esp_io.hpp"
 #define NOFILEPRINTER (1)
 #define noAssertMessage (1)
@@ -190,38 +191,36 @@ void setup() {
 usize counter = 0;
 usize start = 0;
 usize finish = 0;
-#include "command.hpp"
+  #include "command.hpp"
 void loop() {
   counter++;
-  if(!( counter% 10000)) [[ unlikeley ]]{
+  if (!(counter % 10000)) [[unlikeley]] {
     start = finish;
     finish = millis();
     counter = 1;
   }
-  if (ESP_IO::available())[[unlikeley]] {
+  if (ESP_IO::available()) [[unlikeley]] {
     usize startTime = millis();
-    mList_scoped(u8) readlist = mList_init(stdAlloc,u8);
+    mList_scoped(u8) readlist = mList_init(stdAlloc, u8);
     {
     readmore:
-      while(ESP_IO::available())
-        mList_push(readlist,ESP_IO::read());
+      while (ESP_IO::available())
+        mList_push(readlist, ESP_IO::read());
     }
-    if(
-        *mList_get(readlist,mList_len(readlist)-1)!='\n' &&
-        millis()<startTime+5000
+    if (
+        *mList_get(readlist, mList_len(readlist) - 1) != '\n' &&
+        millis() < startTime + 5000
     )
       goto readmore;
     fptr input = mList_slice(readlist);
-    println_("{}",input);
+    println_("{}", input);
     commands::execute(input);
   }
   local_stateTable_update();
   remote_stateTable_update();
 
   bounceTable::update();
-  keyMap::pressKeys
-    <countof(rowGpios), countof(colGpios)>
-  (bounceTable::lstate, rm); // !!will modify stateTable
+  keyMap::pressKeys<countof(rowGpios), countof(colGpios)>(bounceTable::lstate, rm); // !!will modify stateTable
   rm.send();
   static auto last = millis();
   if (millis() > last + 1000) [[unlikely]] {
@@ -232,7 +231,7 @@ void loop() {
       print_("|");
     }
     println_();
-    println_("10K_time:{}",finish-start);
+    println_("10K_time:{}", finish - start);
   }
 }
 //
@@ -247,20 +246,27 @@ void loop() {
 //
 static const uint rowGpios[] = {2, 3, 4, 5};
 static const uint colGpios[] = {10, 11, 9, 8, 7, 6};
-volatile static bool sateTable[countof(rowGpios)][countof(colGpios)] = {};
-volatile static fptr statemessatge[2] = {};
+
+static u8 messagesBuf[2][countof(rowGpios) * countof(colGpios) * 2];
+volatile static fptr statemessatge[2] = {
+    (fptr){
+        .ptr = messagesBuf[0],
+    },
+    (fptr){
+        .ptr = messagesBuf[1],
+    }
+};
   #include <atomic>
 volatile static std::atomic<bool> flipper(false);
 //
 //
 //
 //
-static u8 message[countof(rowGpios) * countof(colGpios) * 2];
 void wireSetup() {
   Wire.begin(SLAVE_ADDR);
   Wire.onRequest([]() {
-    Wire.write((uint)statemessatge[flipper].width);
-    Wire.write(statemessatge[flipper].ptr, statemessatge[flipper].width);
+    Wire.write((uint)statemessatge[!flipper].width);
+    Wire.write(statemessatge[!flipper].ptr, statemessatge[!flipper].width);
   });
   Wire.setClock(WIRE_CLOCK);
 }
@@ -273,10 +279,15 @@ void setup() {
     pinMode(rowGpios[i], INPUT_PULLDOWN);
 }
 void loop() {
+  statemessatge[flipper].width = 0;
   for (auto i = 0; i < countof(colGpios); i++) {
     digitalWrite(colGpios[i], HIGH);
-    for (auto j = 0; j < countof(rowGpios); j++)
-      sateTable[j][i] = digitalRead(rowGpios[j]);
+    for (auto j = 0; j < countof(rowGpios); j++) {
+      if (digitalRead(rowGpios[j])) {
+        statemessatge[flipper].ptr[statemessatge[flipper].width++] = (u8)i;
+        statemessatge[flipper].ptr[statemessatge[flipper].width++] = (u8)j;
+      }
+    }
     digitalWrite(colGpios[i], LOW);
   }
   flipper = !flipper;
@@ -285,12 +296,15 @@ void loop() {
   if (millis() > last + 10) [[unlikely]] {
     last = millis();
     for (auto i = 0; i < countof(colGpios); i++) {
-      for (auto j = 0; j < countof(rowGpios); j++)
-        print_("{c8}", sateTable[flipper][j][i] ? 'X' : ' ');
-      print_("|");
+      digitalWrite(colGpios[i], HIGH);
+      for (auto j = 0; j < countof(rowGpios); j++) {
+        if (digitalRead(rowGpios[j])) {
+          print_("{c8}", digitalRead(rowGpios[j]) ? 'X' : ' ');
+        }
+        print_("|");
+      }
+      println_();
     }
-    println_();
   }
-}
 #endif
 #include "my-lib/wheels.h"
