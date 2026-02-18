@@ -60,16 +60,21 @@ static inline umax minihash(const fptr str) {
     hash = hash * 65;
     hash ^= (str.ptr[i]);
   }
+  return hash;
 }
 
 constexpr u8 SLAVE_ADDR = 0x42;
 #define WIREA A5
-#define WIREB A5
-#define SERIAL_SPEED 9600
-// #define SERIAL_SPEED  74880
-// #define SERIAL_SPEED 115200
+#define WIREB A4
+// #define SERIAL_SPEED 9600
+// #define SERIAL_SPEED 74880
+#define SERIAL_SPEED 115200
 
-// #define ISMAINHALF (1)
+#define cSum_REDUNDANCY_AMMOUNT ((uint)1) // cant be 0
+#include "my-lib/cSum.h"
+static dataChecker dc = cSum_new(stdAlloc);
+
+#define ISMAINHALF (1)
 #if defined(ISMAINHALF) // main side
   #include "fileSystemInterface.hpp"
   // #include "key.hpp"
@@ -140,32 +145,51 @@ void sendHidReport(u8 modifiers, uint8_t *key_codes) {
 // communication
 //
 void wireSetup() {
-  Serial1.begin(SERIAL_SPEED, SERIAL_8N1, WIREA, WIREB);
-  Serial1.setTimeout(2);
+  Serial1.begin(SERIAL_SPEED, SERIAL_8N2, WIREA, WIREB);
+  Serial1.setTimeout(5);
 }
 
+  #define wait_read() ({                            \
+    auto _m = micros();                             \
+    while (                                         \
+        !Serial1.available() && micros() < _m + 1000 \
+    )                                               \
+      ;                                             \
+    Serial1.read();                                 \
+  })
 void remote_stateTable_update() {
-  while (Serial1.read() != 0xff)
-    Serial1.read();
-
-  int keyCount = Serial1.read(); // Read Number of Keys
-  fptr message = {(usize)keyCount, aCreate(stdAlloc, u8, keyCount)};
-  defer_(aFree(stdAlloc, message.ptr));
-
-  Serial1.read(message.ptr, message.width);
-  usize hash = minihash(message);
-  usize inhash;
-  Serial1.read((u8 *)&inhash, sizeof(inhash));
-  if (inhash != hash)
+  if (!Serial1.availableForWrite()) {
+    println_("partner mia");
     return;
-
-  for (int i = 0; i < message.width; i += 2) {
-    u8 col = message.ptr[i];
-    u8 row = message.ptr[i + 1];
-
-    if (col < countof(colGpios) && row < countof(rowGpios))
-      sateTable[row][col + countof(colGpios)] = 1;
   }
+
+  Serial1.write('/0');
+
+  static mList(u8) message = mList_init(stdAlloc, u8);
+  int marker;
+  while ((u8)(marker = wait_read()) == 0x00)
+    mList_push(message, (u8)wait_read());
+
+  /*if (mList_len(message) > 0)*/ {
+    checkData cd = {.data = {mList_len(message), mList_arr(message)}};
+
+    // fptr result = cSum_fromSum(cd);
+    fptr result = cd.data;
+
+    for (auto i = 0; i < countof(rowGpios); i++) {
+      for (auto j = 0; j < countof(colGpios); j++) {
+        sateTable[i][j + countof(colGpios)] = 0;
+      }
+    }
+
+    for (int i = 0; i < result.width; i++) {
+      u8 row = result.ptr[i] >> 4;
+      u8 col = result.ptr[i] & 0xf;
+      if (col < countof(colGpios) && row < countof(rowGpios))
+        sateTable[row][col + countof(colGpios)] = 1;
+    }
+  }
+  mList_clear(message);
 }
 void local_stateTable_update() {
   for (auto i = 0; i < countof(colGpios); i++) {
@@ -199,7 +223,7 @@ usize finish = 0;
   #include "command.hpp"
 void loop() {
   counter++;
-  if (!(counter % 10000)) [[unlikeley]] {
+  if (!(counter % 1000)) [[unlikeley]] {
     start = finish;
     finish = millis();
     counter = 1;
@@ -236,7 +260,7 @@ void loop() {
       print_("|");
     }
     println_();
-    println_("10K_time:{}", finish - start);
+    println_("1K_time:{}", finish - start);
   }
 }
 //
@@ -259,72 +283,50 @@ static fptr statemessatge = {.ptr = messagesBuf};
 //
 //
 void wireSetup() {
-  Serial1.begin(SERIAL_SPEED, SERIAL_8N1, WIREB, WIREA);
-  Serial1.setTimeout(2);
+  Serial1.begin(SERIAL_SPEED, SERIAL_8N2, WIREB, WIREA);
+  Serial1.setTimeout(5);
 }
 void setup() {
-  Serial.begin(115200);
+  ESP_IO::begin(115200);
   wireSetup();
   for (int i = 0; i < countof(colGpios); i++)
     pinMode(colGpios[i], OUTPUT);
   for (int i = 0; i < countof(rowGpios); i++)
     pinMode(rowGpios[i], INPUT_PULLDOWN);
 }
-// void remote_stateTable_update() {
-//   while (Serial1.read() != 0xff)
-//     Serial1.read();
-//
-//   int keyCount = Serial1.read(); // Read Number of Keys
-//   fptr message = {(usize)keyCount, aCreate(stdAlloc, u8, keyCount)};
-//   defer_(aFree(stdAlloc, message.ptr));
-//
-//   Serial1.read(message.ptr, message.width);
-//   usize hash = minihash(message);
-//   usize inhash;
-//   Serial1.read((u8 *)&inhash, sizeof(inhash));
-//   if (inhash != hash)
-//     return;
-//
-//   for (int i = 0; i < message.width; i += 2) {
-//     u8 col = message.ptr[i];
-//     u8 row = message.ptr[i + 1];
-//
-//     if (col < countof(colGpios) && row < countof(rowGpios))
-//       sateTable[row][col + countof(colGpios)] = 1;
-//   }
-// }
 void loop() {
   statemessatge.width = 0;
   for (auto i = 0; i < countof(colGpios); i++) {
     digitalWrite(colGpios[i], HIGH);
     for (auto j = 0; j < countof(rowGpios); j++) {
-      if (digitalRead(rowGpios[j])) {
-        statemessatge.ptr[statemessatge.width++] = (u8)i;
-        statemessatge.ptr[statemessatge.width++] = (u8)j;
-      }
+      if (digitalRead(rowGpios[j]))
+        statemessatge.ptr[statemessatge.width++] = (u8)j << 4 | (u8)i;
     }
     digitalWrite(colGpios[i], LOW);
   }
-  Serial1.write(0xFF);
-  Serial1.write((uint)statemessatge.width);
-  Serial1.write(statemessatge.ptr, statemessatge.width);
-  usize hash = minihash(statemessatge);
-  Serial1.write((u8 *)&hash, sizeof(hash));
-
-  static auto last = millis();
-  if (millis() > last + 10) [[unlikely]] {
-    last = millis();
-    for (auto i = 0; i < countof(colGpios); i++) {
-      digitalWrite(colGpios[i], HIGH);
-      for (auto j = 0; j < countof(rowGpios); j++) {
-        if (digitalRead(rowGpios[j])) {
-          print_("{c8}", digitalRead(rowGpios[j]) ? 'X' : ' ');
-        }
-        print_("|");
-      }
-      println_();
-    }
+  checkData cd = {statemessatge};
+  // checkData cd = cSum_toSum(dc, statemessatge);
+  static mList(u8) ll = mList_init(stdAlloc, u8);
+  for (auto i = 0; i < cd.data.width; i++) {
+    mList_push(ll, 0x00);
+    mList_push(ll, cd.data.ptr[i]);
   }
+  mList_push(ll, 0xff);
+
+  // fptr from = cSum_fromSum(cd);
+  // print_("meaning/{");
+  // for (auto i = 0; i < from.width; i++) {
+  //   print_("{u8},", from.ptr[i]);
+  // }
+  // println_("}");
+  if (Serial1.available()) {
+    while (Serial1.available())
+      Serial1.read();
+    Serial1.write(mList_arr(ll), mList_len(ll));
+    // Serial1.flush();
+    println_("wrote {fptr<void>}", ((fptr){mList_len(ll), mList_arr(ll)}));
+  }
+  mList_clear(ll);
 }
 #endif
 #include "my-lib/wheels.h"
