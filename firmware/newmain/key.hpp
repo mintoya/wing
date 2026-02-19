@@ -8,7 +8,7 @@
 #include "my-lib/my-list.h"
 #include "my-lib/mytypes.h"
 
-extern unsigned long millis(void);
+extern ulong millis(void);
 extern void (*keyboardFunctions[10])(void);
 
 #include "hid_keys.h"
@@ -227,36 +227,34 @@ enum KeyState : char {
   HELDDOWN = 2,
   RELEASED = 3,
 };
-// clang-format off
 inline KeyState KeyState_up(KeyState state) {
   switch (state) {
-    case HELDDOWN:  
-    case PRESSED:   
+    case HELDDOWN:
+    case PRESSED:
       return RELEASED;
-    case RELEASED:  
-    case HELDUP:    
+    case RELEASED:
+    case HELDUP:
       return HELDUP;
   }
   return HELDUP;
 }
 inline KeyState KeyState_down(KeyState state) {
   switch (state) {
-    case HELDUP:    
-    case RELEASED: 
+    case HELDUP:
+    case RELEASED:
       return PRESSED;
     case PRESSED:
-    case HELDDOWN: 
+    case HELDDOWN:
       return HELDDOWN;
   }
   return HELDUP;
 }
-// clang-format on
 
 struct tapDance {
   KeyItem pressActions[10];
   KeyItem holdActions[10];
-  unsigned int state;
-  unsigned long currentCountDown;
+  uint state;
+  usize currentCountDown;
   KeyState keystate;
   bool heldActionTriggered;
 };
@@ -281,7 +279,7 @@ static void pressKeys(bool keyState[rows][cols * 2], reportManager &rm, unsigned
 
   static mList(KeyItem) que = mList_init(stdAlloc, KeyItem);
 
-  unsigned long now = millis();
+  ulong now = millis();
   /*
     KeyItem::kType::CHARACTER
     KeyItem::kType::FUNCTIONCALL
