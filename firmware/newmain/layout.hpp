@@ -34,10 +34,14 @@ tapDance default_tapDances[] = {
     .holdActions = {K("ESC")}
   }
 };
-// clang-format on
-static char defaultLayout_chars[] = {
-
+tapDance default_tapDances[] = {
+  {
+    .pressActions = {K("TAB")},
+    .holdActions = {K("ESC")}
+  }
 };
+// clang-format on
+static char defaultLayout_chars[] = {};
 
 extern slice(slice(KeyItem)) keyMapLayers;
 
@@ -98,7 +102,7 @@ void addDances(vason in) {}
 static void parseLayout(fptr string = {}, vason parsed = {}) {
   keyMapLayers = {
       countof(default_layers),
-      aCreate(stdAlloc, slice(KeyItem),countof(default_layers))
+      aCreate(stdAlloc, slice(KeyItem), countof(default_layers))
   };
   for (int i = 0; i < keyMapLayers.len; i++)
     keyMapLayers[i] = {
@@ -107,7 +111,7 @@ static void parseLayout(fptr string = {}, vason parsed = {}) {
     };
   tapDances = {
       countof(default_tapDances),
-      aCreate(stdAlloc, tapDance,countof(default_tapDances))
+      aCreate(stdAlloc, tapDance, countof(default_tapDances))
   };
   for (auto i = 0; i < tapDances.len; i++)
     tapDances[i] = {
