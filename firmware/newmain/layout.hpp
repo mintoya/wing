@@ -6,21 +6,30 @@
 #include "my-lib/mytypes.h"
 #include "my-lib/vason.h"
 #include "stdint.h"
-// slice(slice(KeyItem)) defaultLayout_keyitems = slice_stat(
-//     ((slice(KeyItem)[2]){
-//         slice(KeyItem) slice_stat(((KeyItem[]){
-//             // clang-format off
-//             KEY_TAB,KEY_Q,KEY_W,KEY_E,KEY_R,KEY_T,KEY_Y,KEY_U,KEY_I,KEY_O,KEY_P,KEY_LEFTBRACE,
-//             {'M',MOD_ALT},KEY_Q,KEY_W,KEY_E,KEY_R,KEY_T,KEY_Y,KEY_U,KEY_I,KEY_O,KEY_P,KEY_LEFTBRACE,
-//             0      ,KEY_Q,KEY_W,KEY_E,KEY_R,KEY_T,KEY_Y,KEY_U,KEY_I,KEY_O,KEY_P,KEY_LEFTBRACE,
-//             0      ,    0,    0,KEY_E,KEY_R,KEY_T,KEY_Y,KEY_U,KEY_I,KEY_O,KEY_P,KEY_LEFTBRACE,
-//             // clang-format on
-//         })),
-//         slice(KeyItem) slice_stat(((KeyItem[]){
-//
-//         }))
-//     })
-// );
+extern const unsigned int nrowGpios;
+extern const unsigned int ncolGpios;
+using namespace KeyItem_ititiazizers;
+// clang-format off
+KeyItem default_layers[3][48] = {
+  {
+      K("TAB"), K('Q'),  K('W'),  K('E'),    K('R'), K('T'),    K('Y'),  K('U'), K('I'), K('O'), K('P'),   K('['),
+       M("LS"), K('A'),  K('S'),  K('D'),    K('F'), K('G'),    K('H'),  K('J'), K('K'), K('L'), K(';'),  K('\''),
+       M("LC"), K('Z'),  K('X'),  K('C'),    K('V'), K('B'),    K('N'),  K('M'), K(','), K('.'), K('/'), K("ENT"),
+            {},     {}, M("LA"),    L(1),  K("SPC"),     {},        {},    L(2),M("LG"),     {},     {},   {},
+  },
+  {
+      L(2),K('1'),  K("2"),    K('3'), K('4'), K('5'),    K('6'),   K('7'),  K('8'),  K('9'),  K('0'),  K("ESC"),
+        {},    {},      {},        {},     {},     {},        {},       {},      {},      {},      {},        {},
+        {},    {},      {},        {},     {},     {},        {},   K("-"),  K("="),      {},      {},  K("BKS"),
+  },
+  {
+        {},KEY_F1,  KEY_F2,    KEY_F3, KEY_F4, KEY_F5,    KEY_F6,   KEY_F7,   KEY_F8,    KEY_F9,KEY_F10,   KEY_F11,KEY_F1,
+        {},    {},      {},        {},     {},     {},        {},       {},  K("UP"),        {},      {},        {},
+        {},    {},      {},        {},     {},     {},        {},K("LEFT"),K("DOWN"),K("RIGHT"),      {},        {},
+  }
+};
+// clang-format on
+
 auto defaultLayout_chars = R"d(
   {keyboard:{
     tapdances:[
@@ -44,14 +53,11 @@ auto defaultLayout_chars = R"d(
       [
           K(ESC),  K(1),  K(2),    K(3), K(4), K(5),    K(6),   K(7),  K(8),  K(9),  K(0),  K(ESC),
                 ,     ,      ,      ,        ,     ,        ,       ,      ,      ,      ,        ,
-              ,     ,      ,      ,        ,     ,        ,  K(-) ,  K(/=),       ,      ,  K(BKS),
+                ,     ,      ,      ,        ,     ,        ,  K(-) ,  K(/=),       ,      ,  K(BKS),
       ]
     ];
   }}
 )d";
-
-extern const unsigned int nrowGpios;
-extern const unsigned int ncolGpios;
 
 extern slice(slice(KeyItem)) keyMapLayers;
 #include "my-lib/print.h"

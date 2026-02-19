@@ -3,6 +3,7 @@
 #include "my-lib/fptr.h"
 #include <cstring>
 #include <stdint.h>
+#include <string>
 #define TAPDANCEDEFAULTTIMEOUT ((unsigned long)300)
 #include "my-lib/my-list.h"
 #include "my-lib/mytypes.h"
@@ -11,7 +12,23 @@ extern unsigned long millis(void);
 extern void (*keyboardFunctions[10])(void);
 
 #include "hid_keys.h"
-#include <string_view>
+
+template <usize N, usize M, usize I = 0>
+struct StrEq {
+  static constexpr bool streqfn(const char (&str)[N], const char (&fixed)[M]) {
+    return (N == M && str[I] == fixed[I]) ? StrEq<N, M, I + 1>::streqfn(str, fixed) : false;
+  }
+};
+template <usize N, usize M>
+struct StrEq<N, M, N> {
+  static constexpr bool streqfn(const char (&str)[N], const char (&fixed)[M]) { return true; }
+};
+
+template <usize N, usize M>
+static constexpr bool streq(const char (&str)[N], const char (&fixed)[M]) {
+  return N != M ? false : StrEq<N, M, 0>::streqfn(str, fixed);
+}
+
 struct KeyItem {
   u8 character; // not really a character
   enum kType : char {
@@ -27,25 +44,96 @@ struct KeyItem {
   inline constexpr KeyItem(u8 data)
       : character(data), type(data ? kType::CHARACTER : kType::PASSTHROUGH_) {}
   inline constexpr KeyItem(u8 data, kType t) : character(data), type(t) {}
-  // static inline constexpr u8 M(const char str[2]) {
-  //   // clang-format off
-  //   if (str[0] == 'l') {
-  //       if (str[1] == 'c') return KEY_MOD_LCTRL;
-  //       if (str[1] == 's') return KEY_MOD_LSHIFT;
-  //       if (str[1] == 'a') return KEY_MOD_LALT;
-  //       if (str[1] == 'm') return KEY_MOD_LMETA;
-  //   }
-  //   else if (str[0] == 'r') {
-  //       if (str[1] == 'c') return KEY_MOD_RCTRL;
-  //       if (str[1] == 's') return KEY_MOD_RSHIFT;
-  //       if (str[1] == 'a') return KEY_MOD_RALT;
-  //       if (str[1] == 'm') return KEY_MOD_RMETA;
-  //   }
-  //   // clang-format on
-  //   return 0;
-  // }
-  // clang-format on
+  static constexpr KeyItem K(const char c) {
+    return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' ? KeyItem{(u8)((c | 32) - 'a' + KEY_A) /* */, KeyItem::CHARACTER}
+           : c >= '1' && c <= '9'
+               ? KeyItem{u8(KEY_1 + c - '1') /*    */, KeyItem::CHARACTER}
+           : c == '0'  ? KeyItem{KEY_0 /*          */, KeyItem::CHARACTER}
+           : c == ','  ? KeyItem{KEY_COMMA /*      */, KeyItem::CHARACTER}
+           : c == '.'  ? KeyItem{KEY_DOT /*        */, KeyItem::CHARACTER}
+           : c == '/'  ? KeyItem{KEY_SLASH /*      */, KeyItem::CHARACTER}
+           : c == '\\' ? KeyItem{KEY_BACKSLASH /*  */, KeyItem::CHARACTER}
+           : c == '\'' ? KeyItem{KEY_APOSTROPHE /* */, KeyItem::CHARACTER}
+           : c == ';'  ? KeyItem{KEY_SEMICOLON /*  */, KeyItem::CHARACTER}
+           : c == '-'  ? KeyItem{KEY_MINUS /*      */, KeyItem::CHARACTER}
+           : c == '='  ? KeyItem{KEY_EQUAL /*      */, KeyItem::CHARACTER}
+           : c == '['  ? KeyItem{KEY_LEFTBRACE /*  */, KeyItem::CHARACTER}
+           : c == ']'  ? KeyItem{KEY_RIGHTBRACE /* */, KeyItem::CHARACTER}
+           : c == '`'  ? KeyItem{KEY_APOSTROPHE /* */, KeyItem::CHARACTER}
+                       : 0;
+  }
+  template <usize N>
+  static constexpr KeyItem K(const char (&in)[N]) {
+    return N == 4
+               ? streq(in, "SPC")
+                     ? KeyItem{KEY_SPACE, KeyItem::CHARACTER}
+                 : streq(in, "ENT")
+                     ? KeyItem{KEY_ENTER, KeyItem::CHARACTER}
+                 : streq(in, "TAB")
+                     ? KeyItem{KEY_TAB, KeyItem::CHARACTER}
+                 : streq(in, "ESC")
+                     ? KeyItem{KEY_ESC, KeyItem::CHARACTER}
+                 : streq(in, "BKS")
+                     ? KeyItem{KEY_BACKSPACE, KeyItem::CHARACTER}
+                 : streq(in, "INS")
+                     ? KeyItem{KEY_INSERT, KeyItem::CHARACTER}
+                 : streq(in, "DEL")
+                     ? KeyItem{KEY_DELETE, KeyItem::CHARACTER}
+                     : 0
+           : N == 5
+               ? streq(in, "DOWN")
+                     ? KeyItem{KEY_SPACE, KeyItem::CHARACTER}
+                 : streq(in, "LEFT")
+                     ? KeyItem{KEY_SPACE, KeyItem::CHARACTER}
+                     : 0
+           : N == 3
+               ? streq(in, "UP")
+                     ? KeyItem{KEY_UP, KeyItem::CHARACTER}
+                     : 0
+           : N == 2 ? K(in[0])
+                    : 0;
+  }
+  static constexpr KeyItem M(const char (&in)[3]) {
+    return (in[0] | 32) == 'l'
+               ? (in[1] | 32) == 's'
+                     ? KeyItem{KEY_MOD_LSHIFT /**/, KeyItem::MODIFIER}
+                 : (in[1] | 32) == 'a'
+                     ? KeyItem{KEY_MOD_LALT /*  */, KeyItem::MODIFIER}
+                 : (in[1] | 32) == 'c'
+                     ? KeyItem{KEY_MOD_LCTRL /* */, KeyItem::MODIFIER}
+                 : (in[1] | 32) == 'm'
+                     ? KeyItem{KEY_MOD_LMETA /* */, KeyItem::MODIFIER}
+                     : KeyItem{}
+           : (in[0] | 32) == 'r'
+               ? (in[1] | 32) == 's'
+                     ? KeyItem{KEY_MOD_RSHIFT /**/, KeyItem::MODIFIER}
+                 : (in[1] | 32) == 'a'
+                     ? KeyItem{KEY_MOD_RALT /*  */, KeyItem::MODIFIER}
+                 : (in[1] | 32) == 'c'
+                     ? KeyItem{KEY_MOD_RCTRL /* */, KeyItem::MODIFIER}
+                 : (in[1] | 32) == 'm'
+                     ? KeyItem{KEY_MOD_RMETA /* */, KeyItem::MODIFIER}
+                     : KeyItem{}
+               : KeyItem{};
+  }
+  template <usize N>
+  static constexpr KeyItem K(u8 num) {
+    return num >= 1 & num <= 9
+               ? KeyItem{u8(KEY_1 + num), KeyItem::CHARACTER}
+               : KeyItem{KEY_0, KeyItem::CHARACTER};
+  }
+  static constexpr KeyItem L(u8 num) { return KeyItem{num, KeyItem::LAYER}; }
+  static constexpr KeyItem T(u8 num) { return KeyItem{num, KeyItem::TAPDANCE}; }
+  // static constexpr KeyItem F(u8 num) { return KeyItem{num, KeyItem::MODIFIER}; }
 };
+namespace KeyItem_ititiazizers {
+constexpr KeyItem K(u8 n) { return KeyItem::K(n); }
+template <usize N>
+constexpr KeyItem K(const char (&s)[N]) { return KeyItem::K<N>(s); }
+constexpr KeyItem L(u8 n) { return KeyItem::L(n); }
+constexpr KeyItem M(const char (&s)[3]) { return KeyItem::M(s); }
+} // namespace KeyItem_ititiazizers
+
 REGISTER_PRINTER(KeyItem, {
   // clang-format off
   switch (in.type) {

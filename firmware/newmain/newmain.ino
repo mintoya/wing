@@ -149,26 +149,18 @@ void wireSetup() {
   Serial1.setTimeout(5);
 }
 
-  #define wait_read() ({                            \
-    auto _m = micros();                             \
-    while (                                         \
-        !Serial1.available() && micros() < _m + 1000 \
-    )                                               \
-      ;                                             \
-    Serial1.read();                                 \
-  })
-void remote_stateTable_update() {
-  if (!Serial1.availableForWrite()) {
-    println_("partner mia");
-    return;
-  }
 
-  Serial1.write('/0');
+void remote_stateTable_update() {
 
   static mList(u8) message = mList_init(stdAlloc, u8);
-  int marker;
-  while ((u8)(marker = wait_read()) == 0x00)
-    mList_push(message, (u8)wait_read());
+  defer { Serial1.write('/0'); };
+  if (!Serial1.available())
+    return;
+  {
+    int marker;
+    while ((u8)(marker = wait_read()) == 0x00)
+      mList_push(message, (u8)wait_read());
+  }
 
   /*if (mList_len(message) > 0)*/ {
     checkData cd = {.data = {mList_len(message), mList_arr(message)}};
@@ -216,6 +208,7 @@ void setup() {
   rm = reportManager(sendHidReport, fakeSender);
   // rm = reportManager(nullptr, fakeSender);
   println_("loop begin");
+  Serial1.write('/0');
 }
 usize counter = 0;
 usize start = 0;
@@ -313,17 +306,10 @@ void loop() {
   }
   mList_push(ll, 0xff);
 
-  // fptr from = cSum_fromSum(cd);
-  // print_("meaning/{");
-  // for (auto i = 0; i < from.width; i++) {
-  //   print_("{u8},", from.ptr[i]);
-  // }
-  // println_("}");
   if (Serial1.available()) {
     while (Serial1.available())
       Serial1.read();
     Serial1.write(mList_arr(ll), mList_len(ll));
-    // Serial1.flush();
     println_("wrote {fptr<void>}", ((fptr){mList_len(ll), mList_arr(ll)}));
   }
   mList_clear(ll);
