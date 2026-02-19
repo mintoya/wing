@@ -149,7 +149,6 @@ void wireSetup() {
   Serial1.setTimeout(5);
 }
 
-
 void remote_stateTable_update() {
 
   static mList(u8) message = mList_init(stdAlloc, u8);
@@ -158,8 +157,8 @@ void remote_stateTable_update() {
     return;
   {
     int marker;
-    while ((u8)(marker = wait_read()) == 0x00)
-      mList_push(message, (u8)wait_read());
+    while ((u8)(marker = Serial1.read()) == 0x00)
+      mList_push(message, (u8)Serial1.read());
   }
 
   /*if (mList_len(message) > 0)*/ {
@@ -224,16 +223,13 @@ void loop() {
   if (ESP_IO::available()) [[unlikeley]] {
     usize startTime = millis();
     mList_scoped(u8) readlist = mList_init(stdAlloc, u8);
-    {
-    readmore:
-      while (ESP_IO::available())
+    do {
+      if (ESP_IO::available())
         mList_push(readlist, ESP_IO::read());
-    }
-    if (
-        *mList_get(readlist, mList_len(readlist) - 1) != '\n' &&
+    } while (
+        mList_arr(readlist)[mList_len(readlist) - 1] != '\n' &&
         millis() < startTime + 5000
-    )
-      goto readmore;
+    );
     fptr input = mList_slice(readlist);
     println_("{}", input);
     commands::execute(input);

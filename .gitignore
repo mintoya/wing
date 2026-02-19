@@ -99,3 +99,5 @@ fp-info-cache
 
 /firmware/left_esp/build/compile_commands.json
 /firmware/left_esp/build
+/firmware/newmain/build
+/firmware/newmain/compile_commands.json
