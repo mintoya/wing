@@ -4,8 +4,7 @@
 #include "key.hpp"
 #include "my-lib/my-list.h"
 #include "my-lib/mytypes.h"
-#include "my-lib/vason.h"
-#include "stdint.h"
+#include "my-lib/vason_arr.h"
 extern const unsigned int nrowGpios;
 extern const unsigned int ncolGpios;
 using namespace KeyItem_ititiazizers;
@@ -57,7 +56,7 @@ static void prettyPrintLayers() {
 }
 void addLayers(vason in) {
   auto layerCount = in.countChildren();
-  if (in.tag() != vason_ARR || layerCount == 0)
+  if (in.tag() != vason_TABLE || layerCount == 0)
     return;
 
   keyMapLayers = {
@@ -68,7 +67,7 @@ void addLayers(vason in) {
 
   for (usize i = 0; i < layerCount; i++) {
     auto layerVason = in[i];
-    if (layerVason.tag() != vason_ARR) {
+    if (layerVason.tag() != vason_TABLE) {
       println_(
           "parsing interrupted by non-array :\n"
           " it:({vason_container})\n"
@@ -92,7 +91,7 @@ void addLayers(vason in) {
 extern slice(tapDance) tapDances;
 void addDances(vason in) {}
 #include "my-lib/arenaAllocator.h"
-static void parseLayout(fptr string = {}, vason parsed = {}) {
+static void parseLayout(fptr string = {}, vason parsed = {{}}) {
   keyMapLayers = {
       countof(default_layers),
       aCreate(stdAlloc, slice(KeyItem))
