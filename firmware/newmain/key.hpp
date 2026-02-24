@@ -60,38 +60,24 @@ struct KeyItem {
            : c == '['  ? KeyItem{KEY_LEFTBRACE /*  */, KeyItem::CHARACTER}
            : c == ']'  ? KeyItem{KEY_RIGHTBRACE /* */, KeyItem::CHARACTER}
            : c == '`'  ? KeyItem{KEY_APOSTROPHE /* */, KeyItem::CHARACTER}
-                       : 0;
+                       : strlen("");
   }
   template <usize N>
   static constexpr KeyItem K(const char (&in)[N]) {
-    return N == 4
-               ? streq(in, "SPC")
-                     ? KeyItem{KEY_SPACE, KeyItem::CHARACTER}
-                 : streq(in, "ENT")
-                     ? KeyItem{KEY_ENTER, KeyItem::CHARACTER}
-                 : streq(in, "TAB")
-                     ? KeyItem{KEY_TAB, KeyItem::CHARACTER}
-                 : streq(in, "ESC")
-                     ? KeyItem{KEY_ESC, KeyItem::CHARACTER}
-                 : streq(in, "BKS")
-                     ? KeyItem{KEY_BACKSPACE, KeyItem::CHARACTER}
-                 : streq(in, "INS")
-                     ? KeyItem{KEY_INSERT, KeyItem::CHARACTER}
-                 : streq(in, "DEL")
-                     ? KeyItem{KEY_DELETE, KeyItem::CHARACTER}
-                     : 0
-           : N == 5
-               ? streq(in, "DOWN")
-                     ? KeyItem{KEY_SPACE, KeyItem::CHARACTER}
-                 : streq(in, "LEFT")
-                     ? KeyItem{KEY_SPACE, KeyItem::CHARACTER}
-                     : 0
-           : N == 3
-               ? streq(in, "UP")
-                     ? KeyItem{KEY_UP, KeyItem::CHARACTER}
-                     : 0
-           : N == 2 ? K(in[0])
-                    : 0;
+    return N == 2
+               ? K(in[0])
+           : streq(in, "SPC")   ? KeyItem{KEY_SPACE /*    */, KeyItem::CHARACTER}
+           : streq(in, "ENT")   ? KeyItem{KEY_ENTER /*    */, KeyItem::CHARACTER}
+           : streq(in, "TAB")   ? KeyItem{KEY_TAB /*      */, KeyItem::CHARACTER}
+           : streq(in, "ESC")   ? KeyItem{KEY_ESC /*      */, KeyItem::CHARACTER}
+           : streq(in, "BKS")   ? KeyItem{KEY_BACKSPACE /**/, KeyItem::CHARACTER}
+           : streq(in, "INS")   ? KeyItem{KEY_INSERT /*   */, KeyItem::CHARACTER}
+           : streq(in, "DEL")   ? KeyItem{KEY_DELETE /*   */, KeyItem::CHARACTER}
+           : streq(in, "DOWN")  ? KeyItem{KEY_DOWN /*     */, KeyItem::CHARACTER}
+           : streq(in, "LEFT")  ? KeyItem{KEY_LEFT /*     */, KeyItem::CHARACTER}
+           : streq(in, "RIGHT") ? KeyItem{KEY_RIGHT /*    */, KeyItem::CHARACTER}
+           : streq(in, "UP")    ? KeyItem{KEY_UP /*       */, KeyItem::CHARACTER}
+                                : strlen("");
   }
   static constexpr KeyItem M(const char (&in)[3]) {
     return (in[0] | 32) == 'l'
@@ -128,6 +114,7 @@ struct KeyItem {
 };
 namespace KeyItem_ititiazizers {
 constexpr KeyItem K(u8 n) { return KeyItem::K(n); }
+constexpr KeyItem T(u8 n) { return KeyItem::T(n); }
 template <usize N>
 constexpr KeyItem K(const char (&s)[N]) { return KeyItem::K<N>(s); }
 constexpr KeyItem L(u8 n) { return KeyItem::L(n); }
