@@ -12,15 +12,15 @@ using namespace KeyItem_ititiazizers;
 // clang-format off
 KeyItem default_layers[3][48] = {
   {
-      K("TAB"), K('Q'),  K('W'),  K('E'),    K('R'), K('T'),    K('Y'),  K('U'), K('I'), K('O'), K('P'),   K('['),
+      K("ESC"), K('Q'),  K('W'),  K('E'),    K('R'), K('T'),    K('Y'),  K('U'), K('I'), K('O'), K('P'),   K('['),
        M("LS"), K('A'),  K('S'),  K('D'),    K('F'), K('G'),    K('H'),  K('J'), K('K'), K('L'), K(';'),  K('\''),
        M("LC"), K('Z'),  K('X'),  K('C'),    K('V'), K('B'),    K('N'),  K('M'), K(','), K('.'), K('/'), K("ENT"),
-            {},     {}, M("LA"),    L(1),  K("SPC"),     {},        {},    L(2),M("LG"),     {},     {},   {},
+            {},     {}, M("LA"),    L(1),  K("SPC"),     {},        {},    L(2),   L(1),M("LM"),     {},   {},
   },
   {
-  K("ESC"),K('1'),  K("2"),    K('3'), K('4'), K('5'),    K('6'),   K('7'),  K('8'),  K('9'),  K('0'),  K("ESC"),
+  K("TAB"),K('1'),  K("2"),    K('3'), K('4'), K('5'),    K('6'),   K('7'),  K('8'),  K('9'),  K('0'),    K(']'),
         {},    {},      {},        {},     {},     {},        {},       {},      {},      {},      {},        {},
-        {},    {},      {},        {},     {},     {},        {},   K("-"),  K("="),      {},      {},  K("BKS"),
+        {},    {},      {},        {},     {},     {},        {},   K("-"),  K("="),      {}, K('\\'),  K("BKS"),
   },
   {
         {},KEY_F1,  KEY_F2,    KEY_F3, KEY_F4, KEY_F5,    KEY_F6,   KEY_F7,  KEY_F8,   KEY_F9, KEY_F10,  KEY_F11 ,
@@ -34,12 +34,7 @@ tapDance default_tapDances[] = {
     .holdActions = {K("ESC")}
   }
 };
-tapDance default_tapDances[] = {
-  {
-    .pressActions = {K("TAB")},
-    .holdActions = {K("ESC")}
-  }
-};
+
 // clang-format on
 static char defaultLayout_chars[] = {};
 

@@ -83,7 +83,7 @@ void writeFile(AllocatorV _, vason filename, vason content) {
 void removeFile(AllocatorV _, vason filename) { deleteFile(filename.asString()); }
 #define sel_first(a, ...) a
 
-int j = COUNT_ARGS();
+
 static kv basicMap[] =
     {
 

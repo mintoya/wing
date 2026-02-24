@@ -89,14 +89,14 @@ const uint nrowGpios = countof(rowGpios);
 const uint ncolGpios = countof(colGpios);
 static bool sateTable[countof(rowGpios)][countof(colGpios) * 2] = {};
 namespace bounceTable {
-static u8 pstate[countof(sateTable)][countof(sateTable[0])];
+static u16 pstate[countof(sateTable)][countof(sateTable[0])];
 static bool lstate[countof(sateTable)][countof(sateTable[0])];
 void update() {
   for (int i = 0; i < countof(sateTable); i++) {
     for (int j = 0; j < countof(sateTable[0]); j++) {
       pstate[i][j] <<= 1;
       pstate[i][j] |= !!sateTable[i][j];
-      if (pstate[i][j] == 0xff || pstate[i][j] == 0x00)
+      if (pstate[i][j] == (typeof(pstate[0][0]))(-1)  || pstate[i][j] == 0)
         lstate[i][j] = !!pstate[i][j];
     }
   }
