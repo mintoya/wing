@@ -1,12 +1,11 @@
 #include "fileSystemInterface.hpp"
 #include "my-lib/omap.h"
-#include "my-lib/vason.h"
+#include "my-lib/vason_arr.h"
 #include <cstdio>
-#include <memory>
 
 extern void prettyPrintLayers(void);
 
-extern void parseLayout(fptr,vason );
+extern void parseLayout(fptr, vason);
 namespace commands {
 typedef void (*command)(AllocatorV, vason *args);
 typedef fptr commandName;
@@ -94,12 +93,12 @@ static kv basicMap[] =
             },
             (char *[]){"filename", "content"}
         ),
-        makeCommand(
-            "reset-layout",
-            [](AllocatorV a, vason *args) {
-              parseLayout(fp(defaultLayout_chars));
-            }
-        ),
+        // makeCommand(
+        //     "reset-layout",
+        //     [](AllocatorV a, vason *args) {
+        //       parseLayout(fp(defaultLayout_chars));
+        //     }
+        // ),
         makeCommand(
             "save",
             [](AllocatorV a, vason *args) {
@@ -150,7 +149,7 @@ static kv basicMap[] =
 
 static void execute(fptr commandText) {
   Arena_scoped *local = arena_new_ext(stdAlloc, 1024);
-  vason v = {parseStr(local, {commandText.width, commandText.ptr})};
+  vason v = vason_parseString(local, {commandText.width, commandText.ptr});
 
   auto executeSingle = [](vason v, AllocatorV allocator) {
     fptr command = v["command"].asString();
@@ -182,7 +181,7 @@ static void execute(fptr commandText) {
       println_("\t{}", pair.key);
   };
 
-  if (v.tag() == vason_ARR) {
+  if (v.tag() == vason_TABLE) {
     Arena_scoped *single = arena_new_ext(local, 1024);
     for (int i = 0; i < v.countChildren(); i++) {
       executeSingle(v[i], single);
