@@ -1,5 +1,6 @@
 #include "Arduino.h"
 #include "esp32-hal-gpio.h"
+#include "esp32-hal.h"
 #include "esp_io.hpp"
 #define NOFILEPRINTER (1)
 #define noAssertMessage (1)
@@ -89,15 +90,22 @@ const uint nrowGpios = countof(rowGpios);
 const uint ncolGpios = countof(colGpios);
 static bool sateTable[countof(rowGpios)][countof(colGpios) * 2] = {};
 namespace bounceTable {
-static u16 pstate[countof(sateTable)][countof(sateTable[0])];
+static long pstate[countof(sateTable)][countof(sateTable[0])]; // last state, negetive for high, positive for low
 static bool lstate[countof(sateTable)][countof(sateTable[0])];
 void update() {
   for (int i = 0; i < countof(sateTable); i++) {
     for (int j = 0; j < countof(sateTable[0]); j++) {
-      pstate[i][j] <<= 1;
-      pstate[i][j] |= !!sateTable[i][j];
-      if (pstate[i][j] == (typeof(pstate[0][0]))(-1)  || pstate[i][j] == 0)
-        lstate[i][j] = !!pstate[i][j];
+      auto now = micros();
+      if (sateTable[i][j]) {
+        if (pstate[i][j] > 0)
+          pstate[i][j] = -now;
+      } else {
+        if (pstate[i][j] < 0)
+          pstate[i][j] = now;
+      }
+
+      if (abs(pstate[i][j]) + 1000 < now)
+        lstate[i][j] = pstate[i][j] < 0;
     }
   }
 }
