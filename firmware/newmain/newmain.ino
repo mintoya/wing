@@ -90,25 +90,21 @@ const uint nrowGpios = countof(rowGpios);
 const uint ncolGpios = countof(colGpios);
 static bool sateTable[countof(rowGpios)][countof(colGpios) * 2] = {};
 namespace bounceTable {
-static long pstate[countof(sateTable)][countof(sateTable[0])]; // last state, negetive for high, positive for low
+static unsigned long pstate[countof(sateTable)][countof(sateTable[0])]; // last state, negetive for high, positive for low
 static bool lstate[countof(sateTable)][countof(sateTable[0])];
 void update() {
   for (int i = 0; i < countof(sateTable); i++) {
     for (int j = 0; j < countof(sateTable[0]); j++) {
       auto now = micros();
-      if (sateTable[i][j]) {
-        if (pstate[i][j] > 0)
-          pstate[i][j] = -now;
-      } else {
-        if (pstate[i][j] < 0)
-          pstate[i][j] = now;
-      }
 
-      if (abs(pstate[i][j]) + 1000 < now)
-        lstate[i][j] = pstate[i][j] < 0;
+      if (sateTable[i][j] == lstate[i][j])
+        pstate[i][j] = now;
+      if (now - pstate[i][j] > 1000)
+        lstate[i][j] = sateTable[i][j];
     }
   }
 }
+
 }; // namespace bounceTable
 //
 // keyboard report variables
@@ -128,12 +124,12 @@ slice(tapDance) tapDances = {};
 volatile static bool fakeSenderEnabled = true;
 void fakeSender(u8 mod, u8 *keys) {
   if (fakeSenderEnabled)
-    println_(
+    
         "{x}|{x} {x} {x} {x} {x} {x}",
         mod,
         keys[0], keys[1], keys[2],
         keys[3], keys[4], keys[5]
-    );
+    ;
 }
 void sendHidReport(u8 modifiers, uint8_t *key_codes) {
   static KeyReport k;
@@ -217,6 +213,7 @@ void setup() {
   println_("loop begin");
   Serial1.write('/0');
 }
+  #include "my-lib/arenaAllocator.h"
 usize counter = 0;
 usize start = 0;
 usize finish = 0;
@@ -239,7 +236,9 @@ void loop() {
         millis() < startTime + 5000
     );
     fptr input = mList_slice(readlist);
-    println_("{}", input);
+    My_allocator *local = arena_new_ext(stdAlloc, 1024);
+    println_("{vason_container}", vason_parseString(local, mList_slice(readlist)));
+    arena_cleanup(local);
     commands::execute(input);
   }
   local_stateTable_update();
