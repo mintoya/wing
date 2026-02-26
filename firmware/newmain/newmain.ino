@@ -93,13 +93,12 @@ namespace bounceTable {
 static unsigned long pstate[countof(sateTable)][countof(sateTable[0])]; // last state, negetive for high, positive for low
 static bool lstate[countof(sateTable)][countof(sateTable[0])];
 void update() {
-  for (int i = 0; i < countof(sateTable); i++) {
-    for (int j = 0; j < countof(sateTable[0]); j++) {
-      auto now = micros();
-
+  auto now = micros();
+  for (uint i = 0; i < countof(sateTable); i++) {
+    for (uint j = 0; j < countof(sateTable[0]); j++) {
       if (sateTable[i][j] == lstate[i][j])
         pstate[i][j] = now;
-      if (now - pstate[i][j] > 1000)
+      if (now - pstate[i][j] > 2000)
         lstate[i][j] = sateTable[i][j];
     }
   }
@@ -124,12 +123,12 @@ slice(tapDance) tapDances = {};
 volatile static bool fakeSenderEnabled = true;
 void fakeSender(u8 mod, u8 *keys) {
   if (fakeSenderEnabled)
-    
+    println_(
         "{x}|{x} {x} {x} {x} {x} {x}",
         mod,
         keys[0], keys[1], keys[2],
         keys[3], keys[4], keys[5]
-    ;
+    );
 }
 void sendHidReport(u8 modifiers, uint8_t *key_codes) {
   static KeyReport k;

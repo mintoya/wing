@@ -4,7 +4,7 @@
 #include <cstring>
 #include <stdint.h>
 #include <string>
-#define TAPDANCEDEFAULTTIMEOUT ((unsigned long)300)
+constexpr uint TAPDANCEDEFAULTTIMEOUT = 300;
 #include "my-lib/my-list.h"
 #include "my-lib/mytypes.h"
 
@@ -31,7 +31,7 @@ static constexpr bool streq(const char (&str)[N], const char (&fixed)[M]) {
 
 struct KeyItem {
   u8 character; // not really a character
-  enum kType : char {
+  enum kType : c8 {
     PASSTHROUGH_ = 0,
     CHARACTER /*   */ = (1 << 0),
     LAYER /*       */ = (1 << 1),
@@ -194,7 +194,7 @@ struct reportManager {
     currentModifier = 0;
     mList_clear(currentReport);
   }
-  void addKey(KeyItem k) {
+  void addKey(const KeyItem k) {
     switch (k.type) {
       case KeyItem::MODIFIER:
         currentModifier |= k.character;
@@ -208,34 +208,34 @@ struct reportManager {
   }
 };
 
-enum KeyState : char {
-  HELDUP = 0,
-  PRESSED = 1,
-  HELDDOWN = 2,
-  RELEASED = 3,
+struct KeyState {
+  enum : c8 {
+    HELDUP = 0,
+    PRESSED = 1,
+    HELDDOWN = 2,
+    RELEASED = 3,
+  } state;
+  inline void up() {
+    switch (state) {
+      case HELDDOWN:
+      case PRESSED:
+        state = RELEASED;
+      case RELEASED:
+      case HELDUP:
+        state = HELDUP;
+    }
+  }
+  inline void down() {
+    switch (state) {
+      case HELDUP:
+      case RELEASED:
+        state = PRESSED;
+      case PRESSED:
+      case HELDDOWN:
+        state = HELDDOWN;
+    }
+  }
 };
-inline KeyState KeyState_up(KeyState state) {
-  switch (state) {
-    case HELDDOWN:
-    case PRESSED:
-      return RELEASED;
-    case RELEASED:
-    case HELDUP:
-      return HELDUP;
-  }
-  return HELDUP;
-}
-inline KeyState KeyState_down(KeyState state) {
-  switch (state) {
-    case HELDUP:
-    case RELEASED:
-      return PRESSED;
-    case PRESSED:
-    case HELDDOWN:
-      return HELDDOWN;
-  }
-  return HELDUP;
-}
 
 struct tapDance {
   KeyItem pressActions[10];
@@ -253,12 +253,14 @@ extern slice(slice(KeyItem)) keyMapLayers;
 namespace keyMap {
 
 template <usize rows, usize cols>
-static void pressKeys(bool keyState[rows][cols * 2], reportManager &rm, unsigned int currentLayer = 0) {
+static void pressKeys(bool keyState[rows][cols * 2], reportManager &rm, uint currentLayer = 0) {
+
   if (currentLayer >= keyMapLayers.len)
     return;
   static bool forceDown = false;
-  unsigned int length = rows * cols * 2;
-  auto keystate_get = [&](uint index) -> bool & {
+  uint length = rows * cols * 2;
+  // uint length = sizeof(keyState) / sizeof(bool);
+  auto key_getBool = [&](uint index) -> bool & {
     uint r = index / countof(keyState[0]);
     uint c = index % countof(keyState[0]);
     return keyState[r][c];
@@ -268,131 +270,140 @@ static void pressKeys(bool keyState[rows][cols * 2], reportManager &rm, unsigned
 
   ulong now = millis();
   /*
-    KeyItem::kType::CHARACTER
-    KeyItem::kType::FUNCTIONCALL
-    KeyItem::kType::LAYER
-    KeyItem::kType::MODIFIER
-    KeyItem::kType::PASSTHROUGH_
-    KeyItem::kType::TAPDANCE
-  */
+    KeyItem::kType::CHARACTER
+    KeyItem::kType::FUNCTIONCALL
+    KeyItem::kType::LAYER
+    KeyItem::kType::MODIFIER
+    KeyItem::kType::PASSTHROUGH_
+    KeyItem::kType::TAPDANCE
+  */
   slice(KeyItem) keyMapLayers_arr = keyMapLayers[currentLayer];
-  for (unsigned int i = 0; i < length; i++) {
-    if (keystate_get(i) &&
+  for (uint i = 0; i < length; i++) {
+    if (key_getBool(i) &&
         keyMapLayers_arr[i].type == KeyItem::kType::LAYER) {
-      keystate_get(i) = (false);
+      key_getBool(i) = (false);
       return pressKeys<rows, cols>(keyState, rm, keyMapLayers_arr[i].character);
     }
   }
 
   /*
-    KeyItem::kType::CHARACTER
-    KeyItem::kType::FUNCTIONCALL
-    KeyItem::kType::MODIFIER
-    KeyItem::kType::PASSTHROUGH_
-    KeyItem::kType::TAPDANCE
-  */
+    KeyItem::kType::CHARACTER
+    KeyItem::kType::FUNCTIONCALL
+    KeyItem::kType::MODIFIER
+    KeyItem::kType::PASSTHROUGH_
+    KeyItem::kType::TAPDANCE
+  */
+
+  static KeyItem activeKeyCache[rows * cols * 2];
+  static bool isKeyCached[rows * cols * 2] = {false};
 
   forceDown = false;
   for (auto i = 0; i < length; i++) {
-    KeyItem currentKey = keyMapLayers_arr[i];
-    if (currentKey.type == KeyItem::kType::PASSTHROUGH_) {
-      for (auto j = currentLayer + 1; j > 0; j--) {
-        KeyItem temp = keyMapLayers[j - 1][i];
-        if (temp.type != KeyItem::PASSTHROUGH_) {
-          currentKey = temp;
-          break;
+    KeyItem currentKey;
+    if (key_getBool(i) && isKeyCached[i]) {
+      currentKey = activeKeyCache[i];
+
+    } else if (!key_getBool(i) && isKeyCached[i]) {
+      currentKey = activeKeyCache[i];
+      isKeyCached[i] = false;
+    } else {
+      currentKey = keyMapLayers_arr[i];
+      if (currentKey.type == KeyItem::kType::PASSTHROUGH_) {
+        for (auto j = currentLayer + 1; j > 0; j--) {
+          KeyItem temp = keyMapLayers[j - 1][i];
+          if (temp.type != KeyItem::PASSTHROUGH_) {
+            currentKey = temp;
+            break;
+          }
         }
       }
+      if (key_getBool(i)) {
+        activeKeyCache[i] = currentKey;
+        isKeyCached[i] = true;
+      }
     }
-    if (keystate_get(i)) {
+
+    if (key_getBool(i)) {
       /*
-        KeyItem::kType::CHARACTER
-        KeyItem::kType::FUNCTIONCALL
-        KeyItem::kType::MODIFIER
-        KeyItem::kType::TAPDANCE
-      */
+                    KeyItem::kType::CHARACTER
+                    KeyItem::kType::FUNCTIONCALL
+                    KeyItem::kType::MODIFIER
+                    KeyItem::kType::TAPDANCE
+                  */
       switch (currentKey.type) {
         case KeyItem::kType::FUNCTIONCALL: {
           // keyboardFunctions[currentKey.character]();
+
         } break;
         case KeyItem::kType::TAPDANCE: {
-          if (currentKey.character < tapDances.len) {
-            tapDances[currentKey.character].keystate =
-                KeyState_down(tapDances[currentKey.character].keystate);
-          }
+          if (currentKey.character < tapDances.len)
+            tapDances[currentKey.character].keystate.down();
+
         } break;
         default:
           forceDown = true;
           /*
-            KeyItem::kType::CHARACTER
-            KeyItem::kType::MODIFIER
-          */
+                              KeyItem::kType::CHARACTER
+                              KeyItem::kType::MODIFIER
+                            */
           mList_push(que, currentKey);
       }
+
     } else {
-      if (currentKey.type == KeyItem::kType::TAPDANCE) {
-        if (currentKey.character < tapDances.len) {
-          tapDances[currentKey.character].keystate =
-              KeyState_up(tapDances[currentKey.character].keystate);
+      if (currentKey.type == KeyItem::kType::TAPDANCE)
+        if (currentKey.character < tapDances.len)
+          tapDances[currentKey.character].keystate.up();
+    }
+  }
+
+  for (tapDance &td : tapDances) {
+    if (td.keystate.state == KeyState::PRESSED) {
+      if (td.state == 0 || now < td.currentCountDown) {
+        td.state++;
+        td.currentCountDown = now + TAPDANCEDEFAULTTIMEOUT;
+      }
+
+    } else if (td.state) {
+      if (forceDown || now > td.currentCountDown) {
+        if (td.keystate.state == KeyState::RELEASED) {
+          if (!td.heldActionTriggered)
+            mList_ins(que, 0, td.pressActions[(td.state - 1) % 10]);
+          td.state = 0;
+          td.heldActionTriggered = false;
+
+        } else if (td.keystate.state == KeyState::HELDDOWN) {
+          mList_ins(que, 0, td.holdActions[(td.state - 1) % 10]);
+          td.heldActionTriggered = true;
+        } else if (td.keystate.state == KeyState::HELDUP) {
+          mList_ins(que, 0, td.pressActions[(td.state - 1) % 10]);
+          td.state = 0;
         }
       }
     }
   }
-
-  for (unsigned int i = 0; i < tapDances.len; i++) {
-    tapDance *td = tapDances.ptr + i;
-    if (!td)
-      break;
-
-    if (td->keystate == PRESSED) {
-      if (td->state == 0 || now < td->currentCountDown) {
-        td->state++;
-        td->currentCountDown = now + TAPDANCEDEFAULTTIMEOUT;
-      }
-    } else if (td->state) {
-      if (forceDown || now > td->currentCountDown) {
-        if (td->keystate == RELEASED) {
-          if (!td->heldActionTriggered) {
-            mList_ins(que, 0, td->pressActions[(td->state - 1) % 10]);
-          }
-          td->state = 0;
-          td->heldActionTriggered = false;
-        } else if (td->keystate == HELDDOWN) {
-          mList_ins(que, 0, td->holdActions[(td->state - 1) % 10]);
-          td->heldActionTriggered = true;
-        } else if (td->keystate == HELDUP) {
-          mList_ins(que, 0, td->pressActions[(td->state - 1) % 10]);
-          td->state = 0;
-        }
-      }
-    }
-  }
-
-  auto que_arr = mList_arr(que);
-  for (int i = 0; i < mList_len(que); i++) {
-    switch (que_arr[i].type) {
+  for (const KeyItem k : *mList_vla(que)) {
+    switch (k.type) {
       case KeyItem::kType::FUNCTIONCALL: {
         // keyboardFunctions[que_arr[i].character]();
+
       } break;
       case KeyItem::kType::LAYER: {
-        // idk
-        currentLayer = que_arr[i].character;
+        assertMessage(false, "unreachable?");
+
       } break;
       case KeyItem::kType::TAPDANCE: {
-        if (que_arr[i].character < tapDances.len) {
-          tapDances[que_arr[i].character].keystate =
-              KeyState_down(tapDances[que_arr[i].character].keystate);
-        }
+        if (k.character < tapDances.len)
+          tapDances[k.character].keystate.down();
+
       } break;
       default:
         /*
-          KeyItem::kType::CHARACTER
-          KeyItem::kType::MODIFIER
-        */
-        rm.addKey(que_arr[i]);
+                     KeyItem::kType::CHARACTER
+                     KeyItem::kType::MODIFIER
+                   */
+        rm.addKey(k);
     }
   }
   mList_clear(que);
 }
-
 } // namespace keyMap
