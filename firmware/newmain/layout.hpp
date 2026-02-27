@@ -35,7 +35,38 @@ tapDance default_tapDances[] = {
 };
 
 // clang-format on
-static char defaultLayout_chars[] = {};
+static char defaultLayout_chars[] =
+    R"d(
+"{ 
+  command:setLayout,
+  args : {
+    keyboard:{
+      tapdances:{
+        { taps:{ K:A }, holds:{M:la , M:ls }, }
+        { taps:{ K:B }, holds:{M:lc , M:rs }, }
+      },
+      layers:{ 
+        { 
+          K:TAB,  K:Q,  K:W, K:E,   K:R, K:T,        K:Y, K:U,   K:I,  K:O,   K:P,  K:'[',
+           M:ls,  K:A,  K:S, K:D,   K:F, K:G,        K:H, K:J,   K:K,  K:L, K:';',  K:\', 
+           M:lc,  K:Z,  K:X, K:C,   K:V, K:B,        K:N, K:M, K:',',  K:.,  K:\/,  K:ENT,
+              0,    0, M:la, L:1, K:SPC,   0,          0, L:2,   L:1, M:lm,     0,  0 
+        },
+        {
+          K:TAB,K:1,  K:2,    K:3, K:4, K:5,    K:6,   K:7,  K:8,  K:9,  K:0,    K:']',
+              0,  0,    0,      0,   0,   0,      0,     0,    0,    0,    0,      0,
+              0,  0,    0,      0,   0,   0,      0,   K:-,  K:=,    0, K:\\,  K:BKS
+        },
+        {
+               0,KEY_F1,  KEY_F2,    KEY_F3, KEY_F4, KEY_F5,    KEY_F6,   KEY_F7,   KEY_F8,    KEY_F9, KEY_F10,  KEY_F11 ,
+               0,     0,       0,         0,      0,      0,         0,        0,     K:UP,         0,       0,         0,
+               0,     0,       0,         0,      0,      0,         0,   K:LEFT,   K:DOWN,   K:RIGHT,       0,         0
+        },
+      } ,
+    },
+  }
+}
+)d";
 
 extern slice(slice(KeyItem)) keyMapLayers;
 
@@ -60,7 +91,6 @@ void addLayers(vason in) {
   auto layerCount = in.countChildren();
   if (in.tag() != vason_TABLE || layerCount == 0)
     return;
-
   keyMapLayers = {
       .len = 0,
       .ptr = aCreate(stdAlloc, slice(KeyItem), layerCount)
@@ -85,8 +115,10 @@ void addLayers(vason in) {
         .len = thisLayerLen,
         .ptr = aCreate(stdAlloc, KeyItem, thisLayerLen)
     };
+
+#error api change!!!
     for (usize k = 0; k < thisLayerLen; k++)
-      thisLayer[k] = kn_Match(layerVason[k].asString());
+      thisLayer[k] = kn_Match(layerVason[k].);
     keyMapLayers[keyMapLayers.len++] = thisLayer;
   }
 }
@@ -94,43 +126,29 @@ extern slice(tapDance) tapDances;
 void addDances(vason in) {}
 #include "my-lib/arenaAllocator.h"
 static void parseLayout(fptr string = {}, vason parsed = {{}}) {
-  keyMapLayers = {
-      countof(default_layers),
-      aCreate(stdAlloc, slice(KeyItem), countof(default_layers))
-  };
-  for (int i = 0; i < keyMapLayers.len; i++)
-    keyMapLayers[i] = {
-        countof(default_layers[i]),
-        default_layers[i]
+  if (string.ptr || parsed) {
+    Arena_scoped *local = arena_new_ext(stdAlloc, 1024);
+    if (string.ptr)
+      parsed = vason_parseString(local, slice(c8){string.width, string.ptr});
+    addLayers(parsed["layers"]);
+    addDances(parsed["tapDances"]);
+  } else {
+    keyMapLayers = {
+        countof(default_layers),
+        aCreate(stdAlloc, slice(KeyItem), countof(default_layers))
     };
-  tapDances = {
-      countof(default_tapDances),
-      aCreate(stdAlloc, tapDance, countof(default_tapDances))
-  };
-  for (auto i = 0; i < tapDances.len; i++)
-    tapDances[i] = {
-        default_tapDances[i]
+    for (int i = 0; i < keyMapLayers.len; i++)
+      keyMapLayers[i] = {
+          countof(default_layers[i]),
+          default_layers[i]
+      };
+    tapDances = {
+        countof(default_tapDances),
+        aCreate(stdAlloc, tapDance, countof(default_tapDances))
     };
-  // Arena_scoped *local = arena_new_ext(stdAlloc, 512);
-  // fptr layoutBuf;
-  // if (!parsed.self.objects.ptr) {
-  //   if (string.ptr)
-  //     layoutBuf = string;
-  //   else
-  //     layoutBuf = fp(defaultLayout_chars);
-  //   println_("parsing \n{}", layoutBuf);
-  //   parsed = {parseStr(local, {layoutBuf.width, layoutBuf.ptr})};
-  // }
-  //
-  // println_("top( {vason_container} )", parsed.self);
-  //
-  // vason layers = parsed["keyboard"]["layers"];
-  // vason tapdances = parsed["keyboard"]["tapdances"];
-  // println_("layers   ( {vason_container} )", layers.self);
-  // println_("tapdances( {vason_container} )", tapdances.self);
-  // addLayers(layers);
-  // addDances(tapdances);
-  //
-  // println_("Layout parsed. Layers: {}, TapDances: {}", keyMapLayers.len, tapDances.len);
-  // writeFile("/lay.kml", layoutBuf);
+    for (auto i = 0; i < tapDances.len; i++)
+      tapDances[i] = {
+          default_tapDances[i]
+      };
+  }
 }
