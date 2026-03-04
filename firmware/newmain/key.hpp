@@ -59,7 +59,7 @@ struct KeyItem {
            : c == '='  ? KeyItem{KEY_EQUAL /*      */, KeyItem::CHARACTER}
            : c == '['  ? KeyItem{KEY_LEFTBRACE /*  */, KeyItem::CHARACTER}
            : c == ']'  ? KeyItem{KEY_RIGHTBRACE /* */, KeyItem::CHARACTER}
-           : c == '`'  ? KeyItem{KEY_APOSTROPHE /* */, KeyItem::CHARACTER}
+           : c == '`'  ? KeyItem{KEY_GRAVE /*      */, KeyItem::CHARACTER}
                        : strlen("");
   }
   template <usize N>

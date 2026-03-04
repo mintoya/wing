@@ -18,7 +18,7 @@ KeyItem default_layers[3][48] = {
   },
   {
     K("TAB"),K('1'),  K("2"),    K('3'), K('4'), K('5'),    K('6'),   K('7'),  K('8'),  K('9'),  K('0'),    K(']'),
-          {},    {},      {},        {},     {},     {},        {},       {},      {},      {},      {},        {},
+          {},    {},      {},        {},     {},     {},        {},       {},      {},      {},      {},    K('`'),
           {},    {},      {},        {},     {},     {},        {},   K('-'),  K('='),      {}, K('\\'),  K("BKS"),
   },
   {
@@ -37,7 +37,7 @@ tapDance default_tapDances[] = {
 // clang-format on
 static char defaultLayout_chars[] =
     R"d(
-"{ 
+{ 
   command:setLayout,
   args : {
     keyboard:{
@@ -62,7 +62,7 @@ static char defaultLayout_chars[] =
                0,     0,       0,         0,      0,      0,         0,        0,     K:UP,         0,       0,         0,
                0,     0,       0,         0,      0,      0,         0,   K:LEFT,   K:DOWN,   K:RIGHT,       0,         0
         },
-      } ,
+      },
     },
   }
 }
@@ -116,23 +116,23 @@ void addLayers(vason in) {
         .ptr = aCreate(stdAlloc, KeyItem, thisLayerLen)
     };
 
-#error api change!!!
-    for (usize k = 0; k < thisLayerLen; k++)
-      thisLayer[k] = kn_Match(layerVason[k].);
-    keyMapLayers[keyMapLayers.len++] = thisLayer;
+//#error api change!!!
+    // for (usize k = 0; k < thisLayerLen; k++)
+      // thisLayer[k] = kn_Match(layerVason[k].);
+    // keyMapLayers[keyMapLayers.len++] = thisLayer;
   }
 }
 extern slice(tapDance) tapDances;
 void addDances(vason in) {}
 #include "my-lib/arenaAllocator.h"
 static void parseLayout(fptr string = {}, vason parsed = {{}}) {
-  if (string.ptr || parsed) {
-    Arena_scoped *local = arena_new_ext(stdAlloc, 1024);
-    if (string.ptr)
-      parsed = vason_parseString(local, slice(c8){string.width, string.ptr});
-    addLayers(parsed["layers"]);
-    addDances(parsed["tapDances"]);
-  } else {
+  // if (string.ptr || parsed) {
+  //   Arena_scoped *local = arena_new_ext(stdAlloc, 1024);
+  //   if (string.ptr)
+  //     parsed = vason_parseString(local, slice(c8){string.width, string.ptr});
+  //   addLayers(parsed["layers"]);
+  //   addDances(parsed["tapDances"]);
+  // } else {
     keyMapLayers = {
         countof(default_layers),
         aCreate(stdAlloc, slice(KeyItem), countof(default_layers))
@@ -150,5 +150,5 @@ static void parseLayout(fptr string = {}, vason parsed = {{}}) {
       tapDances[i] = {
           default_tapDances[i]
       };
-  }
+  // }
 }
