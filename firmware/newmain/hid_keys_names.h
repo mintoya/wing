@@ -490,7 +490,7 @@ static KeyItem kn_Match_Special(fptr name) {
       .width = 0,
       .ptr = (u8 *)aCreate(stdAlloc, u8, name.width),
   };
-  defer_(aFree(stdAlloc, out.ptr););
+  defer {aFree(stdAlloc,out.ptr);};
 
   if (fp_indexOf(name, '/') < name.width || fp_indexOf(name, '\\') < name.width) {
     removeEscapeCharacters(name, &out);

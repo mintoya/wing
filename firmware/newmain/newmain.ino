@@ -1,7 +1,7 @@
 #include "Arduino.h"
-#include "esp32-hal-gpio.h"
-#include "esp32-hal.h"
-#include "esp_io.hpp"
+#include "HardwareSerial.h"
+#include "USBCDC.h"
+
 #define NOFILEPRINTER (1)
 #define noAssertMessage (1)
 
@@ -12,7 +12,6 @@
 #undef println_
 #define print_(fmt, ...) print_wfO(serialOutputFunction, 0, fmt, __VA_ARGS__)
 #define println_(fmt, ...) print_(fmt "\r\n", __VA_ARGS__);
-// #include "esp_io.hpp"
 
 void(serialOutputFunction)(
     const c32 *c,
@@ -35,14 +34,14 @@ void(serialOutputFunction)(
 
     // flush full buffer
     if (place == countof(chars)) {
-      ESP_IO::write(chars, place);
+      Serial.write(chars, place);
       place = 0;
     }
   }
 
   if (flush && place > 0) {
-    ESP_IO::write(chars, place);
-    ESP_IO::flush();
+    Serial.write(chars, place);
+    Serial.flush();
     place = 0;
   }
 }
@@ -194,7 +193,7 @@ void local_stateTable_update() {
   }
 }
 void setup() {
-  ESP_IO::begin(115200);
+  Serial.begin(115200);
   wireSetup();
   for (int i = 0; i < countof(colGpios); i++)
     pinMode(colGpios[i], OUTPUT);
@@ -205,7 +204,10 @@ void setup() {
   Keyboard.begin();
   FSISetup();
   println_("layout parsing begin");
-  parseLayout();
+    // delay(2000);
+  parseLayout(fp(defaultLayout_chars));
+  // delay(2000);
+  prettyPrintLayers() ;
   println_("reportmanager begin");
   rm = reportManager(sendHidReport, fakeSender);
   // rm = reportManager(nullptr, fakeSender);
@@ -224,12 +226,12 @@ void loop() {
     finish = millis();
     counter = 1;
   }
-  if (ESP_IO::available()) [[unlikeley]] {
+  if (Serial.available()) [[unlikeley]] {
     usize startTime = millis();
     mList_scoped(u8) readlist = mList_init(stdAlloc, u8);
     do {
-      if (ESP_IO::available())
-        mList_push(readlist, ESP_IO::read());
+      if (Serial.available())
+        mList_push(readlist, Serial.read());
     } while (
         mList_arr(readlist)[mList_len(readlist) - 1] != '\n' &&
         millis() < startTime + 5000
@@ -282,7 +284,7 @@ void wireSetup() {
   Serial1.setTimeout(5);
 }
 void setup() {
-  ESP_IO::begin(115200);
+  Serial.begin(115200);
   wireSetup();
   for (int i = 0; i < countof(colGpios); i++)
     pinMode(colGpios[i], OUTPUT);

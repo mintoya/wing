@@ -82,7 +82,6 @@ void writeFile(AllocatorV _, vason filename, vason content) {
 void removeFile(AllocatorV _, vason filename) { deleteFile(filename.asString()); }
 #define sel_first(a, ...) a
 
-
 static kv basicMap[] =
     {
 
@@ -93,12 +92,12 @@ static kv basicMap[] =
             },
             (char *[]){"filename", "content"}
         ),
-        // makeCommand(
-        //     "reset-layout",
-        //     [](AllocatorV a, vason *args) {
-        //       parseLayout(fp(defaultLayout_chars));
-        //     }
-        // ),
+        makeCommand(
+            "reset-layout",
+            [](AllocatorV a, vason *args) {
+              parseLayout(fp(defaultLayout_chars));
+            }
+        ),
         makeCommand(
             "save",
             [](AllocatorV a, vason *args) {
@@ -149,7 +148,8 @@ static kv basicMap[] =
 
 static void execute(fptr commandText) {
   Arena_scoped *local = arena_new_ext(stdAlloc, 1024);
-  vason v = vason_parseString(local, {commandText.width, commandText.ptr});
+  vason_container vc = vason_parseString(local, {commandText.width, commandText.ptr});
+  vason v = {vc};
 
   auto executeSingle = [](vason v, AllocatorV allocator) {
     fptr command = v["command"].asString();
@@ -161,7 +161,7 @@ static void execute(fptr commandText) {
     for (auto pair : basicMap) {
       if (pair.key == command) {
         vason *args = aCreate(allocator, vason, pair.nargs);
-        defer_({ aFree(allocator, args); });
+        defer { aFree(allocator, args); };
         for (auto i = 0; i < pair.nargs; i++) {
           auto inargs = v["args"];
           if (inargs)
