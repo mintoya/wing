@@ -1,6 +1,7 @@
 #pragma once
 #include "fileSystemInterface.hpp"
 #include "my-lib/fptr.h"
+#include "my-lib/macros.h"
 #include <cstring>
 #include <stdint.h>
 #include <string>
@@ -119,6 +120,62 @@ template <usize N>
 constexpr KeyItem K(const char (&s)[N]) { return KeyItem::K<N>(s); }
 constexpr KeyItem L(u8 n) { return KeyItem::L(n); }
 constexpr KeyItem M(const char (&s)[3]) { return KeyItem::M(s); }
+KeyItem M(fptr fp) {
+  auto in = fp.ptr;
+  if (fp.width == 2) {
+    return (in[0] | 32) == 'l'
+               ? (in[1] | 32) == 's'
+                     ? KeyItem{KEY_MOD_LSHIFT /**/, KeyItem::MODIFIER}
+                 : (in[1] | 32) == 'a'
+                     ? KeyItem{KEY_MOD_LALT /*  */, KeyItem::MODIFIER}
+                 : (in[1] | 32) == 'c'
+                     ? KeyItem{KEY_MOD_LCTRL /* */, KeyItem::MODIFIER}
+                 : (in[1] | 32) == 'm'
+                     ? KeyItem{KEY_MOD_LMETA /* */, KeyItem::MODIFIER}
+                     : KeyItem{}
+           : (in[0] | 32) == 'r'
+               ? (in[1] | 32) == 's'
+                     ? KeyItem{KEY_MOD_RSHIFT /**/, KeyItem::MODIFIER}
+                 : (in[1] | 32) == 'a'
+                     ? KeyItem{KEY_MOD_RALT /*  */, KeyItem::MODIFIER}
+                 : (in[1] | 32) == 'c'
+                     ? KeyItem{KEY_MOD_RCTRL /* */, KeyItem::MODIFIER}
+                 : (in[1] | 32) == 'm'
+                     ? KeyItem{KEY_MOD_RMETA /* */, KeyItem::MODIFIER}
+                     : KeyItem{}
+               : KeyItem{};
+  } else {
+    return KeyItem{};
+  }
+}
+KeyItem K(fptr in) {
+  return in.width == 1
+             ? K(in.ptr[0])
+         : in == fp("SPC")   ? KeyItem{KEY_SPACE /*    */, KeyItem::CHARACTER}
+         : in == fp("ENT")   ? KeyItem{KEY_ENTER /*    */, KeyItem::CHARACTER}
+         : in == fp("TAB")   ? KeyItem{KEY_TAB /*      */, KeyItem::CHARACTER}
+         : in == fp("ESC")   ? KeyItem{KEY_ESC /*      */, KeyItem::CHARACTER}
+         : in == fp("BKS")   ? KeyItem{KEY_BACKSPACE /**/, KeyItem::CHARACTER}
+         : in == fp("INS")   ? KeyItem{KEY_INSERT /*   */, KeyItem::CHARACTER}
+         : in == fp("DEL")   ? KeyItem{KEY_DELETE /*   */, KeyItem::CHARACTER}
+         : in == fp("DOWN")  ? KeyItem{KEY_DOWN /*     */, KeyItem::CHARACTER}
+         : in == fp("LEFT")  ? KeyItem{KEY_LEFT /*     */, KeyItem::CHARACTER}
+         : in == fp("RIGHT") ? KeyItem{KEY_RIGHT /*    */, KeyItem::CHARACTER}
+         : in == fp("UP")    ? KeyItem{KEY_UP /*       */, KeyItem::CHARACTER}
+         : in == fp("F1")    ? KeyItem{KEY_F1 /*       */, KeyItem::CHARACTER}
+         : in == fp("F2")    ? KeyItem{KEY_F2 /*       */, KeyItem::CHARACTER}
+         : in == fp("F3")    ? KeyItem{KEY_F3 /*       */, KeyItem::CHARACTER}
+         : in == fp("F4")    ? KeyItem{KEY_F4 /*       */, KeyItem::CHARACTER}
+         : in == fp("F5")    ? KeyItem{KEY_F5 /*       */, KeyItem::CHARACTER}
+         : in == fp("F6")    ? KeyItem{KEY_F6 /*       */, KeyItem::CHARACTER}
+         : in == fp("F7")    ? KeyItem{KEY_F7 /*       */, KeyItem::CHARACTER}
+         : in == fp("F8")    ? KeyItem{KEY_F8 /*       */, KeyItem::CHARACTER}
+         : in == fp("F9")    ? KeyItem{KEY_F9 /*       */, KeyItem::CHARACTER}
+         : in == fp("F10")   ? KeyItem{KEY_F10 /*      */, KeyItem::CHARACTER}
+         : in == fp("F11")   ? KeyItem{KEY_F11 /*      */, KeyItem::CHARACTER}
+         : in == fp("F12")   ? KeyItem{KEY_F12 /*      */, KeyItem::CHARACTER}
+                             : KeyItem{};
+}
 } // namespace KeyItem_ititiazizers
 
 REGISTER_PRINTER(KeyItem, {
@@ -209,20 +266,23 @@ struct reportManager {
 };
 
 struct KeyState {
+  ulong lastTrigger : sizeof(ulong) * 8 - 3;
   enum : c8 {
-    HELDUP = 0,
-    PRESSED = 1,
-    HELDDOWN = 2,
-    RELEASED = 3,
-  } state;
+    HELDUP,
+    PRESSED,
+    HELDDOWN,
+    RELEASED,
+  } state : 3;
+  static constexpr ulong triggerMask = ((ulong)-1) >> 3;
   inline void up() {
     switch (state) {
       case HELDDOWN:
       case PRESSED:
         state = RELEASED;
-      case RELEASED:
-      case HELDUP:
+        break;
+      default:
         state = HELDUP;
+        break;
     }
   }
   inline void down() {
@@ -230,12 +290,14 @@ struct KeyState {
       case HELDUP:
       case RELEASED:
         state = PRESSED;
-      case PRESSED:
-      case HELDDOWN:
+        break;
+      default:
         state = HELDDOWN;
+        break;
     }
   }
 };
+static_assert(sizeof(KeyState) == sizeof(ulong));
 
 struct tapDance {
   KeyItem pressActions[10];
@@ -246,11 +308,19 @@ struct tapDance {
   bool heldActionTriggered;
 };
 
-extern slice(tapDance) tapDances;
-
-extern slice(slice(KeyItem)) keyMapLayers;
+extern slice_t<tapDance> tapDances;
+extern slice_t<slice_t<KeyItem>> keyMapLayers;
 
 namespace keyMap {
+
+template <usize rows, usize cols>
+static void pressKeys2(
+    bool literalState[rows][cols * 2],
+    reportManager &rm
+) {
+  static KeyState internalState[rows][cols * 2];
+  uint currentLayer = 0;
+}
 
 template <usize rows, usize cols>
 static void pressKeys(bool keyState[rows][cols * 2], reportManager &rm, uint currentLayer = 0) {
