@@ -146,11 +146,9 @@ static kv basicMap[] =
  */
 #include "my-lib/arenaAllocator.h"
 
-static void execute(fptr commandText) {
-  Arena_scoped *local = arena_new_ext(stdAlloc, 1024);
-  vason_container vc = vason_parseString(local, {commandText.width, commandText.ptr});
+static void execute(vason_container vc) {
   vason v = {vc};
-
+Arena_scoped* local = arena_new_ext(stdAlloc,512);
   auto executeSingle = [](vason v, AllocatorV allocator) {
     fptr command = v["command"].asString();
     if (!command.width) {
@@ -182,7 +180,7 @@ static void execute(fptr commandText) {
   };
 
   if (v.tag() == vason_TABLE) {
-    Arena_scoped *single = arena_new_ext(local, 1024);
+    Arena_scoped *single = arena_new_ext(stdAlloc, 1024);
     for (int i = 0; i < v.countChildren(); i++) {
       executeSingle(v[i], single);
       arena_clear(single);

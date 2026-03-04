@@ -149,8 +149,8 @@ KeyItem M(fptr fp) {
   }
 }
 KeyItem K(fptr in) {
-  return in.width == 1
-             ? K(in.ptr[0])
+  return in == fp("\\/")     ? KeyItem{KEY_SLASH /*    */, KeyItem::CHARACTER}
+         : in == fp("\\\\")    ? KeyItem{KEY_BACKSLASH /**/, KeyItem::CHARACTER}
          : in == fp("SPC")   ? KeyItem{KEY_SPACE /*    */, KeyItem::CHARACTER}
          : in == fp("ENT")   ? KeyItem{KEY_ENTER /*    */, KeyItem::CHARACTER}
          : in == fp("TAB")   ? KeyItem{KEY_TAB /*      */, KeyItem::CHARACTER}
@@ -174,6 +174,7 @@ KeyItem K(fptr in) {
          : in == fp("F10")   ? KeyItem{KEY_F10 /*      */, KeyItem::CHARACTER}
          : in == fp("F11")   ? KeyItem{KEY_F11 /*      */, KeyItem::CHARACTER}
          : in == fp("F12")   ? KeyItem{KEY_F12 /*      */, KeyItem::CHARACTER}
+         : in.width == 1     ? K(in.ptr[0])
                              : KeyItem{};
 }
 } // namespace KeyItem_ititiazizers

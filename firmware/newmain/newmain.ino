@@ -237,10 +237,10 @@ void loop() {
         millis() < startTime + 5000
     );
     fptr input = mList_slice(readlist);
-    My_allocator *local = arena_new_ext(stdAlloc, 1024);
-    println_("{vason_container}", vason_parseString(local, mList_slice(readlist)));
-    arena_cleanup(local);
-    commands::execute(input);
+    Arena_scoped *local = arena_new_ext(stdAlloc, 1024);
+    vason_container vc = vason_parseString(local, (slice(c8))mList_slice(readlist));
+    println_("{vason_container}", vc);
+    commands::execute(vc);
   }
   local_stateTable_update();
   remote_stateTable_update();
