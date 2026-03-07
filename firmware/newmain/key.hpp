@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <string>
 constexpr uint TAPDANCEDEFAULTTIMEOUT = 300;
-#include "my-lib/my-list.h"
+#include "my-lib/mylist.h"
 #include "my-lib/mytypes.h"
 
 extern ulong millis(void);
@@ -150,7 +150,7 @@ KeyItem M(fptr fp) {
 }
 KeyItem K(fptr in) {
   return in == fp("\\/")     ? KeyItem{KEY_SLASH /*    */, KeyItem::CHARACTER}
-         : in == fp("\\\\")    ? KeyItem{KEY_BACKSLASH /**/, KeyItem::CHARACTER}
+         : in == fp("\\\\")  ? KeyItem{KEY_BACKSLASH /**/, KeyItem::CHARACTER}
          : in == fp("SPC")   ? KeyItem{KEY_SPACE /*    */, KeyItem::CHARACTER}
          : in == fp("ENT")   ? KeyItem{KEY_ENTER /*    */, KeyItem::CHARACTER}
          : in == fp("TAB")   ? KeyItem{KEY_TAB /*      */, KeyItem::CHARACTER}
@@ -181,14 +181,14 @@ KeyItem K(fptr in) {
 
 REGISTER_PRINTER(KeyItem, {
   // clang-format off
-  switch (in.type) {
+    switch (in.type) {
     case KeyItem::CHARACTER    : { PUTS(U"K"); } break;
     case KeyItem::MODIFIER     : { PUTS(U"M"); } break;
     case KeyItem::LAYER        : { PUTS(U"L"); } break;
     case KeyItem::TAPDANCE     : { PUTS(U"T"); } break;
     case KeyItem::FUNCTIONCALL : { PUTS(U"F"); } break;
     case KeyItem::PASSTHROUGH_ : { PUTS(U"_"); } break;
-  }
+    }
   // clang-format on
   PUTS(U":");
   switch (in.type) {
@@ -298,7 +298,6 @@ struct KeyState {
     }
   }
 };
-static_assert(sizeof(KeyState) == sizeof(ulong));
 
 struct tapDance {
   KeyItem pressActions[10];
@@ -314,71 +313,53 @@ extern slice_t<slice_t<KeyItem>> keyMapLayers;
 
 namespace keyMap {
 
+#define key_getBool(index) keyState[index / countof(keyState[0])][index % countof(keyState[0])]
 template <usize rows, usize cols>
-static void pressKeys2(
-    bool literalState[rows][cols * 2],
-    reportManager &rm
-) {
-  static KeyState internalState[rows][cols * 2];
-  uint currentLayer = 0;
-}
-
-template <usize rows, usize cols>
-static void pressKeys(bool keyState[rows][cols * 2], reportManager &rm, uint currentLayer = 0) {
-
-  if (currentLayer >= keyMapLayers.len)
-    return;
+static void pressKeys(bool keyState[rows][cols * 2], reportManager &rm) {
   static bool forceDown = false;
   uint length = rows * cols * 2;
-  // uint length = sizeof(keyState) / sizeof(bool);
-  auto key_getBool = [&](uint index) -> bool & {
-    uint r = index / countof(keyState[0]);
-    uint c = index % countof(keyState[0]);
-    return keyState[r][c];
-  };
+  u8 currentLayer = 0;
 
   static mList(KeyItem) que = mList_init(stdAlloc, KeyItem);
+  defer { mList_clear(que); };
 
   ulong now = millis();
   /*
-    KeyItem::kType::CHARACTER
-    KeyItem::kType::FUNCTIONCALL
-    KeyItem::kType::LAYER
-    KeyItem::kType::MODIFIER
-    KeyItem::kType::PASSTHROUGH_
-    KeyItem::kType::TAPDANCE
-  */
-  slice(KeyItem) keyMapLayers_arr = keyMapLayers[currentLayer];
-  for (uint i = 0; i < length; i++) {
-    if (key_getBool(i) &&
-        keyMapLayers_arr[i].type == KeyItem::kType::LAYER) {
-      key_getBool(i) = (false);
-      return pressKeys<rows, cols>(keyState, rm, keyMapLayers_arr[i].character);
+         KeyItem::kType::CHARACTER
+         KeyItem::kType::FUNCTIONCALL
+         KeyItem::kType::LAYER
+         KeyItem::kType::MODIFIER
+         KeyItem::kType::PASSTHROUGH_
+         KeyItem::kType::TAPDANCE
+       */
+  for (uint i = 0; i < length; i++)
+    if (key_getBool(i) && keyMapLayers[currentLayer][i].type == KeyItem::kType::LAYER) {
+      key_getBool(i) = false;
+      currentLayer = keyMapLayers[currentLayer][i].character;
     }
-  }
 
   /*
-    KeyItem::kType::CHARACTER
-    KeyItem::kType::FUNCTIONCALL
-    KeyItem::kType::MODIFIER
-    KeyItem::kType::PASSTHROUGH_
-    KeyItem::kType::TAPDANCE
-  */
+         KeyItem::kType::CHARACTER
+         KeyItem::kType::FUNCTIONCALL
+         KeyItem::kType::MODIFIER
+         KeyItem::kType::PASSTHROUGH_
+         KeyItem::kType::TAPDANCE
+       */
 
-  static KeyItem activeKeyCache[rows * cols * 2];
-  static bool isKeyCached[rows * cols * 2] = {false};
+  static KeyItem activelLock[rows * cols * 2];
+  static bool layerLock[rows * cols * 2] = {};
 
   forceDown = false;
   for (auto i = 0; i < length; i++) {
     KeyItem currentKey;
-    if (key_getBool(i) && isKeyCached[i]) {
-      currentKey = activeKeyCache[i];
+    if (key_getBool(i) && layerLock[i]) {
+      currentKey = activelLock[i];
 
-    } else if (!key_getBool(i) && isKeyCached[i]) {
-      currentKey = activeKeyCache[i];
-      isKeyCached[i] = false;
+    } else if (!key_getBool(i) && layerLock[i]) {
+      currentKey = activelLock[i];
+      layerLock[i] = false;
     } else {
-      currentKey = keyMapLayers_arr[i];
+      currentKey = keyMapLayers[currentLayer][i];
       if (currentKey.type == KeyItem::kType::PASSTHROUGH_) {
         for (auto j = currentLayer + 1; j > 0; j--) {
           KeyItem temp = keyMapLayers[j - 1][i];
@@ -389,18 +370,18 @@ static void pressKeys(bool keyState[rows][cols * 2], reportManager &rm, uint cur
         }
       }
       if (key_getBool(i)) {
-        activeKeyCache[i] = currentKey;
-        isKeyCached[i] = true;
+        activelLock[i] = currentKey;
+        layerLock[i] = true;
       }
     }
 
     if (key_getBool(i)) {
       /*
-                    KeyItem::kType::CHARACTER
-                    KeyItem::kType::FUNCTIONCALL
-                    KeyItem::kType::MODIFIER
-                    KeyItem::kType::TAPDANCE
-                  */
+                 KeyItem::kType::CHARACTER
+                 KeyItem::kType::FUNCTIONCALL
+                 KeyItem::kType::MODIFIER
+                 KeyItem::kType::TAPDANCE
+               */
       switch (currentKey.type) {
         case KeyItem::kType::FUNCTIONCALL: {
           // keyboardFunctions[currentKey.character]();
@@ -414,9 +395,9 @@ static void pressKeys(bool keyState[rows][cols * 2], reportManager &rm, uint cur
         default:
           forceDown = true;
           /*
-                              KeyItem::kType::CHARACTER
-                              KeyItem::kType::MODIFIER
-                            */
+                         KeyItem::kType::CHARACTER
+                         KeyItem::kType::MODIFIER
+                       */
           mList_push(que, currentKey);
       }
 
@@ -475,6 +456,5 @@ static void pressKeys(bool keyState[rows][cols * 2], reportManager &rm, uint cur
         rm.addKey(k);
     }
   }
-  mList_clear(que);
 }
 } // namespace keyMap

@@ -1,5 +1,5 @@
 #include "fileSystemInterface.hpp"
-#include "my-lib/omap.h"
+#include "layout.hpp"
 #include "my-lib/vason_arr.h"
 #include <cstdio>
 
@@ -60,7 +60,7 @@ void listdirectories(AllocatorV _, vason dirname) {
 
   listDir(target);
 }
-void writeFile(AllocatorV _, vason filename, vason content) {
+void writefile(AllocatorV _, vason filename, vason content) {
   fptr fileNameStr = filename.asString();
   fptr contentStr = content.asString();
   if (!fileNameStr.width) {
@@ -80,6 +80,10 @@ void writeFile(AllocatorV _, vason filename, vason content) {
   fclose(file);
 }
 void removeFile(AllocatorV _, vason filename) { deleteFile(filename.asString()); }
+void setlayout(AllocatorV _, vason keyboard) {
+  addLayers(keyboard["layers"]);
+  addDances(keyboard["tapDances"]);
+}
 #define sel_first(a, ...) a
 
 static kv basicMap[] =
@@ -88,47 +92,38 @@ static kv basicMap[] =
         makeCommand(
             "save",
             [](AllocatorV a, vason *args) {
-              writeFile(a, args[0], args[1]);
+              writefile(a, args[0], args[1]);
             },
             (char *[]){"filename", "content"}
         ),
         makeCommand(
             "reset-layout",
             [](AllocatorV a, vason *args) {
-              parseLayout(fp(defaultLayout_chars));
-            }
-        ),
-        makeCommand(
-            "save",
-            [](AllocatorV a, vason *args) {
-              writeFile(a, args[0], args[1]);
+              parseLayout();
             }
         ),
         makeCommand(
             "rm",
-            [](AllocatorV a, vason *args) {
-              removeFile(a, args[0]);
-            },
+            [](AllocatorV a, vason *args) { removeFile(a, args[0]); },
             (char *[]){"filename"}
         ),
         makeCommand(
             "pretty-layers",
-            [](AllocatorV a, vason *args) {
-              prettyPrintLayers();
-            }
+            [](AllocatorV a, vason *args) { prettyPrintLayers(); }
         ),
         makeCommand(
             "ls",
-            [](AllocatorV a, vason *args) {
-              listdirectories(a, args[0]);
-            },
+            [](AllocatorV a, vason *args) { listdirectories(a, args[0]); },
             (char *[]){"dirname"}
         ),
         makeCommand(
+            "set-layout",
+            [](AllocatorV a, vason *args) { setlayout(a, args[0]); },
+            (char *[]){"layout"}
+        ),
+        makeCommand(
             "open",
-            [](AllocatorV a, vason *args) {
-              openfile(a, args[0]);
-            },
+            [](AllocatorV a, vason *args) { openfile(a, args[0]); },
             (char *[]){"filename"}
         ),
 };
@@ -148,7 +143,7 @@ static kv basicMap[] =
 
 static void execute(vason_container vc) {
   vason v = {vc};
-Arena_scoped* local = arena_new_ext(stdAlloc,512);
+  Arena_scoped *local = arena_new_ext(stdAlloc, 512);
   auto executeSingle = [](vason v, AllocatorV allocator) {
     fptr command = v["command"].asString();
     if (!command.width) {
@@ -179,13 +174,13 @@ Arena_scoped* local = arena_new_ext(stdAlloc,512);
       println_("\t{}", pair.key);
   };
 
-  if (v.tag() == vason_TABLE) {
-    Arena_scoped *single = arena_new_ext(stdAlloc, 1024);
-    for (int i = 0; i < v.countChildren(); i++) {
-      executeSingle(v[i], single);
-      arena_clear(single);
-    }
-  } else
-    executeSingle(v, local);
+  // if (v.tag() == vason_TABLE) {
+  //   Arena_scoped *single = arena_new_ext(stdAlloc, 1024);
+  //   for (int i = 0; i < v.countChildren(); i++) {
+  //     executeSingle(v[i], single);
+  //     arena_clear(single);
+  //   }
+  // } else
+  executeSingle(v, local);
 }
 } // namespace commands

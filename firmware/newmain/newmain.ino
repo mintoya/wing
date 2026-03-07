@@ -70,9 +70,9 @@ constexpr u8 SLAVE_ADDR = 0x42;
 // #define SERIAL_SPEED 74880
 #define SERIAL_SPEED 115200
 
-#define cSum_REDUNDANCY_AMMOUNT ((uint)1) // cant be 0
-#include "my-lib/cSum.h"
-static dataChecker dc = cSum_new(stdAlloc);
+// #define cSum_REDUNDANCY_AMMOUNT ((uint)1) // cant be 0
+// #include "my-lib/cSum.h"
+// static dataChecker dc = cSum_new(stdAlloc);
 
 #define ISMAINHALF (1)
 #if defined(ISMAINHALF) // main side
@@ -164,10 +164,10 @@ void remote_stateTable_update() {
   }
 
   /*if (mList_len(message) > 0)*/ {
-    checkData cd = {.data = {mList_len(message), mList_arr(message)}};
+    fptr result = {mList_len(message), mList_arr(message)};
+    // checkData cd = {.data = {mList_len(message), mList_arr(message)}};
 
     // fptr result = cSum_fromSum(cd);
-    fptr result = cd.data;
 
     for (auto i = 0; i < countof(rowGpios); i++) {
       for (auto j = 0; j < countof(colGpios); j++) {
@@ -199,13 +199,22 @@ void setup() {
     pinMode(colGpios[i], OUTPUT);
   for (int i = 0; i < countof(rowGpios); i++)
     pinMode(rowGpios[i], INPUT_PULLDOWN);
+  My_allocator* local = arena_new_ext(stdAlloc,512);
+  defer {arena_cleanup(local);};
 
   USB.begin();
   Keyboard.begin();
   FSISetup();
   println_("layout parsing begin");
     // delay(2000);
-  parseLayout(fp(defaultLayout_chars));
+  auto vs =
+      vason_parseString(
+        local,
+        (slice(c8))slice_stat(
+          defaultLayout_chars
+        )
+        );
+  parseLayout(vs);
   // delay(2000);
   prettyPrintLayers() ;
   println_("reportmanager begin");

@@ -2,7 +2,7 @@
 #include "fileSystemInterface.hpp"
 #include "hid_keys_names.h"
 #include "key.hpp"
-#include "my-lib/my-list.h"
+#include "my-lib/mylist.h"
 #include "my-lib/mytypes.h"
 #include "my-lib/shortList.h"
 #include "my-lib/vason_arr.h"
@@ -132,19 +132,15 @@ void addLayers(vason in) {
 
 void addDances(vason in) {}
 #include "my-lib/arenaAllocator.h"
-static void parseLayout(fptr string = {}, vason parsed = {nullptr, 0}) {
-  if (string.ptr || parsed) {
+static void parseLayout(vason parsed = {nullptr, 0}) {
+  if (parsed) {
     vason_container c;
     My_allocator *local = arena_new_ext(stdAlloc, 1024);
     defer { arena_cleanup(local); };
 
-    if (string.ptr) {
-      c = vason_parseString(local, slice(c8){string.width, string.ptr});
-      parsed = {c};
-    }
     parsed = parsed["keyboard"];
-    println_("{vason_container}",(vason_container)parsed)
-    addLayers(parsed["layers"]);
+    println_("{vason_container}", (vason_container)parsed)
+        addLayers(parsed["layers"]);
     addDances(parsed["tapDances"]);
   } else {
     keyMapLayers = {
