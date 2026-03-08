@@ -18,7 +18,7 @@ void(serialOutputFunction)(
     void *_,
     uint len,
     bool flush
-) {
+    ) {
   static u8 chars[512];
   static usize place = 0;
 
@@ -76,9 +76,9 @@ constexpr u8 SLAVE_ADDR = 0x42;
 
 #define ISMAINHALF (1)
 #if defined(ISMAINHALF) // main side
-  #include "fileSystemInterface.hpp"
-  // #include "key.hpp"
-  #include "layout.hpp"
+#include "fileSystemInterface.hpp"
+// #include "key.hpp"
+#include "layout.hpp"
 //
 //
 //
@@ -89,23 +89,23 @@ const uint nrowGpios = countof(rowGpios);
 const uint ncolGpios = countof(colGpios);
 static bool sateTable[countof(rowGpios)][countof(colGpios) * 2] = {};
 namespace bounceTable {
-static unsigned long pstate[countof(sateTable)][countof(sateTable[0])]; // last state, negetive for high, positive for low
-static bool lstate[countof(sateTable)][countof(sateTable[0])];
-void update() {
-  auto now = micros();
-  for (uint i = 0; i < countof(sateTable); i++) {
-    for (uint j = 0; j < countof(sateTable[0]); j++) {
-      if (sateTable[i][j] == lstate[i][j])
-        pstate[i][j] = now;
-      if (now - pstate[i][j] > 2000)
-        lstate[i][j] = sateTable[i][j];
+  static unsigned long pstate[countof(sateTable)][countof(sateTable[0])]; // last state, negetive for high, positive for low
+  static bool lstate[countof(sateTable)][countof(sateTable[0])];
+  void update() {
+    auto now = micros();
+    for (uint i = 0; i < countof(sateTable); i++) {
+      for (uint j = 0; j < countof(sateTable[0]); j++) {
+        if (sateTable[i][j] == lstate[i][j])
+          pstate[i][j] = now;
+        if (now - pstate[i][j] > 2000)
+          lstate[i][j] = sateTable[i][j];
+      }
     }
   }
-}
 
 }; // namespace bounceTable
-//
-// keyboard report variables
+   //
+   // keyboard report variables
 USBHIDKeyboard Keyboard;
 reportManager rm;
 
@@ -127,7 +127,7 @@ void fakeSender(u8 mod, u8 *keys) {
         mod,
         keys[0], keys[1], keys[2],
         keys[3], keys[4], keys[5]
-    );
+        );
 }
 void sendHidReport(u8 modifiers, uint8_t *key_codes) {
   static KeyReport k;
@@ -206,28 +206,18 @@ void setup() {
   Keyboard.begin();
   FSISetup();
   println_("layout parsing begin");
-    // delay(2000);
-  auto vs =
-      vason_parseString(
-        local,
-        (slice(c8))slice_stat(
-          defaultLayout_chars
-        )
-        );
+  auto vs = vason_parseString( local, (slice(c8))slice_stat( defaultLayout_chars));
   parseLayout(vs);
-  // delay(2000);
   prettyPrintLayers() ;
   println_("reportmanager begin");
   rm = reportManager(sendHidReport, fakeSender);
-  // rm = reportManager(nullptr, fakeSender);
   println_("loop begin");
   Serial1.write('/0');
 }
-  #include "my-lib/arenaAllocator.h"
 usize counter = 0;
 usize start = 0;
 usize finish = 0;
-  #include "command.hpp"
+#include "command.hpp"
 void loop() {
   counter++;
   if (!(counter % 1000)) [[unlikeley]] {
@@ -244,7 +234,7 @@ void loop() {
     } while (
         mList_arr(readlist)[mList_len(readlist) - 1] != '\n' &&
         millis() < startTime + 5000
-    );
+        );
     fptr input = mList_slice(readlist);
     Arena_scoped *local = arena_new_ext(stdAlloc, 1024);
     vason_container vc = vason_parseString(local, (slice(c8))mList_slice(readlist));
@@ -275,10 +265,10 @@ void loop() {
 //
 //
 #else // peripheral side
-//
-//
-//
-//
+      //
+      //
+      //
+      //
 static const uint rowGpios[] = {2, 3, 4, 5};
 static const uint colGpios[] = {10, 11, 9, 8, 7, 6};
 

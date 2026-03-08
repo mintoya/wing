@@ -346,28 +346,17 @@ static void pressKeys(bool keyState[rows][cols * 2], reportManager &rm) {
     KeyItem::TAPDANCE
   */
 
-  static u8 activellLock[rows * cols * 2] = {}; // held down keys cant change layers
-
   forceDown = false;
   for (auto i = 0; i < length; i++) {
-    KeyItem currentKey;
-    if (key_getBool(i) && activellLock[i]) {
-      currentKey = keyMapLayers[activellLock[i] - 1][i];
-    } else if (!key_getBool(i) && activellLock[i]) {
-      activellLock[i] = 0;
-    } else {
-      currentKey = keyMapLayers[currentLayer][i];
-      if (currentKey.type == KeyItem::PASSTHROUGH_) {
-        for (auto j = currentLayer + 1; j > 0; j--) {
-          KeyItem temp = keyMapLayers[j - 1][i];
-          if (temp.type != KeyItem::PASSTHROUGH_) {
-            currentKey = temp;
-            break;
-          }
+    KeyItem currentKey = keyMapLayers[currentLayer][i];
+    if (currentKey.type == KeyItem::PASSTHROUGH_) {
+      for (auto j = currentLayer + 1; j > 0; j--) {
+        KeyItem temp = keyMapLayers[j - 1][i];
+        if (temp.type != KeyItem::PASSTHROUGH_) {
+          currentKey = temp;
+          break;
         }
       }
-      if (key_getBool(i))
-        activellLock[i] = currentLayer + 1;
     }
 
     if (key_getBool(i)) {
