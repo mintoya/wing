@@ -3,6 +3,7 @@
 #include "my-lib/fptr.h"
 #include "my-lib/macros.h"
 #include <cstring>
+#include <functional>
 #include <stdint.h>
 #include <string>
 constexpr uint TAPDANCEDEFAULTTIMEOUT = 300;
@@ -311,136 +312,112 @@ extern slice_t<slice_t<KeyItem>> keyMapLayers;
 
 namespace keyMap {
 
-#define key_getBool(index) keyState[index / countof(keyState[0])][index % countof(keyState[0])]
 template <usize rows, usize cols>
-static void pressKeys(bool keyState[rows][cols * 2], reportManager &rm) {
+static void pressKeys(bool matrix[rows][cols * 2], reportManager &rm) {
   constexpr auto length = rows * cols * 2;
-
-  static bool forceDown = false;
+  auto matrix_get = [matrix](uint i) -> bool & { return matrix[i / countof(matrix[0])][i % countof(matrix[0])]; };
+  static mList(uint) activeKeys = mList_init(stdAlloc, uint);
+  static mList(KeyItem) reportque = mList_init(stdAlloc, KeyItem);
+  // will always finish at 0 length
   u8 currentLayer = 0;
+  auto now = millis();
 
-  static mList(KeyItem) que = mList_init(stdAlloc, KeyItem);
-  defer { mList_clear(que); };
+  // since tapdances need to know when theyre not pressed
+  bool tapdances_check[tapDances.len];
+  memset(tapdances_check, 0, sizeof(tapdances_check));
 
-  ulong now = millis();
-  /*
-    KeyItem::CHARACTER
-    KeyItem::FUNCTIONCALL
-    KeyItem::LAYER
-    KeyItem::MODIFIER
-    KeyItem::PASSTHROUGH_
-    KeyItem::TAPDANCE
-  */
-  // remove layers first
-  for (uint i = 0; i < length; i++)
-    if (key_getBool(i) && keyMapLayers[currentLayer][i].type == KeyItem::LAYER) {
-      key_getBool(i) = false;
-      currentLayer = keyMapLayers[currentLayer][i].character;
-    }
+  for (auto i = 0; i < length; i++)
+    if (matrix_get(i))
+      mList_push(activeKeys, i);
 
-  /*
-    KeyItem::CHARACTER
-    KeyItem::FUNCTIONCALL
-    KeyItem::MODIFIER
-    KeyItem::PASSTHROUGH_
-    KeyItem::TAPDANCE
-  */
-
-  forceDown = false;
-  for (auto i = 0; i < length; i++) {
-    KeyItem currentKey = keyMapLayers[currentLayer][i];
-    if (currentKey.type == KeyItem::PASSTHROUGH_) {
-      for (auto j = currentLayer + 1; j > 0; j--) {
-        KeyItem temp = keyMapLayers[j - 1][i];
-        if (temp.type != KeyItem::PASSTHROUGH_) {
-          currentKey = temp;
-          break;
-        }
-      }
-    }
-
-    if (key_getBool(i)) {
-      /*
-        KeyItem::CHARACTER
-        KeyItem::FUNCTIONCALL
-        KeyItem::MODIFIER
-        KeyItem::TAPDANCE
-      */
-      switch (currentKey.type) {
-        case KeyItem::FUNCTIONCALL: {
-          // keyboardFunctions[currentKey.character]();
-
-        } break;
-        case KeyItem::TAPDANCE: {
-          if (currentKey.character < tapDances.len)
-            tapDances[currentKey.character].keystate.down();
-
-        } break;
-        default:
-          forceDown = true;
-          /*
-            KeyItem::CHARACTER
-            KeyItem::MODIFIER
-          */
-          mList_push(que, currentKey);
-      }
-
-    } else {
-      if (
-          currentKey.type == KeyItem::TAPDANCE &&
-          currentKey.character < tapDances.len
-      )
-        tapDances[currentKey.character].keystate.up();
+  for (auto i = 0; i < mList_len(activeKeys); i++) {
+    uint ki = mList_arr(activeKeys)[i];
+    KeyItem k =
+        currentLayer < keyMapLayers.len && ki < keyMapLayers[currentLayer].len
+            ? keyMapLayers[currentLayer][ki]
+            : KeyItem{};
+    switch (k.type) {
+      case KeyItem::LAYER:
+        currentLayer = k.character;
+        mList_rem(activeKeys, i);
+        i = -1;
+        break;
+      case KeyItem::TAPDANCE:
+        tapdances_check[k.character] = true;
+        mList_rem(activeKeys, i);
+        i = -1;
+        break;
+      case KeyItem::FUNCTIONCALL: // TODO
+        mList_rem(activeKeys, i);
+        break;
+      case KeyItem::PASSTHROUGH_:
+        break;
     }
   }
 
+  for (auto i = 0; i < tapDances.len; i++)
+    tapdances_check[i] ? tapDances[i].keystate.down() : tapDances[i].keystate.up();
+  std::function<void(KeyItem)> td_key_handle = [&currentLayer](KeyItem k) -> void {
+    switch (k.type) {
+      case KeyItem::TAPDANCE: // no way
+      case KeyItem::PASSTHROUGH_:
+        break;
+      case KeyItem::LAYER:
+        currentLayer = k.character;
+        break;
+      case KeyItem::CHARACTER:
+      case KeyItem::MODIFIER:
+        mList_push(reportque, k);
+      case KeyItem::FUNCTIONCALL: // TODO
+        break;
+    }
+  };
   for (tapDance &td : tapDances) {
     if (td.keystate.state == KeyState::PRESSED) {
       if (td.state == 0 || now < td.currentCountDown) {
         td.state++;
         td.currentCountDown = now + TAPDANCEDEFAULTTIMEOUT;
       }
-
     } else if (td.state) {
-      if (forceDown || now > td.currentCountDown) {
+      if (mList_len(activeKeys) || now > td.currentCountDown) {
         if (td.keystate.state == KeyState::RELEASED) {
           if (!td.heldActionTriggered)
-            mList_ins(que, 0, td.pressActions[(td.state - 1) % 10]);
+            td_key_handle(td.pressActions[(td.state - 1) % 10]);
           td.state = 0;
           td.heldActionTriggered = false;
-
         } else if (td.keystate.state == KeyState::HELDDOWN) {
-          mList_ins(que, 0, td.holdActions[(td.state - 1) % 10]);
+          td_key_handle(td.holdActions[(td.state - 1) % 10]);
           td.heldActionTriggered = true;
         } else if (td.keystate.state == KeyState::HELDUP) {
-          mList_ins(que, 0, td.pressActions[(td.state - 1) % 10]);
+          td_key_handle(td.pressActions[(td.state - 1) % 10]);
           td.state = 0;
         }
       }
     }
   }
-  for (const KeyItem k : *mList_vla(que)) {
-    switch (k.type) {
-      case KeyItem::FUNCTIONCALL: {
-        // keyboardFunctions[que_arr[i].character]();
-
-      } break;
-      case KeyItem::LAYER: {
-        assertMessage(false, "unreachable?");
-
-      } break;
-      case KeyItem::TAPDANCE: {
-        if (k.character < tapDances.len)
-          tapDances[k.character].keystate.down();
-
-      } break;
-      default:
-        /*
-                     KeyItem::CHARACTER
-                     KeyItem::MODIFIER
-                   */
-        rm.addKey(k);
+  for (auto kindex : *mList_vla(activeKeys)) {
+    for (auto useLayer = currentLayer;; useLayer--) {
+      KeyItem currentKey =
+          useLayer < keyMapLayers.len && kindex < keyMapLayers[useLayer].len
+              ? keyMapLayers[useLayer][kindex]
+              : KeyItem{};
+      if (currentKey.type == KeyItem::PASSTHROUGH_ && useLayer)
+        continue;
+      switch (currentKey.type) {
+        case KeyItem::MODIFIER:
+        case KeyItem::CHARACTER:
+          mList_push(reportque, currentKey);
+          break;
+        case KeyItem::FUNCTIONCALL: // TODO
+          break;
+        default: // no more layer/tapdance recursion
+          break;
+      }
+      break;
     }
   }
+  mList_clear(activeKeys);
+  while (mList_len(reportque))
+    rm.addKey(mList_pop(reportque));
 }
 } // namespace keyMap
