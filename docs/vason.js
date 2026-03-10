@@ -1,4 +1,5 @@
-import VASONmodule from "./vason_wasm/vason_parser.js";
+import VASONmoduleFactory from "./vason_parser.js";
+const VASONmodule = await VASONmoduleFactory();
 function vasonToAST(vHandle) {
   if (!vHandle || !vHandle.isValid()) {
     if (vHandle) vHandle.delete();
