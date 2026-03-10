@@ -24,7 +24,7 @@ jobs:
           mkdir -p docs/vason_wasm
           cp vason_parser.js docs/vason_wasm/
           cp vason_parser.wasm docs/vason_wasm/
-          cp vason.js docs/vason_wasm/
+          cp firmware/newmain/my-lib/vason.js docs/vason_wasm/
 
       - name: Commit and Push to GitHub
         run: |
