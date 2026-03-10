@@ -18,12 +18,20 @@ jobs:
         run: git clone https://github.com/mintoya/wheels firmware/newmain/my-lib
       - name: Compile C++ to WASM
         run: |
-          emcc -x c++ firmware/newmain/my-lib/examples/includeAll.c -o vason_parser.js --bind -s ALLOW_MEMORY_GROWTH=1 -DnoAssertMessage -O3 -s WASM_ASYNC_COMPILATION=0 -s EXPORT_ES6=1 -s MODULARIZE=1
+          emcc -x c++ firmware/newmain/my-lib/examples/includeAll.c \
+            -o vason_parser.js                                      \
+            --bind                                                  \
+            -DnoAssertMessage                                       \
+            -O3                                                     \
+            -s ALLOW_MEMORY_GROWTH=1                                \
+            -s WASM_ASYNC_COMPILATION=0                             \
+            -s EXPORT_ES6=1                                         \
+            -s MODULARIZE=1                                         \
+            -s SINGLE_FILE=1
       - name: Copy files to docs folder
         run: |
           mkdir -p docs/vason_wasm
-          cp vason_parser.js docs/vason_wasm/
-          cp vason_parser.wasm docs/vason_wasm/
+          mv vason_parser.js docs/vason_wasm/
 
       - name: Commit and Push to GitHub
         run: |
