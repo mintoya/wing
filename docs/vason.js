@@ -1,4 +1,4 @@
-const VASONmodule = require("./vason_parser.js");
+import VASONmodule from "./vason_wasm/vason_parser.js";
 function vasonToAST(vHandle) {
   if (!vHandle || !vHandle.isValid()) {
     if (vHandle) vHandle.delete();
@@ -143,4 +143,4 @@ class Vason {
     return astToVason(this.data);
   }
 }
-module.exports = Vason;
+export default Vason;
