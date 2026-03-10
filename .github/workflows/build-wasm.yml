@@ -22,10 +22,9 @@ jobs:
       - name: Copy files to docs folder
         run: |
           mkdir -p docs/vason_wasm
-          cp vason_wasm/vason_parser.js docs/vason_wasm/
-          cp vason_wasm/vason_parser.wasm docs/vason_wasm/
-          cp vason_wasm/vason.js docs/vason_wasm/
-          cp vason_wasm/vason_test.js docs/vason_wasm/
+          cp vason_parser.js docs/vason_wasm/
+          cp vason_parser.wasm docs/vason_wasm/
+          cp vason.js docs/vason_wasm/
 
       - name: Commit and Push to GitHub
         run: |
