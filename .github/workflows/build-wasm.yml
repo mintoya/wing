@@ -25,8 +25,7 @@ jobs:
 
       - name: Compile C++ to WASM
         run: |
-          # REPLACE the line below with your exact emcc command
-          emcc vason.cpp -o vason_wasm/vason_parser.js -O3 --bind
+           emcc -x c++ examples\includeAll.c -o vason_parser.js --bind -s ALLOW_MEMORY_GROWTH=1 -DnoAssertMessage -O3 -s WASM_ASYNC_COMPILATION=0
           
       - name: Copy files to docs folder
         run: |
