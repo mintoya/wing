@@ -3,15 +3,14 @@ name: Build and Deploy WASM
 on:
   push:
     branches:
-      - main  # Change to 'master' if that is your default branch
+      - master 
     paths:
-      # Only run this action if you change C++ files or the JS wrappers
       - '**.cpp'
       - '**.h'
       - 'vason_wasm/**.js'
 
 permissions:
-  contents: write  # Allows the action to commit files back to your repo
+  contents: write  # Allows to commit files 
 
 jobs:
   build-and-update-docs:
