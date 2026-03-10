@@ -1,22 +1,22 @@
 globalThis.validKeyValues = [
   { name: "NONE", value: "KEY_NONE" },
-  { name: "Layer 1", value: { _pair: ["L", 1] } },
-  { name: "Layer 2", value: { _pair: ["L", 2] } },
-  { name: "Layer 3", value: { _pair: ["L", 3] } },
-  { name: "Layer 4", value: { _pair: ["L", 4] } },
-  { name: "Layer 5", value: { _pair: ["L", 5] } },
-  { name: "Layer 6", value: { _pair: ["L", 6] } },
-  { name: "Layer 7", value: { _pair: ["L", 7] } },
-  { name: "Layer 8", value: { _pair: ["L", 8] } },
-  { name: "Layer 9", value: { _pair: ["L", 9] } },
+  { name: "Layer 1", value: { _pair: ["L", "1"] } },
+  { name: "Layer 2", value: { _pair: ["L", "2"] } },
+  { name: "Layer 3", value: { _pair: ["L", "3"] } },
+  { name: "Layer 4", value: { _pair: ["L", "4"] } },
+  { name: "Layer 5", value: { _pair: ["L", "5"] } },
+  { name: "Layer 6", value: { _pair: ["L", "6"] } },
+  { name: "Layer 7", value: { _pair: ["L", "7"] } },
+  { name: "Layer 8", value: { _pair: ["L", "8"] } },
+  { name: "Layer 9", value: { _pair: ["L", "9"] } },
   { name: "Left Ctrl", value: { _pair: ["M", "LC"] } },
-  { name: "Left Shift", value: { _pair: ["M", ls] } },
-  { name: "Left Alt", value: { _pair: ["M", la] } },
-  { name: "Left Meta", value: { _pair: ["M", lm] } },
-  { name: "Right Ctrl", value: { _pair: ["M", rc] } },
-  { name: "Right Shift", value: { _pair: ["M", rs] } },
-  { name: "Right Alt", value: { _pair: ["M", ra] } },
-  { name: "Right Meta", value: { _pair: ["M", rm] } },
+  { name: "Left Shift", value: { _pair: ["M", "ls"] } },
+  { name: "Left Alt", value: { _pair: ["M", "la"] } },
+  { name: "Left Meta", value: { _pair: ["M", "lm"] } },
+  { name: "Right Ctrl", value: { _pair: ["M", "rc"] } },
+  { name: "Right Shift", value: { _pair: ["M", "rs"] } },
+  { name: "Right Alt", value: { _pair: ["M", "ra"] } },
+  { name: "Right Meta", value: { _pair: ["M", "rm"] } },
   { name: "KEY_ERR_OVF", value: "KEY_ERR_OVF" },
   { name: "A", value: "A" },
   { name: "B", value: "KEY_B" },
@@ -191,10 +191,9 @@ globalThis.tapDanceExtension = [];
 globalThis.extendValidKeys = () => {
   tapDanceExtension = [];
   globalThis.tapDanceArr.forEach((_, idx) => {
-    tapDanceExtension.push({
-      name: "Dance " + idx,
-      value: "T( " + idx + " )",
-    });
+    tapDanceExtension.push(
+      { name: "Dance " + idx, value: { _pair: ["T", "" + idx] } },
+    );
   });
 };
 function levenshteinDistance(str1, str2) {
@@ -241,7 +240,9 @@ globalThis.fuzzySearch = (query, threshold = 10) => {
   const lowerCaseQuery = query.toLowerCase();
   for (const item of data) {
     const lowerCaseItem = item.name.toLowerCase();
-    const lowerCaseItem2 = item.value.toLowerCase();
+    const lowerCaseItem2 = item.value.toLowerCase
+      ? item.value.toLowerCase()
+      : "";
     const distance = Math.min(
       levenshteinDistance(lowerCaseQuery, lowerCaseItem),
       levenshteinDistance(lowerCaseQuery, lowerCaseItem2),

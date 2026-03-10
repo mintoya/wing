@@ -18,7 +18,7 @@ jobs:
         run: git submodule update --init --recursive
       - name: Compile C++ to WASM
         run: |
-          emcc -x c++ firmware/newmain/my-lib/examples/includeAll.c -o vason_parser.js --bind -s ALLOW_MEMORY_GROWTH=1 -DnoAssertMessage -O3 -s WASM_ASYNC_COMPILATION=0
+          emcc -x c++ firmware/newmain/my-lib/examples/includeAll.c -o vason_parser.js --bind -s ALLOW_MEMORY_GROWTH=1 -DnoAssertMessage -O3 -s WASM_ASYNC_COMPILATION=0 -s EXPORT_ES6=1 -s MODULARIZE=1
       - name: Copy files to docs folder
         run: |
           mkdir -p docs/vason_wasm
