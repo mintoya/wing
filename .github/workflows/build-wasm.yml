@@ -1,14 +1,6 @@
 name: Build and Deploy WASM
 
-on:
-  push:
-    branches:
-      - master 
-    paths:
-      - '**.cpp'
-      - '**.h'
-      - '**.js'
-
+on: workflow_dispatch
 permissions:
   contents: write  # Allows to commit files 
 
