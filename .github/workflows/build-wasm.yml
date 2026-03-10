@@ -10,14 +10,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
+        with:
+          submodules: recursive
       - name: Setup Emscripten
         uses: mymindstorm/setup-emsdk@v14
 
       - name: Compile C++ to WASM
         run: |
-           emcc -x c++ examples/includeAll.c -o vason_parser.js --bind -s ALLOW_MEMORY_GROWTH=1 -DnoAssertMessage -O3 -s WASM_ASYNC_COMPILATION=0
-          
+          emcc -x c++ firmware/newmain/my-lib/examples/includeAll.c -o vason_parser.js --bind -s ALLOW_MEMORY_GROWTH=1 -DnoAssertMessage -O3 -s WASM_ASYNC_COMPILATION=0
       - name: Copy files to docs folder
         run: |
           mkdir -p docs/vason_wasm
