@@ -11,10 +11,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: false
       - name: Setup Emscripten
         uses: mymindstorm/setup-emsdk@v14
-
+      - name: Initialize submodules manually
+        run: git submodule update --init --recursive
       - name: Compile C++ to WASM
         run: |
           emcc -x c++ firmware/newmain/my-lib/examples/includeAll.c -o vason_parser.js --bind -s ALLOW_MEMORY_GROWTH=1 -DnoAssertMessage -O3 -s WASM_ASYNC_COMPILATION=0
