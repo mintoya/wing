@@ -150,31 +150,34 @@ KeyItem M(fptr fp) {
   }
 }
 KeyItem K(fptr in) {
-  return in == fp("\\/")     ? KeyItem{KEY_SLASH /*    */, KeyItem::CHARACTER}
-         : in == fp("\\\\")  ? KeyItem{KEY_BACKSLASH /**/, KeyItem::CHARACTER}
-         : in == fp("SPC")   ? KeyItem{KEY_SPACE /*    */, KeyItem::CHARACTER}
-         : in == fp("ENT")   ? KeyItem{KEY_ENTER /*    */, KeyItem::CHARACTER}
-         : in == fp("TAB")   ? KeyItem{KEY_TAB /*      */, KeyItem::CHARACTER}
-         : in == fp("ESC")   ? KeyItem{KEY_ESC /*      */, KeyItem::CHARACTER}
-         : in == fp("BKS")   ? KeyItem{KEY_BACKSPACE /**/, KeyItem::CHARACTER}
-         : in == fp("INS")   ? KeyItem{KEY_INSERT /*   */, KeyItem::CHARACTER}
-         : in == fp("DEL")   ? KeyItem{KEY_DELETE /*   */, KeyItem::CHARACTER}
-         : in == fp("DOWN")  ? KeyItem{KEY_DOWN /*     */, KeyItem::CHARACTER}
-         : in == fp("LEFT")  ? KeyItem{KEY_LEFT /*     */, KeyItem::CHARACTER}
-         : in == fp("RIGHT") ? KeyItem{KEY_RIGHT /*    */, KeyItem::CHARACTER}
-         : in == fp("UP")    ? KeyItem{KEY_UP /*       */, KeyItem::CHARACTER}
-         : in == fp("F1")    ? KeyItem{KEY_F1 /*       */, KeyItem::CHARACTER}
-         : in == fp("F2")    ? KeyItem{KEY_F2 /*       */, KeyItem::CHARACTER}
-         : in == fp("F3")    ? KeyItem{KEY_F3 /*       */, KeyItem::CHARACTER}
-         : in == fp("F4")    ? KeyItem{KEY_F4 /*       */, KeyItem::CHARACTER}
-         : in == fp("F5")    ? KeyItem{KEY_F5 /*       */, KeyItem::CHARACTER}
-         : in == fp("F6")    ? KeyItem{KEY_F6 /*       */, KeyItem::CHARACTER}
-         : in == fp("F7")    ? KeyItem{KEY_F7 /*       */, KeyItem::CHARACTER}
-         : in == fp("F8")    ? KeyItem{KEY_F8 /*       */, KeyItem::CHARACTER}
-         : in == fp("F9")    ? KeyItem{KEY_F9 /*       */, KeyItem::CHARACTER}
-         : in == fp("F10")   ? KeyItem{KEY_F10 /*      */, KeyItem::CHARACTER}
-         : in == fp("F11")   ? KeyItem{KEY_F11 /*      */, KeyItem::CHARACTER}
-         : in == fp("F12")   ? KeyItem{KEY_F12 /*      */, KeyItem::CHARACTER}
+  return in == fp("\\/")     ? KeyItem{KEY_SLASH /*     */, KeyItem::CHARACTER}
+         : in == fp("\\\\")  ? KeyItem{KEY_BACKSLASH /* */, KeyItem::CHARACTER}
+         : in == fp("\\,")   ? KeyItem{KEY_COMMA /*     */, KeyItem::CHARACTER}
+         : in == fp("\\[")   ? KeyItem{KEY_LEFTBRACE /* */, KeyItem::CHARACTER}
+         : in == fp("\\]")   ? KeyItem{KEY_RIGHTBRACE /**/, KeyItem::CHARACTER}
+         : in == fp("SPC")   ? KeyItem{KEY_SPACE /*     */, KeyItem::CHARACTER}
+         : in == fp("ENT")   ? KeyItem{KEY_ENTER /*     */, KeyItem::CHARACTER}
+         : in == fp("TAB")   ? KeyItem{KEY_TAB /*       */, KeyItem::CHARACTER}
+         : in == fp("ESC")   ? KeyItem{KEY_ESC /*       */, KeyItem::CHARACTER}
+         : in == fp("BKS")   ? KeyItem{KEY_BACKSPACE /* */, KeyItem::CHARACTER}
+         : in == fp("INS")   ? KeyItem{KEY_INSERT /*    */, KeyItem::CHARACTER}
+         : in == fp("DEL")   ? KeyItem{KEY_DELETE /*    */, KeyItem::CHARACTER}
+         : in == fp("DOWN")  ? KeyItem{KEY_DOWN /*      */, KeyItem::CHARACTER}
+         : in == fp("LEFT")  ? KeyItem{KEY_LEFT /*      */, KeyItem::CHARACTER}
+         : in == fp("RIGHT") ? KeyItem{KEY_RIGHT /*     */, KeyItem::CHARACTER}
+         : in == fp("UP")    ? KeyItem{KEY_UP /*        */, KeyItem::CHARACTER}
+         : in == fp("F1")    ? KeyItem{KEY_F1 /*        */, KeyItem::CHARACTER}
+         : in == fp("F2")    ? KeyItem{KEY_F2 /*        */, KeyItem::CHARACTER}
+         : in == fp("F3")    ? KeyItem{KEY_F3 /*        */, KeyItem::CHARACTER}
+         : in == fp("F4")    ? KeyItem{KEY_F4 /*        */, KeyItem::CHARACTER}
+         : in == fp("F5")    ? KeyItem{KEY_F5 /*        */, KeyItem::CHARACTER}
+         : in == fp("F6")    ? KeyItem{KEY_F6 /*        */, KeyItem::CHARACTER}
+         : in == fp("F7")    ? KeyItem{KEY_F7 /*        */, KeyItem::CHARACTER}
+         : in == fp("F8")    ? KeyItem{KEY_F8 /*        */, KeyItem::CHARACTER}
+         : in == fp("F9")    ? KeyItem{KEY_F9 /*        */, KeyItem::CHARACTER}
+         : in == fp("F10")   ? KeyItem{KEY_F10 /*       */, KeyItem::CHARACTER}
+         : in == fp("F11")   ? KeyItem{KEY_F11 /*       */, KeyItem::CHARACTER}
+         : in == fp("F12")   ? KeyItem{KEY_F12 /*       */, KeyItem::CHARACTER}
          : in.width == 1     ? K(in.ptr[0])
                              : KeyItem{};
 }
@@ -350,14 +353,14 @@ static void pressKeys(bool matrix[rows][cols * 2], reportManager &rm) {
       case KeyItem::FUNCTIONCALL: // TODO
         mList_rem(activeKeys, i);
         break;
-      case KeyItem::PASSTHROUGH_:
+      default:
         break;
     }
   }
 
   for (auto i = 0; i < tapDances.len; i++)
     tapdances_check[i] ? tapDances[i].keystate.down() : tapDances[i].keystate.up();
-  std::function<void(KeyItem)> td_key_handle = [&currentLayer](KeyItem k) -> void {
+  auto td_key_handle = [&currentLayer](KeyItem k) -> void {
     switch (k.type) {
       case KeyItem::TAPDANCE: // no way
       case KeyItem::PASSTHROUGH_:
@@ -395,8 +398,17 @@ static void pressKeys(bool matrix[rows][cols * 2], reportManager &rm) {
       }
     }
   }
-  for (auto kindex : *mList_vla(activeKeys)) {
+
+  static u8 layerLocks[length] = {0};
+
+  for (auto i = 0; i < length; i++)
+    if (!matrix_get(i) && layerLocks[i])
+      layerLocks[i] = 0;
+
+  while (mList_len(activeKeys)) {
+    auto kindex = mList_pop(activeKeys);
     for (auto useLayer = currentLayer;; useLayer--) {
+      useLayer = layerLocks[kindex] ? layerLocks[kindex] - 1 : useLayer;
       KeyItem currentKey =
           useLayer < keyMapLayers.len && kindex < keyMapLayers[useLayer].len
               ? keyMapLayers[useLayer][kindex]
@@ -406,6 +418,7 @@ static void pressKeys(bool matrix[rows][cols * 2], reportManager &rm) {
       switch (currentKey.type) {
         case KeyItem::MODIFIER:
         case KeyItem::CHARACTER:
+          layerLocks[kindex] = useLayer + 1;
           mList_push(reportque, currentKey);
           break;
         case KeyItem::FUNCTIONCALL: // TODO
@@ -416,7 +429,6 @@ static void pressKeys(bool matrix[rows][cols * 2], reportManager &rm) {
       break;
     }
   }
-  mList_clear(activeKeys);
   while (mList_len(reportque))
     rm.addKey(mList_pop(reportque));
 }

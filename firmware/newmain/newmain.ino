@@ -119,9 +119,9 @@ slice(tapDance) tapDances = {};
 //
 // report senders
 //
-volatile static bool fakeSenderEnabled = true;
+volatile static bool logEnabled = true;
 void fakeSender(u8 mod, u8 *keys) {
-  if (fakeSenderEnabled)
+  if (logEnabled)
     println_(
         "{x}|{x} {x} {x} {x} {x} {x}",
         mod,
@@ -206,8 +206,7 @@ void setup() {
   Keyboard.begin();
   FSISetup();
   println_("layout parsing begin");
-  auto vs = vason_parseString( local, (slice(c8))slice_stat( defaultLayout_chars));
-  parseLayout(vs);
+  parseLayout();
   prettyPrintLayers() ;
   println_("reportmanager begin");
   rm = reportManager(sendHidReport, fakeSender);
@@ -248,7 +247,7 @@ void loop() {
   keyMap::pressKeys<countof(rowGpios), countof(colGpios)>(bounceTable::lstate, rm); // !!will modify stateTable
   rm.send();
   static auto last = millis();
-  if (millis() > last + 1000) [[unlikely]] {
+  if (millis() > last + 1000 && logEnabled) [[unlikely]] {
     last = millis();
     for (auto i = 0; i < countof(colGpios) * 2; i++) {
       for (auto j = 0; j < countof(rowGpios); j++)

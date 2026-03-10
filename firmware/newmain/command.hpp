@@ -5,7 +5,7 @@
 
 extern void prettyPrintLayers(void);
 
-extern void parseLayout(fptr, vason);
+extern void parseLayout(vason);
 namespace commands {
 typedef void (*command)(AllocatorV, vason *args);
 typedef fptr commandName;
@@ -80,10 +80,6 @@ void writefile(AllocatorV _, vason filename, vason content) {
   fclose(file);
 }
 void removeFile(AllocatorV _, vason filename) { deleteFile(filename.asString()); }
-void setlayout(AllocatorV _, vason keyboard) {
-  addLayers(keyboard["layers"]);
-  addDances(keyboard["tapDances"]);
-}
 #define sel_first(a, ...) a
 
 static kv basicMap[] =
@@ -98,9 +94,12 @@ static kv basicMap[] =
         ),
         makeCommand(
             "reset-layout",
-            [](AllocatorV a, vason *args) {
-              parseLayout();
-            }
+            [](AllocatorV a, vason *args) { parseLayout(); }
+        ),
+        makeCommand(
+            "set-layout",
+            [](AllocatorV a, vason *args) { parseLayout(args[0]); },
+            (char *[]){"layout"}
         ),
         makeCommand(
             "rm",
@@ -112,14 +111,13 @@ static kv basicMap[] =
             [](AllocatorV a, vason *args) { prettyPrintLayers(); }
         ),
         makeCommand(
+            "toggle-log",
+            [](AllocatorV a, vason *args) { logEnabled = !logEnabled; }
+        ),
+        makeCommand(
             "ls",
             [](AllocatorV a, vason *args) { listdirectories(a, args[0]); },
             (char *[]){"dirname"}
-        ),
-        makeCommand(
-            "set-layout",
-            [](AllocatorV a, vason *args) { setlayout(a, args[0]); },
-            (char *[]){"layout"}
         ),
         makeCommand(
             "open",
@@ -146,41 +144,42 @@ static void execute(vason_container vc) {
   Arena_scoped *local = arena_new_ext(stdAlloc, 512);
   auto executeSingle = [](vason v, AllocatorV allocator) {
     fptr command = v["command"].asString();
-    if (!command.width) {
-      println_("supply a command please");
-      return;
-    }
+    if (!command.width)
+      return println_("supply a command please");
 
     for (auto pair : basicMap) {
       if (pair.key == command) {
         vason *args = aCreate(allocator, vason, pair.nargs);
         defer { aFree(allocator, args); };
+        auto inargs = v["args"];
+        if (!inargs && pair.nargs > 0)
+          return println_("missing args table");
         for (auto i = 0; i < pair.nargs; i++) {
-          auto inargs = v["args"];
-          if (inargs)
-            return;
-          args[i] = inargs[((char *)pair.args[i])];
-          if (args[i]) {
-            println_("missing required arg {cstr}", pair.args[i]);
-            return;
-          }
+          args[i] = inargs[fp(pair.args[i])];
+          if (!args[i])
+            return println_("missing required arg {cstr}", pair.args[i]);
         }
         pair.value(allocator, args);
         return;
       }
     }
     print_("command not found : {}\navailable commands:\n", command);
-    for (auto pair : basicMap)
-      println_("\t{}", pair.key);
+    for (auto pair : basicMap) {
+      print_("\t{}/{", pair.key);
+      for (char *arg : *(typeof(typeof(char *(*)[pair.nargs])))(pair.args))
+        print_("{cstr},", arg);
+      println_("}");
+    }
   };
 
-  // if (v.tag() == vason_TABLE) {
-  //   Arena_scoped *single = arena_new_ext(stdAlloc, 1024);
-  //   for (int i = 0; i < v.countChildren(); i++) {
-  //     executeSingle(v[i], single);
-  //     arena_clear(single);
-  //   }
-  // } else
-  executeSingle(v, local);
+  if (v.simpleArray()) {
+    Arena_scoped *single = arena_new_ext(stdAlloc, 1024);
+    for (int i = 0; i < v.countChildren(); i++) {
+      executeSingle(v[i], single);
+      arena_clear(single);
+    }
+  } else
+    executeSingle(v, local);
 }
+
 } // namespace commands

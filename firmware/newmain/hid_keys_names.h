@@ -479,133 +479,128 @@ void removeEscapeCharacters(fptr in, fptr *out) {
     }
   }
 }
-static KeyItem kn_Match_Special(fptr name) {
-  name = fp_trim(name);
-
-  if (name.width == 0 || name.ptr == nullptr) {
-    return KeyItem(0, KeyItem::PASSTHROUGH_);
-  }
-
-  fptr out = {
-      .width = 0,
-      .ptr = (u8 *)aCreate(stdAlloc, u8, name.width),
-  };
-  defer {aFree(stdAlloc,out.ptr);};
-
-  if (fp_indexOf(name, '/') < name.width || fp_indexOf(name, '\\') < name.width) {
-    removeEscapeCharacters(name, &out);
-    name = out;
-  }
-
-  char D = name.ptr[0];
-  fptr id = fp_trim(fp_inside("()", name));
-
-  if (id.width == 0)
-    return KeyItem(0, KeyItem::PASSTHROUGH_);
-
-  switch (D) {
-    case 'M':
-      if (id == fp("lc"))
-        return KeyItem(KEY_MOD_LCTRL, KeyItem::MODIFIER);
-      if (id == fp("la"))
-        return KeyItem(KEY_MOD_LALT, KeyItem::MODIFIER);
-      if (id == fp("ls"))
-        return KeyItem(KEY_MOD_LSHIFT, KeyItem::MODIFIER);
-      if (id == fp("lm"))
-        return KeyItem(KEY_MOD_LMETA, KeyItem::MODIFIER);
-      if (id == fp("rc"))
-        return KeyItem(KEY_MOD_RCTRL, KeyItem::MODIFIER);
-      if (id == fp("ra"))
-        return KeyItem(KEY_MOD_RALT, KeyItem::MODIFIER);
-      if (id == fp("rs"))
-        return KeyItem(KEY_MOD_RSHIFT, KeyItem::MODIFIER);
-      if (id == fp("rm"))
-        return KeyItem(KEY_MOD_RMETA, KeyItem::MODIFIER);
-      break;
-
-    case 'L':
-      return KeyItem(um_asUint(id), KeyItem::LAYER);
-    case 'T':
-      return KeyItem(um_asUint(id), KeyItem::TAPDANCE);
-
-    case 'K':
-      if (id.width == 1) {
-        char c = id.ptr[0];
-        switch (c) {
-          case 'a' ... 'z':
-          case 'A' ... 'Z':
-            return KeyItem((c | 32) - 'a' + KEY_A, KeyItem::CHARACTER);
-          case '1' ... '9':
-            return KeyItem(KEY_1 + (c - '1'), KeyItem::CHARACTER);
-          case '0':
-            return KeyItem(KEY_0, KeyItem::CHARACTER);
-          case ',':
-            return KeyItem(KEY_COMMA, KeyItem::CHARACTER);
-          case '.':
-            return KeyItem(KEY_DOT, KeyItem::CHARACTER);
-          case '/':
-            return KeyItem(KEY_SLASH, KeyItem::CHARACTER);
-          case '\\':
-            return KeyItem(KEY_BACKSLASH, KeyItem::CHARACTER);
-          case '\'':
-          case '"':
-            return KeyItem(KEY_APOSTROPHE, KeyItem::CHARACTER);
-          case ';':
-            return KeyItem(KEY_SEMICOLON, KeyItem::CHARACTER);
-          case '-':
-            return KeyItem(KEY_MINUS, KeyItem::CHARACTER);
-          case '=':
-            return KeyItem(KEY_EQUAL, KeyItem::CHARACTER);
-          case '[':
-            return KeyItem(KEY_LEFTBRACE, KeyItem::CHARACTER);
-          case ']':
-            return KeyItem(KEY_RIGHTBRACE, KeyItem::CHARACTER);
-          case '`':
-            return KeyItem(KEY_GRAVE, KeyItem::CHARACTER);
-        }
-      } else {
-        if (id == fp("SPC"))
-          return KeyItem(KEY_SPACE, KeyItem::CHARACTER);
-        if (id == fp("ESC"))
-          return KeyItem(KEY_ESC, KeyItem::CHARACTER);
-        if (id == fp("ENT"))
-          return KeyItem(KEY_ENTER, KeyItem::CHARACTER);
-        if (id == fp("TAB"))
-          return KeyItem(KEY_TAB, KeyItem::CHARACTER);
-        if (id == fp("BKS"))
-          return KeyItem(KEY_BACKSPACE, KeyItem::CHARACTER);
-        if (id == fp("INS"))
-          return KeyItem(KEY_INSERT, KeyItem::CHARACTER);
-        if (id == fp("DEL"))
-          return KeyItem(KEY_DELETE, KeyItem::CHARACTER);
-        if (id == fp("UP"))
-          return KeyItem(KEY_UP, KeyItem::CHARACTER);
-        if (id == fp("DOWN"))
-          return KeyItem(KEY_DOWN, KeyItem::CHARACTER);
-        if (id == fp("LEFT"))
-          return KeyItem(KEY_LEFT, KeyItem::CHARACTER);
-        if (id == fp("RIGHT"))
-          return KeyItem(KEY_RIGHT, KeyItem::CHARACTER);
-      }
-      break;
-  }
-
-  println_("couldn't find key from special: '{}' (ID: '{}')", name, id);
-  return KeyItem();
-}
+// static KeyItem kn_Match_Special(fptr name) {
+//   name = fp_trim(name);
+//
+//   if (name.width == 0 || name.ptr == nullptr) {
+//     return KeyItem(0, KeyItem::PASSTHROUGH_);
+//   }
+//
+//   fptr out = {
+//       .width = 0,
+//       .ptr = (u8 *)aCreate(stdAlloc, u8, name.width),
+//   };
+//   defer { aFree(stdAlloc, out.ptr); };
+//
+//   if (fp_indexOf(name, '/') < name.width || fp_indexOf(name, '\\') < name.width) {
+//     removeEscapeCharacters(name, &out);
+//     name = out;
+//   }
+//
+//   char D = name.ptr[0];
+//   fptr id = fp_trim(fp_inside("()", name));
+//
+//   if (id.width == 0)
+//     return KeyItem{0, KeyItem::PASSTHROUGH_};
+//
+//   switch (D) {
+//     case 'M':
+//       if (id == fp("lc"))
+//         return KeyItem(KEY_MOD_LCTRL, KeyItem::MODIFIER);
+//       if (id == fp("la"))
+//         return KeyItem(KEY_MOD_LALT, KeyItem::MODIFIER);
+//       if (id == fp("ls"))
+//         return KeyItem(KEY_MOD_LSHIFT, KeyItem::MODIFIER);
+//       if (id == fp("lm"))
+//         return KeyItem(KEY_MOD_LMETA, KeyItem::MODIFIER);
+//       if (id == fp("rc"))
+//         return KeyItem(KEY_MOD_RCTRL, KeyItem::MODIFIER);
+//       if (id == fp("ra"))
+//         return KeyItem(KEY_MOD_RALT, KeyItem::MODIFIER);
+//       if (id == fp("rs"))
+//         return KeyItem(KEY_MOD_RSHIFT, KeyItem::MODIFIER);
+//       if (id == fp("rm"))
+//         return KeyItem(KEY_MOD_RMETA, KeyItem::MODIFIER);
+//       break;
+//
+//     case 'L':
+//       return KeyItem(um_asUint(id), KeyItem::LAYER);
+//     case 'T':
+//       return KeyItem(um_asUint(id), KeyItem::TAPDANCE);
+//
+//     case 'K':
+//       if (id.width == 1) {
+//         char c = id.ptr[0];
+//         switch (c) {
+//           case 'a' ... 'z':
+//           case 'A' ... 'Z':
+//             return KeyItem((c | 32) - 'a' + KEY_A, KeyItem::CHARACTER);
+//           case '1' ... '9':
+//             return KeyItem(KEY_1 + (c - '1'), KeyItem::CHARACTER);
+//           case '0':
+//             return KeyItem(KEY_0, KeyItem::CHARACTER);
+//           case ',':
+//             return KeyItem(KEY_COMMA, KeyItem::CHARACTER);
+//           case '.':
+//             return KeyItem(KEY_DOT, KeyItem::CHARACTER);
+//           case '/':
+//             return KeyItem(KEY_SLASH, KeyItem::CHARACTER);
+//           case '\\':
+//             return KeyItem(KEY_BACKSLASH, KeyItem::CHARACTER);
+//           case '\'':
+//           case '"':
+//             return KeyItem(KEY_APOSTROPHE, KeyItem::CHARACTER);
+//           case ';':
+//             return KeyItem(KEY_SEMICOLON, KeyItem::CHARACTER);
+//           case '-':
+//             return KeyItem(KEY_MINUS, KeyItem::CHARACTER);
+//           case '=':
+//             return KeyItem(KEY_EQUAL, KeyItem::CHARACTER);
+//           case '[':
+//             return KeyItem(KEY_LEFTBRACE, KeyItem::CHARACTER);
+//           case ']':
+//             return KeyItem(KEY_RIGHTBRACE, KeyItem::CHARACTER);
+//           case '`':
+//             return KeyItem(KEY_GRAVE, KeyItem::CHARACTER);
+//         }
+//       } else {
+//         if (id == fp("SPC"))
+//           return KeyItem(KEY_SPACE, KeyItem::CHARACTER);
+//         if (id == fp("ESC"))
+//           return KeyItem(KEY_ESC, KeyItem::CHARACTER);
+//         if (id == fp("ENT"))
+//           return KeyItem(KEY_ENTER, KeyItem::CHARACTER);
+//         if (id == fp("TAB"))
+//           return KeyItem(KEY_TAB, KeyItem::CHARACTER);
+//         if (id == fp("BKS"))
+//           return KeyItem(KEY_BACKSPACE, KeyItem::CHARACTER);
+//         if (id == fp("INS"))
+//           return KeyItem(KEY_INSERT, KeyItem::CHARACTER);
+//         if (id == fp("DEL"))
+//           return KeyItem(KEY_DELETE, KeyItem::CHARACTER);
+//         if (id == fp("UP"))
+//           return KeyItem(KEY_UP, KeyItem::CHARACTER);
+//         if (id == fp("DOWN"))
+//           return KeyItem(KEY_DOWN, KeyItem::CHARACTER);
+//         if (id == fp("LEFT"))
+//           return KeyItem(KEY_LEFT, KeyItem::CHARACTER);
+//         if (id == fp("RIGHT"))
+//           return KeyItem(KEY_RIGHT, KeyItem::CHARACTER);
+//       }
+//       break;
+//   }
+//
+//   println_("couldn't find key from special: '{}' (ID: '{}')", name, id);
+//   return KeyItem();
+// }
 
 static KeyItem kn_Match(fptr name) {
-  println_("{}", ((fptr){name.width, (u8 *)name.ptr}));
-  if (fp_indexOf(name, '(') < name.width) {
-    return kn_Match_Special(name);
-  }
   for (unsigned int i = 0; i < sizeof(keyCodes) / sizeof(u8); i++) {
     const char *keyName =
         keyNames[i];
 
-    if (fp(keyName) == name) {
+    if (fp(keyName) == name)
       return KeyItem(keyCodes[i]);
-    }
   }
 
   println_("couldn't find key:  {}", name);

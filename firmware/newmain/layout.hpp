@@ -2,6 +2,7 @@
 #include "fileSystemInterface.hpp"
 #include "hid_keys_names.h"
 #include "key.hpp"
+#include "my-lib/fptr.h"
 #include "my-lib/mylist.h"
 #include "my-lib/mytypes.h"
 #include "my-lib/shortList.h"
@@ -53,7 +54,7 @@ static c8 defaultLayout_chars[] =
         },
         {
           K:TAB,K:1,  K:2, K:3, K:4, K:5,     K:6, K:7, K:8, K:9,  K:0, K:"]",
-               ,   ,     ,    ,    , K:5,        ,    ,    ,    ,     ,   K:`,
+               ,   ,     ,    ,    ,    ,        ,    ,    ,    ,     ,   K:`,
                ,   ,     ,    ,    ,    ,        , K:-, K:=,    , K:\\, K:BKS
         },
         {
@@ -89,6 +90,10 @@ static void prettyPrintLayers() {
 KeyItem KeyItem_fromVaso(vason in) {
   switch (in.tag()) {
     case vason_STRING: {
+      fptr f = in.asString();
+      if (f.width > 4 && (fptr){4, f.ptr} == fp("KEY_")) {
+        return kn_Match(f);
+      }
       return K(in.asString());
     } break;
     case vason_PAIR: {
@@ -130,18 +135,52 @@ void addLayers(vason in) {
   keyMapLayers = (slice(slice(KeyItem)))slice_stat(*msList_vla(keyLayersList));
 }
 
-void addDances(vason in) {}
+void addDances(vason in) {
+  tapDance *danceList = msList_init(stdAlloc, tapDance);
+
+  for (usize i = 0; i < in.countChildren(); i++) {
+    tapDance currentDance = {};
+    vason danceNode = in[i];
+
+    vason taps = danceNode["taps"];
+    if (taps) {
+      for (usize j = 0; j < taps.countChildren(); j++)
+        currentDance.pressActions[j] = KeyItem_fromVaso(taps[j]);
+    }
+
+    vason holds = danceNode["holds"];
+    if (holds) {
+      for (usize j = 0; j < holds.countChildren(); j++)
+        currentDance.holdActions[j] = KeyItem_fromVaso(holds[j]);
+    }
+    msList_push(stdAlloc, danceList, currentDance);
+  }
+
+  tapDances = (slice(tapDance))slice_stat(*msList_vla(danceList));
+}
 #include "my-lib/arenaAllocator.h"
 static void parseLayout(vason parsed = {nullptr, 0}) {
+  fptr wasread = readFile(fp("/lay.kml"));
   if (parsed) {
-    vason_container c;
     My_allocator *local = arena_new_ext(stdAlloc, 1024);
     defer { arena_cleanup(local); };
 
-    parsed = parsed["keyboard"];
-    println_("{vason_container}", (vason_container)parsed)
-        addLayers(parsed["layers"]);
-    addDances(parsed["tapDances"]);
+    addLayers(parsed["keyboard"]["layers"]);
+    addDances(parsed["keyboard"]["tapdances"]);
+
+    slice(c8) text = vason_tostr(local, parsed);
+    writeFile("/lay.kml", (fptr){text.len, text.ptr});
+  } else if (wasread.ptr && wasread.width) {
+    My_allocator *local = arena_new_ext(stdAlloc, 1024);
+    defer { arena_cleanup(local); };
+    vason_container c = vason_parseString(local, (slice(c8)){wasread.width, wasread.ptr});
+    parsed = {c};
+
+    addLayers(parsed["keyboard"]["layers"]);
+    addDances(parsed["keyboard"]["tapdances"]);
+
+    slice(c8) text = vason_tostr(local, parsed);
+    writeFile("/lay.kml", (fptr){text.len, text.ptr});
   } else {
     keyMapLayers = {
         countof(default_layers),
