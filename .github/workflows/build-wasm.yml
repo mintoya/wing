@@ -1,0 +1,46 @@
+name: Build and Deploy WASM
+
+on:
+  push:
+    branches:
+      - main  # Change to 'master' if that is your default branch
+    paths:
+      # Only run this action if you change C++ files or the JS wrappers
+      - '**.cpp'
+      - '**.h'
+      - 'vason_wasm/**.js'
+
+permissions:
+  contents: write  # Allows the action to commit files back to your repo
+
+jobs:
+  build-and-update-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+
+      - name: Compile C++ to WASM
+        run: |
+          # REPLACE the line below with your exact emcc command
+          emcc vason.cpp -o vason_wasm/vason_parser.js -O3 --bind
+          
+      - name: Copy files to docs folder
+        run: |
+          mkdir -p docs/vason_wasm
+          cp vason_wasm/vason_parser.js docs/vason_wasm/
+          cp vason_wasm/vason_parser.wasm docs/vason_wasm/
+          cp vason_wasm/vason.js docs/vason_wasm/
+          cp vason_wasm/vason_test.js docs/vason_wasm/
+
+      - name: Commit and Push to GitHub
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/vason_wasm/
+          
+          # This checks if the compiled files actually changed before trying to commit
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-compile WASM and update docs" && git push)
