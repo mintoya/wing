@@ -29,16 +29,16 @@ globalThis.requestLayout = async ()=>{
 }
 globalThis.saveLayout = async ()=>{
   const keyboard = {
-    request:"setLayout",
+    request:"set-layout",
     keyboard : {
       layers : globalThis.keyValueArrs,
       tapdances : globalThis.tapDanceArr,
     }
   }
-  let msg = toKML(keyboard);
-  msg= msg.substring(1,msg.length-2); // returns with {} by default
-  
-  const response = await writeWithResponse(msg);
-  console.log(response);
+
+  let msg = globalThis.Vason.parse(JSON.stringify(keyboard)).stringify();
+  console.log(msg);
+  // const response = await writeWithResponse(msg);
+  // console.log(response);
 }
 

@@ -127,13 +127,17 @@
   </body>
 
   <script>
-    globalThis.sleep = function (ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
+    globalThis.sleep = function (ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
     globalThis.keyValueArrs = [[]];
     globalThis.tapDanceArr  = [];
   </script>
-  <script type="module" src="vason.js"></script>
+  <script type="module" src="vason.js">
+  </script>
+  <script type="module">
+    import Vason from "./vason.js"
+    globalThis.Vason = Vason;
+    console.log("global vason: ",globalThis.Vason);
+  </script>
   <script src="serial.js"></script>
   <script src="validKeyValues.js"></script>
   <script src="keySelector.js"></script>
@@ -143,4 +147,3 @@
   <script src="layer.js"></script>
   <script src="tapDance.js"></script>
 </html>
-

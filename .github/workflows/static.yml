@@ -31,14 +31,14 @@ jobs:
         run: |
           # -s SINGLE_FILE=1 bundles the WASM into the JS file
           emcc -x c++ firmware/newmain/my-lib/examples/includeAll.c \
-            -o vason_parser.js \
-            --bind \
-            -DnoAssertMessage \
-            -O3 \
-            -s ALLOW_MEMORY_GROWTH=1 \
-            -s WASM_ASYNC_COMPILATION=0 \
-            -s EXPORT_ES6=1 \
-            -s MODULARIZE=1 \
+            -o vason_parser.js                                      \
+            --bind                                                  \
+            -DnoAssertMessage                                       \
+            -O3                                                     \
+            -s ALLOW_MEMORY_GROWTH=1                                \
+            -s WASM_ASYNC_COMPILATION=0                             \
+            -s EXPORT_ES6=1                                         \
+            -s MODULARIZE=1                                         \
             -s SINGLE_FILE=1
 
       - name: Move to docs
@@ -52,6 +52,7 @@ jobs:
           path: '.'
 
   deploy:
+    if: github.actor != 'nektos/act' 
     needs: build-wasm
     environment:
       name: github-pages

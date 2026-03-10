@@ -101,3 +101,4 @@ fp-info-cache
 /firmware/left_esp/build
 /firmware/newmain/build
 /firmware/newmain/compile_commands.json
+/docs/vason_wasm
