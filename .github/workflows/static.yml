@@ -30,10 +30,11 @@ jobs:
       - name: Compile C++ to WASM
         run: |
           # -s SINGLE_FILE=1 bundles the WASM into the JS file
-          emcc -x c++ firmware/newmain/my-lib/examples/includeAll.c \
+          emcc -x c++ firmware/newmain/my-lib/vason_arr.h           \
             -o vason_parser.js                                      \
-            --bind                                                  \
             -DnoAssertMessage                                       \
+            -DVASON_PARSER_C                                        \
+            --bind                                                  \
             -O3                                                     \
             -s ALLOW_MEMORY_GROWTH=1                                \
             -s WASM_ASYNC_COMPILATION=0                             \
