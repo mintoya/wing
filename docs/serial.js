@@ -4,7 +4,7 @@ let writer;
 globalThis.writeWithResponse = async function (msg) {
   serialStream.beginRead();
   await sleep(250);
-  await portWrite("requestLength:" + msg.length + ";" + msg);
+  await portWrite(msg + "\n");
   await sleep(250);
   return serialStream.endRead();
 };

@@ -94,7 +94,14 @@ static kv basicMap[] =
         ),
         makeCommand(
             "reset-layout",
-            [](AllocatorV a, vason *args) { parseLayout(); }
+            [](AllocatorV a, vason *args) {
+              vason_container c = vason_parseString(a, (slice(c8))slice_stat(defaultLayout_chars));
+              parseLayout(c);
+            }
+        ),
+        makeCommand(
+            "get-layout",
+            [](AllocatorV a, vason *args) { fptr f = readFile("/lay.kml");println_("{}",f);free(f.ptr); }
         ),
         makeCommand(
             "set-layout",

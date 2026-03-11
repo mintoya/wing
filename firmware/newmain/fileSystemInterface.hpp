@@ -12,7 +12,6 @@ fptr readFile(const char *path) {
   if (!fsActive())
     return nullFptr;
 
-  println_("reading {cstr}", path);
   File file = FFat.open(path, "r");
   if (!file) {
     println_("file doesnt exist");
@@ -28,7 +27,6 @@ fptr readFile(const char *path) {
 
   file.readBytes((char *)buffer, size);
   file.close();
-  println_("sucessful file read");
   return (fptr){size, (u8 *)buffer};
 }
 fptr readFile(fptr path) {

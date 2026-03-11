@@ -237,7 +237,7 @@ void loop() {
     fptr input = mList_slice(readlist);
     Arena_scoped *local = arena_new_ext(stdAlloc, 1024);
     vason_container vc = vason_parseString(local, (slice(c8))mList_slice(readlist));
-    println_("{vason_container}", vc);
+    if(logEnabled)println_("{vason_container}", vc);
     commands::execute(vc);
   }
   local_stateTable_update();

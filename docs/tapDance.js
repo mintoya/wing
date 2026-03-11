@@ -9,19 +9,46 @@ const tdItemModel = `
     <button class = "remove">-</>
   </div>
 `;
+tapDanceContainerAddButton.onclick = async () => {
+  globalThis.tapDanceArr.push(
+    await globalThis.requestTapdancePopup(),
+  );
+  updateTapdancesDiv();
+};
+globalThis.saveTapdances = (index) => {
+  const uniqueLayers = new Set(globalThis.keyValueArrs);
+  uniqueLayers.forEach((layer) => {
+    layer.forEach((key, layerIndex) => {
+      if (!key || typeof key !== "object" || !key._pair) return;
+      if (key._pair[0] === "T") {
+        let i = typeof key._pair[1] === "string"
+          ? parseInt(key._pair[1], 10)
+          : key._pair[1];
+        if (i > index) {
+          layer[layerIndex] = { _pair: ["T", (i - 1).toString()] };
+        } else if (i === index) {
+          layer[layerIndex] = globalThis.validKeyValues[0].value;
+        }
+      }
+    });
+  });
+};
 globalThis.updateTapdancesDiv = function () {
   tapDancesContainer.innerHTML = "";
+  // Safety check: Make sure tapDanceArr itself exists
+  if (!globalThis.tapDanceArr) return;
   globalThis.tapDanceArr.forEach((element, index) => {
     const container = document.createElement("div");
     container.innerHTML = tdItemModel;
     const tapsDiv = container.querySelector(".taps");
     const holdsDiv = container.querySelector(".holds");
-    element.taps.forEach((tap) => {
+    // Use ?.forEach or (element.taps || []).forEach
+    element.taps?.forEach((tap) => {
       const tapButton = document.createElement("button");
       tapButton.innerText = lookupKey(tap, "name");
       tapsDiv.appendChild(tapButton);
     });
-    element.holds.forEach((hold) => {
+    element.holds?.forEach((hold) => {
       const holdButton = document.createElement("button");
       holdButton.innerText = lookupKey(hold, "name");
       holdsDiv.appendChild(holdButton);
@@ -35,29 +62,4 @@ globalThis.updateTapdancesDiv = function () {
     tapDancesContainer.appendChild(container);
   });
   globalThis.extendValidKeys();
-};
-tapDanceContainerAddButton.onclick = async () => {
-  globalThis.tapDanceArr.push(
-    await globalThis.requestTapdancePopup(),
-  );
-  updateTapdancesDiv();
-};
-globalThis.saveTapdances = (index) => {
-  const uniqueLayers = new Set(globalThis.keyValueArrs);
-
-  uniqueLayers.forEach((layer) => {
-    layer.forEach((key, layerIndex) => {
-      if (!key || typeof key !== 'object' || !key._pair) return;
-
-      if (key._pair[0] === "T") {
-        let i = typeof key._pair[1] === "string" ? parseInt(key._pair[1], 10) : key._pair[1];
-
-        if (i > index) {
-          layer[layerIndex] = { _pair: ["T", (i - 1).toString()] };
-        } else if (i === index) {
-          layer[layerIndex] = globalThis.validKeyValues[0].value;
-        }
-      }
-    });
-  });
 };
