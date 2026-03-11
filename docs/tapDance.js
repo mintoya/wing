@@ -43,15 +43,17 @@ tapDanceContainerAddButton.onclick = async () => {
   updateTapdancesDiv();
 };
 globalThis.saveTapdances = (index) => {
-  const regex = /^T\(\s*(\d+)\s*\)$/;
-  globalThis.keyValueArrs.forEach((layer) => {
-    layer.forEach((keyString, layerIndex) => {
-      const match = keyString.match(regex);
-      if (match) {
-        let i = parseInt(match[1], 10);
+  const uniqueLayers = new Set(globalThis.keyValueArrs);
+
+  uniqueLayers.forEach((layer) => {
+    layer.forEach((key, layerIndex) => {
+      if (!key || typeof key !== 'object' || !key._pair) return;
+
+      if (key._pair[0] === "T") {
+        let i = typeof key._pair[1] === "string" ? parseInt(key._pair[1], 10) : key._pair[1];
+
         if (i > index) {
-          i -= 1;
-          layer[layerIndex] = `T( ${i} )`;
+          layer[layerIndex] = { _pair: ["T", (i - 1).toString()] };
         } else if (i === index) {
           layer[layerIndex] = globalThis.validKeyValues[0].value;
         }
