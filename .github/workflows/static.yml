@@ -26,8 +26,14 @@ jobs:
 
       - name: Initialize wheels
         run: git clone https://github.com/mintoya/wheels firmware/newmain/my-lib
+
       - name: Move vason  
-        run: cp firmware/newmain/my-lib/vason_arr.h firmware/newmain/my-lib/vason_arr.cpp            
+        run: touch firmware/newmain/my-lib/vason_arr.cpp            
+
+      - name: Include other headers
+        run: |
+          echo '#include "vason_arr.h"' >> firmware/newmain/my-lib/vason_arr.cpp
+          echo '#include "wheels.h"'    >> firmware/newmain/my-lib/vason_arr.cpp
 
       - name: Compile C++ to WASM
         run: |
@@ -35,7 +41,6 @@ jobs:
           emcc firmware/newmain/my-lib/vason_arr.cpp                \
             -o vason_parser.js                                      \
             -DnoAssertMessage                                       \
-            -DVASON_PARSER_C                                        \
             --bind                                                  \
             -O3                                                     \
             -s ALLOW_MEMORY_GROWTH=1                                \
