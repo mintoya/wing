@@ -60,7 +60,7 @@ globalThis.validKeyValues = [
   { name: "TAB", value: { _pair: ["K", "TAB"] } },
   { name: "SPACE", value: { _pair: ["K", "SPC"] } },
   { name: "_ -", value: { _pair: ["K", "-"] } },
-  { name: "EQUAL", value: { _pair: ["K", "="] } },
+  { name: "+ =", value: { _pair: ["K", "="] } },
   { name: "{ [", value: { _pair: ["K", "\\["] } },
   { name: "} ]", value: { _pair: ["K", "\\]"] } },
   { name: " | \\ ", value: "KEY_BACKSLASH" },

@@ -108,7 +108,7 @@ class Vason {
     }
     if (this.data && this.data._array) {
       if (index >= this.data._array.length) {
-        for (var i = this.data._array.length - 1; i < index; i++) {
+        for (let i = this.data._array.length - 1; i < index; i++) {
           this.set(i, "");
         }
       }

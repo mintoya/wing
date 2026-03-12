@@ -1,12 +1,21 @@
 let port;
 let reader;
 let writer;
+let logDisabled = false;
 globalThis.writeWithResponse = async function (msg) {
-  serialStream.beginRead();
-  await sleep(250);
-  await portWrite(msg + "\n");
-  await sleep(250);
-  return serialStream.endRead();
+  if (!logDisabled) {
+    await portWrite("{command:disable-log}\n");
+    await sleep(100);
+    logDisabled = true;
+  }
+  try {
+    serialStream.beginRead();
+    await portWrite(msg + "\n");
+    await sleep(100);
+    return serialStream.endRead();
+  } catch (_) {
+    return null;
+  }
 };
 const serialStream = {
   data: "", //for streaming
@@ -25,8 +34,7 @@ const serialStream = {
   },
   beginRead: function () {
     if (this.reading) {
-      console.error("one read at a time for now");
-      return;
+      throw new Error("one read at a time");
     }
     this.readData = "";
     this.reading = true;
@@ -47,7 +55,7 @@ globalThis.initSerial = async function () {
     // await sleep(500);
     // await requestLayout();
   } catch (err) {
-    console.error("Serial error:", err);
+    alert("Serial error:", err);
   }
 };
 async function portWrite(msg) {
@@ -60,7 +68,7 @@ async function portWrite(msg) {
     console.log(msg);
     await writer.write(new TextEncoder().encode(msg));
   } catch (e) {
-    console.error(e);
+    alert(e + "");
   }
 }
 async function beginStream() {
@@ -80,6 +88,6 @@ async function beginStream() {
       }
     }
   } catch (err) {
-    console.error("Serial error:", err);
+    alert("Serial error:" + err);
   }
 }

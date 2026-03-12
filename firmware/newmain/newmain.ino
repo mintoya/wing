@@ -119,7 +119,7 @@ slice(tapDance) tapDances = {};
 //
 // report senders
 //
-volatile static bool logEnabled = true;
+extern volatile bool logEnabled = true;
 void fakeSender(u8 mod, u8 *keys) {
   if (logEnabled)
     println_(

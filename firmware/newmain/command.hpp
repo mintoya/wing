@@ -4,8 +4,9 @@
 #include <cstdio>
 
 extern void prettyPrintLayers(void);
-
 extern void parseLayout(vason);
+extern volatile bool logEnabled;
+
 namespace commands {
 typedef void (*command)(AllocatorV, vason *args);
 typedef fptr commandName;
@@ -44,9 +45,8 @@ void openfile(AllocatorV _, vason filename) {
   println_("<start>");
   if (file) {
     int c = 0;
-    while ((c = fgetc(file)) != EOF) {
+    while ((c = fgetc(file)) != EOF)
       print_("{c8}", (c8)c);
-    }
   }
   println_("\n<end>");
   fclose(file);
@@ -79,18 +79,21 @@ void writefile(AllocatorV _, vason filename, vason content) {
   fwrite(contentStr.ptr, 1, contentStr.width, file);
   fclose(file);
 }
-void removeFile(AllocatorV _, vason filename) { deleteFile(filename.asString()); }
-#define sel_first(a, ...) a
 
 static kv basicMap[] =
     {
 
         makeCommand(
-            "save",
-            [](AllocatorV a, vason *args) {
-              writefile(a, args[0], args[1]);
-            },
-            (char *[]){"filename", "content"}
+            "pretty-layers",
+            [](AllocatorV a, vason *args) { prettyPrintLayers(); }
+        ),
+        makeCommand(
+            "toggle-log",
+            [](AllocatorV a, vason *args) { logEnabled = !logEnabled; }
+        ),
+        makeCommand(
+            "disable-log",
+            [](AllocatorV a, vason *args) { logEnabled = false; }
         ),
         makeCommand(
             "reset-layout",
@@ -110,16 +113,13 @@ static kv basicMap[] =
         ),
         makeCommand(
             "rm",
-            [](AllocatorV a, vason *args) { removeFile(a, args[0]); },
+            [](AllocatorV a, vason *args) { deleteFile(args[0].asString()); },
             (char *[]){"filename"}
         ),
         makeCommand(
-            "pretty-layers",
-            [](AllocatorV a, vason *args) { prettyPrintLayers(); }
-        ),
-        makeCommand(
-            "toggle-log",
-            [](AllocatorV a, vason *args) { logEnabled = !logEnabled; }
+            "open",
+            [](AllocatorV a, vason *args) { openfile(a, args[0]); },
+            (char *[]){"filename"}
         ),
         makeCommand(
             "ls",
@@ -127,23 +127,14 @@ static kv basicMap[] =
             (char *[]){"dirname"}
         ),
         makeCommand(
-            "open",
-            [](AllocatorV a, vason *args) { openfile(a, args[0]); },
-            (char *[]){"filename"}
+            "save",
+            [](AllocatorV a, vason *args) {
+              writefile(a, args[0], args[1]);
+            },
+            (char *[]){"filename", "content"}
         ),
 };
 
-/*
-     example command
-     {
-        `command' : `save';
-        `args'    : {
-          `filename' : `/file.txt'
-          `text'     : `hello world'
-        };
-     }
-
- */
 #include "my-lib/arenaAllocator.h"
 
 static void execute(vason_container vc) {

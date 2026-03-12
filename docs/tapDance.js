@@ -16,22 +16,34 @@ tapDanceContainerAddButton.onclick = async () => {
   updateTapdancesDiv();
 };
 globalThis.saveTapdances = (index) => {
-  const uniqueLayers = new Set(globalThis.keyValueArrs);
-  uniqueLayers.forEach((layer) => {
-    layer.forEach((key, layerIndex) => {
-      if (!key || typeof key !== "object" || !key._pair) return;
-      if (key._pair[0] === "T") {
-        let i = typeof key._pair[1] === "string"
-          ? parseInt(key._pair[1], 10)
-          : key._pair[1];
-        if (i > index) {
-          layer[layerIndex] = { _pair: ["T", (i - 1).toString()] };
-        } else if (i === index) {
-          layer[layerIndex] = globalThis.validKeyValues[0].value;
+  globalThis.keyValueArrs.forEach((layer, i) => {
+    layer.forEach((key, j) => {
+      if (key._pair && key._pair[0] == "T") {
+        const kn = parseInt(key._pair[1], 10);
+        if (kn > index) {
+          keyValueArrs[i][j] = { _pair: ["T", "" + (kn - 1)] };
+        } else if (kn == index) {
+          keyValueArrs[i][j] = globalThis.validKeyValues[0].value;
         }
       }
     });
   });
+  // const uniqueLayers = new Set(globalThis.keyValueArrs);
+  // uniqueLayers.forEach((layer) => {
+  //   layer.forEach((key, layerIndex) => {
+  //     if (!key || typeof key !== "object" || !key._pair) return;
+  //     if (key._pair[0] === "T") {
+  //       let i = typeof key._pair[1] === "string"
+  //         ? parseInt(key._pair[1], 10)
+  //         : key._pair[1];
+  //       if (i > index) {
+  //         layer[layerIndex] = { _pair: ["T", (i - 1).toString()] };
+  //       } else if (i === index) {
+  //         layer[layerIndex] = globalThis.validKeyValues[0].value;
+  //       }
+  //     }
+  //   });
+  // });
 };
 globalThis.updateTapdancesDiv = function () {
   tapDancesContainer.innerHTML = "";
