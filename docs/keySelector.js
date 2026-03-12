@@ -20,6 +20,7 @@ globalThis.requestKeyPopup = function () {
 };
 // Close and cleanup modal
 function closeModal() {
+  if (resolveSelection) resolveSelection(globalThis.validKeyValues[0]);
   selectorModal.style.display = "none";
   resolveSelection = null;
 }
